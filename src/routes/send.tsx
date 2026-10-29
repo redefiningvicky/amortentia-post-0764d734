@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
 import { TIERS, SEASONAL, ALL_BOXES, POTIONS, MAX_BLEND, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
+import { BrewClass } from "@/components/brew-class";
+import { Button } from "@/components/ui/button";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
 import { BOX_ART } from "@/lib/art";
@@ -12,10 +14,10 @@ import { OptArt } from "@/components/opt-art";
 import { makeShareCard } from "@/lib/share-card";
 
 export const Route = createFileRoute("/send")({
-  validateSearch: (s: Record<string, unknown>): { box?: string; bundle?: string; blend?: string } => ({
-    box: typeof s.box === "string" && ALL_BOXES.some((b) => b.id === s.box) ? s.box : undefined,
-    bundle: typeof s.bundle === "string" && BUNDLES.some((b) => b.id === s.bundle) ? s.bundle : undefined,
-    blend: typeof s.blend === "string" ? [...new Set(s.blend.split(","))].filter((id) => POTIONS.some((p) => p.id === id)).slice(0, MAX_BLEND).join(",") : undefined,
+  validateSearch: (s: Record<string, unknown>): { box?: string | undefined; bundle?: string | undefined; blend?: string | undefined } => ({
+    box: typeof s["box"] === "string" && ALL_BOXES.some((b) => b.id === s["box"]) ? s["box"] : undefined,
+    bundle: typeof s["bundle"] === "string" && BUNDLES.some((b) => b.id === s["bundle"]) ? s["bundle"] : undefined,
+    blend: typeof s["blend"] === "string" ? [...new Set(s["blend"].split(","))].filter((id) => POTIONS.some((p) => p.id === id)).slice(0, MAX_BLEND).join(",") : undefined,
   }),
   head: () => ({
     meta: [
@@ -37,6 +39,8 @@ function Send() {
   const search = Route.useSearch();
   const initialBundle = BUNDLES.find((b) => b.id === search.bundle);
   const [step, setStep] = useState(0);
+  const [potionMode, setPotionMode] = useState<"cabinet" | "class">("cabinet");
+  const [brewReady, setBrewReady] = useState(false);
   useEffect(() => { window.scrollTo(0, 0); }, [step]);
   const [potions, setPotions] = useState<string[]>(search.blend ? search.blend.split(",") : []);
   const [keepsakes, setKeepsakes] = useState<string[]>(initialBundle ? [...initialBundle.pick.keepsakes] : []);
@@ -67,7 +71,7 @@ function Send() {
   const total = Math.round((-saving - waived + orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, delivery, keepsakes, antidote)) * 100) / 100;
   const outcome = blendOutcome(potions);
   const canNext =
-    (step !== 1 || potions.length > 0) &&
+    (step !== 1 || (potions.length > 0 && (potionMode === "cabinet" || brewReady))) &&
     (step !== 3 || !handwritten || handText.trim().length > 0) &&
     (step !== 5 || (to.trim() && from.trim() && /\S+@\S+\.\S+/.test(toEmail)));
 
@@ -166,7 +170,13 @@ function Send() {
           </>
         )}
 
-        {step === 1 && <PotionCabinet value={potions} onChange={setPotions} />}
+        {step === 1 && <>
+          <div className="mb-4 grid grid-cols-2 gap-2">
+            <Button variant="outline" aria-pressed={potionMode === "cabinet"} onClick={() => setPotionMode("cabinet")} className={potionMode === "cabinet" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}>Potion Cabinet</Button>
+            <Button variant="outline" aria-pressed={potionMode === "class"} onClick={() => setPotionMode("class")} className={potionMode === "class" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}>Brew My Own</Button>
+          </div>
+          {potionMode === "class" ? <BrewClass value={potions} onChange={setPotions} onReady={setBrewReady} /> : <PotionCabinet value={potions} onChange={(ids) => { setPotions(ids); setBrewReady(false); }} />}
+        </>}
 
         {step === 2 && (
           <>

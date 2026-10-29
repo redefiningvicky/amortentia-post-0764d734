@@ -32,3 +32,4 @@
 - [x] Reset guest order memory so previously sent boxes no longer show on Me
 - [ ] Wall "Choose a Photo" should offer sample photos, not open the device's file picker
 - [ ] Brew My Own: 11 specific raw ingredient types (flowers, leaves, roots...) x 10 flavors = 110 total
+- [ ] Wall confessions: every post must be a full-sentence quote (some are empty or just "love")

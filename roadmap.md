@@ -1,5 +1,5 @@
 # Roadmap
-- [x] Accounts (email + Google), profile with name, photo, history
+- [ ] Accounts — removed for now at user request; re-add before launch
 - [x] Anonymous "Secret Admirer Wall" with swoons + trending potions
 - [x] Save orders to backend
 - [x] Add-ons: handwritten personalized note, greeting cards

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -25,14 +25,12 @@ type Order = { id: string; tier: string; recipient_name: string; total: number; 
 
 function Me() {
   const qc = useQueryClient();
-  const navigate = useNavigate();
   const [tab, setTab] = useState<"sent" | "received">("sent");
   const [name, setName] = useState<string | null>(null);
   const { data } = useQuery({
     queryKey: ["me"],
     queryFn: async () => {
-      const { data: u } = await supabase.auth.getUser();
-      const user = u.user;
+      const user = null as null | { id: string; email?: string };
       if (!user) {
         const p = guest.profile();
         return { user: null, displayName: p.display_name, email: "Guest — saved on this device", avatar: p.avatar,
@@ -74,12 +72,6 @@ function Me() {
     qc.invalidateQueries({ queryKey: ["me"] });
     toast.success("Name saved");
   }
-  async function signOut() {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/", replace: true });
-  }
 
   return (
     <Shell>
@@ -119,9 +111,6 @@ function Me() {
           </div>
         ))}
       </div>
-      {data.user
-        ? <button onClick={signOut} className="mt-8 text-muted-foreground underline">Sign out</button>
-        : <Link to="/auth" search={{ redirect: "/me" }} className="mt-8 text-center text-gold underline">Optional: sign in to save across devices</Link>}
     </Shell>
   );
 }

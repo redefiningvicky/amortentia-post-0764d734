@@ -27,7 +27,7 @@ function Wall() {
   const [sort, setSort] = useState<"hot" | "new">("hot");
   const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    setUserId(null);
   }, []);
 
   const { data: rows = [] } = useQuery({

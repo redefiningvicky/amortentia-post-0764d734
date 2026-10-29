@@ -17,6 +17,8 @@ export const Route = createFileRoute("/me")({
       { name: "description", content: "Your profile, boxes sent, and boxes received." },
       { property: "og:title", content: "My Love Letters" },
       { property: "og:description", content: "Your enchanted chocolate history." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Me,

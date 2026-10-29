@@ -49,12 +49,17 @@ describe("upgrades", () => {
 import { SEASONAL, desperationLevel } from "@/lib/catalog";
 describe("seasonal boxes & desperation meter", () => {
   it("seasonal box prices count in total", () => expect(orderTotal("valentine", "flutter", "hour")).toBe(55.99));
-  it("has four seasonal boxes", () => expect(SEASONAL).toHaveLength(4));
+  it("offers Christmas", () => expect(SEASONAL.some((box) => box.id === "christmas")).toBe(true));
+  it("offers New Year", () => expect(SEASONAL.some((box) => box.id === "newyear")).toBe(true));
+  it("offers Thanksgiving", () => expect(SEASONAL.some((box) => box.id === "thanksgiving")).toBe(true));
+  it("offers birthday gifts", () => expect(SEASONAL.some((box) => box.id === "birthday")).toBe(true));
+  it.each(["christmas", "newyear"])("%s proposed box price counts in totals", (id) => expect(orderTotal(id, "flutter", "hour")).toBe(55.99));
+  it.each(["thanksgiving", "birthday"])("%s proposed box price counts in totals", (id) => expect(orderTotal(id, "flutter", "hour")).toBe(45.99));
   it("cheap order is Mildly Hopeful", () => expect(desperationLevel(40).label).toBe("Mildly Hopeful"));
   it("$400 order is Unhinged Romantic", () => expect(desperationLevel(400).label).toBe("Unhinged Romantic"));
 });
 
-import { bundleSavings, expressWaiver } from "@/lib/catalog";
+import { BUNDLES, bundlePrice, bundleSavings, expressWaiver } from "@/lib/catalog";
 describe("bundles & free express", () => {
   it("Full Love Spell saves $10 when all its items are picked", () =>
     expect(bundleSavings({ handwritten: true, card: "singing", keepsakes: ["vial", "plush"], packaging: "velvet" })).toBe(10));
@@ -62,6 +67,14 @@ describe("bundles & free express", () => {
     expect(bundleSavings({ handwritten: true, card: "singing", keepsakes: ["vial"], packaging: "velvet" })).toBe(0));
   it("express is free over $99", () => expect(expressWaiver("express", 99)).toBe(14.99));
   it("express is paid under $99", () => expect(expressWaiver("express", 98.99)).toBe(0));
+  it.each([["wish", 4, 20.96], ["romance", 7, 44.96], ["serenade", 12, 62.96]])("%s bundle applies its proposed saving", (id, saving, price) => {
+    const bundle = BUNDLES.find((b) => b.id === id);
+    expect(bundle).toBeDefined();
+    if (!bundle) throw new Error("Missing bundle");
+    expect(bundleSavings({ handwritten: bundle.pick.handwritten, card: bundle.pick.card, keepsakes: [...bundle.pick.keepsakes], packaging: bundle.pick.packaging ?? "kraft" })).toBe(saving);
+    expect(bundlePrice(bundle)).toBe(price);
+  });
+  it("overlapping savings do not stack", () => expect(bundleSavings({ handwritten: true, card: "vintage", keepsakes: ["seal", "vial", "bouquet"], packaging: "velvet" })).toBe(7));
 });
 
 import { ICON_NAMES } from "@/components/icons";

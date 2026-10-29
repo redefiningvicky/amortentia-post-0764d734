@@ -20,7 +20,7 @@ export const Route = createFileRoute("/send")({
   component: Send,
 });
 
-const TITLES = ["Choose Your Box", "The Potion Cabinet", "Brew Your Longing", "Make It Unforgettable", "Wrap & Deliver", "Confess Your Heart", "Seal & Send"];
+const TITLES = ["How Many Bites Will It Take?", "The Potion Cabinet (No Judgment)", "How Desperate Are We Talking?", "Make It Impossible Not to Eat", "Wrap & Deliver", "Spill Your Heart", "Seal Your Fate"];
 
 function Send() {
   const navigate = useNavigate();
@@ -72,7 +72,7 @@ function Send() {
       if (share) ({ error } = await supabase.from("confessions").insert({ tier, strength, aroma, note: note.trim().slice(0, 200) || null, potions, outcome: outcome?.name ?? null }));
     }
     setBusy(false);
-    if (error) { toast.error("The owl dropped your box. Try again."); return; }
+    if (error) { toast.error("The owl tripped over its own feelings. Try again."); return; }
     setSent(true);
   }
 
@@ -82,9 +82,15 @@ function Send() {
         <div className="my-auto text-center">
           <div className="sparkle text-7xl">🦉</div>
           <h2 className="mt-6 font-display text-3xl text-gold-gradient">Owl Dispatched</h2>
-          <p className="mt-3 text-lg text-muted-foreground">Your enchanted box is flying to {to}. Soon, they'll only have eyes for you.</p>
+          <p className="mt-3 text-lg text-muted-foreground">Your box is flying to {to}. All they have to do is take one bite… Fingers crossed, tissues ready. 🍫</p>
           <div className="mt-8 space-y-3">
-            <GoldButton onClick={() => navigate({ to: "/wall" })}>See the Wall</GoldButton>
+            <GoldButton onClick={async () => {
+              const text = `I just sent ${to} a box of love-potion chocolates. Now we wait for the first bite. 🍫💘`;
+              const url = window.location.origin;
+              if (navigator.share) { try { await navigator.share({ title: "Amortentia Post", text, url }); } catch { /* cancelled */ } }
+              else { await navigator.clipboard.writeText(`${text} ${url}`); toast.success("Copied! Go make your friends laugh-cry."); }
+            }}>Tell My Friends (They'll Lose It) 📣</GoldButton>
+            <button onClick={() => navigate({ to: "/wall" })} className="h-12 w-full rounded-full border text-gold">See Other Desperate Souls</button>
             <button onClick={() => navigate({ to: "/me" })} className="h-12 w-full rounded-full border text-gold">My Letters</button>
           </div>
         </div>
@@ -123,14 +129,14 @@ function Send() {
 
         {step === 2 && (
           <>
-            <Label>How badly do you want them?</Label>
+            <Label>How badly do you want them? (Be honest. We can tell.)</Label>
             {STRENGTHS.map((s) => (
               <Option key={s.id} active={strength === s.id} onClick={() => setStrength(s.id)}>
                 <div className="flex-1"><div className="text-lg font-semibold">{s.name}</div><p className="text-muted-foreground">{s.desc}</p></div>
                 <span className="text-gold">+${s.price}</span>
               </Option>
             ))}
-            <Label>The scent that reminds them of you</Label>
+            <Label>A scent so tempting they open the box immediately</Label>
             <div className="flex flex-wrap gap-2">
               {AROMAS.map((a) => <Chip key={a.id} active={aroma === a.id} onClick={() => setAroma(a.id)}>{a.name}</Chip>)}
             </div>
@@ -155,7 +161,7 @@ function Send() {
             </Option>
             {handwritten && (
               <textarea value={handText} onChange={(e) => setHandText(e.target.value)} maxLength={300} rows={4}
-                placeholder="What should we write, in your words?"
+                placeholder="Say it. The thing you rehearse in the shower."
                 className="w-full resize-none rounded-2xl bg-parchment p-4 font-serif text-lg italic text-parchment-foreground outline-none" />
             )}
             <Label>Pick a card (optional)</Label>
@@ -166,8 +172,8 @@ function Send() {
                 <span className="text-gold">+${c.price}</span>
               </Option>
             ))}
-            <Label>Keepsakes they'll treasure</Label>
-            <p className="text-sm text-muted-foreground">Little reminders of you, long after the last chocolate.</p>
+            <Label>Extra bait for the first bite</Label>
+            <p className="text-sm text-muted-foreground">Every bite counts. Make the box too beautiful to ignore.</p>
             {KEEPSAKES.map((k) => (
               <Option key={k.id} active={keepsakes.includes(k.id)} onClick={() => toggleKeepsake(k.id)}>
                 <div className="text-3xl">{k.emoji}</div>
@@ -180,7 +186,7 @@ function Send() {
 
         {step === 4 && (
           <>
-            <Label>The moment they first see it</Label>
+            <Label>The moment they first see it (and hopefully eat it)</Label>
             {PACKAGING.map((k) => (
               <Option key={k.id} active={packaging === k.id} onClick={() => setPackaging(k.id)}>
                 <div className="text-3xl">{k.emoji}</div>
@@ -188,7 +194,7 @@ function Send() {
                 <span className="text-gold">{k.price ? `+$${k.price}` : "Included"}</span>
               </Option>
             ))}
-            <Label>How soon should they be yours?</Label>
+            <Label>How long can you possibly wait?</Label>
             {DELIVERY.map((k) => (
               <Option key={k.id} active={delivery === k.id} onClick={() => setDelivery(k.id)}>
                 <div className="text-3xl">{k.emoji}</div>
@@ -205,7 +211,7 @@ function Send() {
             <Field label="Their email" value={toEmail} onChange={setToEmail} placeholder="So the owl can find them" type="email" />
             <Field label="From your admirer" value={from} onChange={setFrom} placeholder="Your name" />
             <label className="mt-2 block text-sm font-semibold uppercase tracking-wider">Your confession</label>
-            <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} rows={4} placeholder="Every time I see you…"
+            <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} rows={4} placeholder="I've liked you since… (please eat the chocolates)"
               className="mt-1 w-full resize-none rounded-lg border border-parchment-foreground/30 bg-transparent p-3 text-lg italic outline-none" />
             <p className="text-right text-xs opacity-60">{note.length}/200</p>
           </div>
@@ -251,7 +257,7 @@ function Send() {
           <span>Total</span><span className="text-lg font-bold text-gold">${total.toFixed(2)}</span>
         </div>
         <GoldButton disabled={!canNext || busy} onClick={() => (step === 6 ? submit() : setStep(step + 1))}>
-          {step === 6 ? (busy ? "Summoning owl…" : "Send by Owl 🦉") : "Continue"}
+          {step === 6 ? (busy ? "Summoning owl…" : "Seal My Fate 🦉") : "Continue"}
         </GoldButton>
       </div>
     </Shell>

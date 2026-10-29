@@ -9,3 +9,4 @@
 - [x] Five chocolate box options
 - [x] Max upsells: 5-potion blends, keepsakes, packaging, delivery, Antidote Guarantee
 - [ ] Real payments — not started
+- [ ] Streamline base + add-on options for customers (fewer choices, bundles, strong honest sales tactics)

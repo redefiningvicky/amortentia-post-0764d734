@@ -25,6 +25,7 @@ const name = (list: { id: string; name: string }[], id: string) => list.find((x)
 
 function Wall() {
   const qc = useQueryClient();
+  const [tab, setTab] = useState<"confessions" | "album">("confessions");
   const [sort, setSort] = useState<"hot" | "new">("hot");
   const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ESSENCES, MAX_BLEND, POTIONS, blendOutcome, type EssenceId } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 import { bottleStyle } from "@/lib/art";
+import { Icon } from "@/components/icons";
 
 const RARITY_LABEL = { common: "", rare: "Rare", legendary: "Legendary" } as const;
 
@@ -33,9 +34,10 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
             <div className="mt-2 flex flex-wrap gap-1.5">
               {value.map((id) => {
                 const p = POTIONS.find((x) => x.id === id)!;
+                const e = ESSENCES.find((x) => x.id === p.essence)!;
                 return (
-                  <button key={id} onClick={() => toggle(id)} className="rounded-full bg-secondary px-3 py-1 text-sm" aria-label={`Remove ${p.name}`}>
-                    {ESSENCES.find((e) => e.id === p.essence)!.icon} {p.name} ✕
+                  <button key={id} onClick={() => toggle(id)} className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-sm" aria-label={`Remove ${p.name}`}>
+                    <Icon name={e.icon} className="h-4 w-4" /> {p.name} <Icon name="x" className="h-3.5 w-3.5 opacity-70" />
                   </button>
                 );
               })}
@@ -47,10 +49,10 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search 100 potions…" aria-label="Search potions"
         className="h-12 w-full rounded-xl border bg-card px-4 outline-none focus:border-gold" />
       <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
-        {[{ id: "all" as const, name: "All", icon: "✦" }, ...ESSENCES].map((e) => (
+        {[{ id: "all" as const, name: "All", icon: "sparkles" }, ...ESSENCES].map((e) => (
           <button key={e.id} onClick={() => setEssence(e.id)}
-            className={cn("min-h-10 shrink-0 rounded-full border px-3 text-sm", essence === e.id ? "bg-gold-gradient text-primary-foreground" : "bg-card")}>
-            {e.icon} {e.name}
+            className={cn("flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm", essence === e.id ? "bg-gold-gradient text-primary-foreground" : "bg-card")}>
+            <Icon name={e.icon} className="h-4 w-4" /> {e.name}
           </button>
         ))}
       </div>

@@ -63,3 +63,20 @@ describe("bundles & free express", () => {
   it("express is free over $99", () => expect(expressWaiver("express", 99)).toBe(14.99));
   it("express is paid under $99", () => expect(expressWaiver("express", 98.99)).toBe(0));
 });
+
+import { ICON_NAMES } from "@/components/icons";
+import { ESSENCES, CARDS, PACKAGING, DELIVERY, KEEPSAKES, DESPERATION } from "@/lib/catalog";
+describe("drawn artwork", () => {
+  const used = [
+    ...ESSENCES.map((e) => e.icon),
+    ...CARDS.map((c) => c.icon),
+    ...PACKAGING.map((p) => p.icon),
+    ...DELIVERY.map((d) => d.icon),
+    ...KEEPSAKES.map((k) => k.icon),
+    ...DESPERATION.map((d) => d.icon),
+  ];
+  it("every catalog icon name has artwork", () => {
+    expect(used.length).toBe(27);
+    for (const name of used) expect(ICON_NAMES).toContain(name);
+  });
+});

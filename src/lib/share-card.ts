@@ -24,7 +24,18 @@ export async function makeShareCard(o: { total: number; to: string; blend: strin
     return yy;
   };
   line("AMORTENTIA POST", 140, 44, GOLD);
-  g.font = "200px serif"; g.fillText("🍫💘", 540, 400);
+  // Gold emblem drawn in vector: a heart cradling a chocolate bar.
+  g.save();
+  g.translate(540, 320);
+  g.scale(11, 11);
+  g.translate(-12, -12);
+  g.strokeStyle = GOLD;
+  g.lineWidth = 0.9;
+  g.lineJoin = "round";
+  g.lineCap = "round";
+  g.stroke(new Path2D("M12 20.5S4 15.6 4 10.2A4.7 4.7 0 0 1 12 7.3a4.7 4.7 0 0 1 8 2.9c0 5.4-8 10.3-8 10.3Z"));
+  g.stroke(new Path2D("M8 11.5h8M12 8.8v6.5"));
+  g.restore();
   let y = line(`I just spent $${o.total.toFixed(2)}`, 560, 76, GOLD, "bold Georgia, serif");
   y = line(`on love-potion chocolates to make ${o.to || "them"} love me.`, y + 90, 56);
   y = line("Pray for me.", y + 100, 64, GOLD, "italic Georgia, serif");

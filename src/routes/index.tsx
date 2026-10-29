@@ -2,11 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import hero from "@/assets/hero.jpg";
 import { useEffect, useState } from "react";
 import { GoldButton, Shell } from "@/components/kit";
+import { Icon } from "@/components/icons";
 
 const TOUR = [
-  { emoji: "😍", title: "You love them.", body: "Like, a lot. Embarrassingly a lot." },
-  { emoji: "🙈", title: "They don't notice you.", body: "Rude. Truly unacceptable." },
-  { emoji: "🍫", title: "Make them eat a chocolate.", body: "We brew love potions into every bite. One bite and they finally see you.*" },
+  { icon: "heart", title: "You love them.", body: "Like, a lot. Embarrassingly a lot." },
+  { icon: "eye-off", title: "They don't notice you.", body: "Rude. Truly unacceptable." },
+  { icon: "choco", title: "Make them eat a chocolate.", body: "We brew love potions into every bite. One bite and they finally see you.*" },
 ];
 
 export const Route = createFileRoute("/")({
@@ -31,14 +32,14 @@ function Home() {
       <Shell>
         <button onClick={done} className="ml-auto min-h-11 px-2 text-sm text-muted-foreground">Skip</button>
         <div key={tour} className="reveal my-auto text-center">
-          <div className="text-8xl">{t.emoji}</div>
+          <Icon name={t.icon} className="mx-auto h-28 w-28 text-gold" />
           <h1 className="mt-6 font-display text-3xl text-gold-gradient">{t.title}</h1>
           <p className="mx-auto mt-3 max-w-xs text-lg text-muted-foreground">{t.body}</p>
         </div>
         <div className="mb-4 flex justify-center gap-2">
           {TOUR.map((_, i) => <span key={i} className={i === tour ? "h-2 w-6 rounded-full bg-gold-gradient" : "h-2 w-2 rounded-full bg-muted"} />)}
         </div>
-        <GoldButton onClick={() => (tour < TOUR.length - 1 ? setTour(tour + 1) : done())}>{tour < TOUR.length - 1 ? "Next" : "Show Me the Potions ✦"}</GoldButton>
+        <GoldButton onClick={() => (tour < TOUR.length - 1 ? setTour(tour + 1) : done())}>{tour < TOUR.length - 1 ? "Next" : "Show Me the Potions"}</GoldButton>
       </Shell>
     );
   }
@@ -52,12 +53,12 @@ function Home() {
         <p className="text-sm uppercase tracking-[0.3em] text-gold">Est. by Owl Post · Results not guaranteed*</p>
         <h1 className="mt-2 font-display text-4xl leading-tight text-gold-gradient">Amortentia Post</h1>
         <p className="mx-auto mt-3 max-w-xs text-lg text-muted-foreground">
-          For everyone who's ever loved someone who didn't notice. Send potion-brewed chocolates. All they have to do is eat one. 🍫
+          For everyone who's ever loved someone who didn't notice. Send potion-brewed chocolates. All they have to do is eat one.
         </p>
       </div>
       <div className="mt-8 space-y-3">
         <Link to="/send" className="flex h-14 w-full items-center justify-center rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow">
-          Make Them Eat One ✦
+          Make Them Eat One
         </Link>
         <Link to="/wall" className="flex h-12 w-full items-center justify-center rounded-full border text-gold">
           Read the Secret Admirer Wall

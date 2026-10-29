@@ -14,3 +14,4 @@
 - No sign-in during build (removed on request): everyone is a guest; orders/profile/swoons live in localStorage (src/lib/guest.ts) and confessions are inserted directly. Signed-in DB code paths remain dormant for later.
 - Pitch deck lives at /pitch as an in-app slide route (1920x1080 scaled, ?slide=N); product slide uses real app screenshots in src/assets/shot-*.jpg — retake them when screens change.
 - Gift tracking: public `gifts` table holds only open/bite timestamps (no names); recipient names travel in the private gift link URL; read/write only via mark_gift/gift_status RPCs.
+- All iconography is hand-drawn SVG line art in src/components/icons.tsx — never emoji or pictograph characters, in the app or the deck. Catalog entries reference icons by name string, so src/test/catalog.test.ts asserts every catalog icon name resolves to artwork; add the assertion for any new icon list.

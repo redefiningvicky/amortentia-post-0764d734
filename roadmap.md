@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Must-have interactive cauldron class: choose paid ingredients, stir and bottle custom blend, carry into Send
 - [ ] Add chosen Discover and Spellbook pages and navigation; carry choices into Send
 - [ ] Generated, labeled sample album memories; working standalone confession form
 - [ ] Full-line results disclaimer; cauldron art; wrapped potion filters

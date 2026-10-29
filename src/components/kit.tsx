@@ -3,8 +3,23 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { OptArt } from "@/components/opt-art";
 
+function MagicDust() {
+  return (
+    <div className="magic-dust" aria-hidden="true">
+      {Array.from({ length: 16 }).map((_, i) => (
+        <span key={i} style={{ left: `${(i * 61) % 97}%`, animationDuration: `${9 + ((i * 7) % 9)}s`, animationDelay: `${(i * 1.7) % 12}s` }} />
+      ))}
+    </div>
+  );
+}
+
 export function Shell({ children }: { children: ReactNode }) {
-  return <div className="mx-auto flex min-h-screen max-w-md flex-col px-5 pb-24 pt-6">{children}</div>;
+  return (
+    <div className="relative mx-auto flex min-h-screen max-w-md flex-col px-5 pb-24 pt-6">
+      <MagicDust />
+      <div className="relative z-10 flex flex-1 flex-col">{children}</div>
+    </div>
+  );
 }
 
 export function GoldButton({ className, ...p }: React.ButtonHTMLAttributes<HTMLButtonElement>) {

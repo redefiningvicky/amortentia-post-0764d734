@@ -92,6 +92,53 @@
   50% { opacity: 1; transform: scale(1.1); }
 }
 
+/* Gentle levitation, like a charmed object */
+@utility float-soft {
+  animation: float-soft 5s ease-in-out infinite;
+}
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Candlelight flicker on glowing surfaces */
+@utility candle-flicker {
+  animation: candle-flicker 3.2s ease-in-out infinite;
+}
+@keyframes candle-flicker {
+  0%, 100% { box-shadow: var(--shadow-glow); }
+  45% { box-shadow: 0 10px 52px -8px oklch(0.78 0.13 80 / 75%); }
+  60% { box-shadow: 0 10px 34px -10px oklch(0.78 0.13 80 / 45%); }
+}
+
+/* Drifting golden dust, like the Great Hall's floating embers */
+.magic-dust {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.magic-dust span {
+  position: absolute;
+  bottom: -12px;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, oklch(0.85 0.14 85) 0%, transparent 70%);
+  opacity: 0;
+  animation: dust-rise linear infinite;
+}
+@keyframes dust-rise {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  12% { opacity: 0.9; }
+  85% { opacity: 0.5; }
+  100% { transform: translateY(-108vh) translateX(24px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .magic-dust { display: none; }
+}
+
 @utility reveal {
   opacity: 0;
   animation: reveal 0.6s ease-out forwards;

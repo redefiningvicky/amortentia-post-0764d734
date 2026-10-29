@@ -47,7 +47,7 @@ function Gift() {
             <p className="text-sm uppercase tracking-[0.3em] text-gold">Special Owl Delivery</p>
             <h1 className="mt-2 font-display text-3xl text-gold-gradient">{s.to ? `${s.to}, someone has a crush on you` : "Someone has a crush on you"}</h1>
             <button onClick={() => setStage("open")} aria-label="Open the box" className="mx-auto mt-8 block w-64 animate-bounce">
-              <img src={BOX_ART[box.id]} alt={box.name} width={816} height={816} className="rounded-3xl shadow-glow" />
+              <img src={BOX_ART[box.id]} alt={box.name} width={816} height={816} className="float-soft candle-flicker rounded-3xl" />
             </button>
             <p className="mt-4 flex items-center justify-center gap-2 text-muted-foreground">Tap the box to open it <OptArt id="wand" alt="" className="h-8 w-8 rounded-full object-cover" /></p>
           </>

@@ -32,7 +32,7 @@ function Home() {
       <Shell>
         <button onClick={done} className="ml-auto min-h-11 px-2 text-sm text-muted-foreground">Skip</button>
         <div key={tour} className="reveal my-auto text-center">
-          <OptArt id={t.icon} alt="" className="sparkle mx-auto h-32 w-32 rounded-3xl border border-gold object-cover shadow-glow" />
+          <OptArt id={t.icon} alt="" className="float-soft candle-flicker mx-auto h-32 w-32 rounded-3xl border border-gold object-cover" />
           <h1 className="mt-6 font-display text-3xl text-gold-gradient">{t.title}</h1>
           <p className="mx-auto mt-3 max-w-xs text-lg text-muted-foreground">{t.body}</p>
         </div>

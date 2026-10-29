@@ -38,3 +38,10 @@ describe("potion cabinet", () => {
   });
   it("potion prices add up", () => expect(potionsTotal(["ember-1", "ember-7", "ember-10"])).toBe(22.97));
 });
+
+import { upgradesTotal, MAX_BLEND } from "@/lib/catalog";
+describe("upgrades", () => {
+  it("blend allows up to 5 potions", () => expect(MAX_BLEND).toBe(5));
+  it("default kraft + standard owl is free", () => expect(upgradesTotal("kraft", "owl", [], false)).toBe(0));
+  it("music box + courier + locket + antidote", () => expect(upgradesTotal("music", "courier", ["locket"], true)).toBe(142.96));
+});

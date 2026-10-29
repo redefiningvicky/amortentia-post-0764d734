@@ -95,13 +95,15 @@ describe("drawn artwork", () => {
 });
 
 describe("raw brewing ingredients", () => {
-  it("has 44 ingredients, 4 per essence, and none are free", () => {
-    expect(INGREDIENTS.length).toBe(44);
+  it("has 110 ingredients, 10 per essence across 11 kinds, and none are free", () => {
+    expect(INGREDIENTS.length).toBe(110);
     for (const ing of INGREDIENTS) expect(ing.price).toBeGreaterThan(0);
+    for (const e of ESSENCES) expect(INGREDIENTS.filter((i) => i.essence === e.id)).toHaveLength(10);
+    expect(new Set(INGREDIENTS.map((i) => INGREDIENT_KIND[i.essence])).size).toBe(11);
   });
   it("prices raw blends through the same totals as potions", () => {
     expect(potionsTotal(["raw-ember-1", "raw-rose-1"])).toBe(3.98);
-    expect(potionsTotal(["raw-ember-4"])).toBe(4.99);
+    expect(potionsTotal(["raw-ember-10"])).toBe(4.99);
     expect(potionsTotal(["ember-1", "raw-thorn-1"])).toBe(5.98);
   });
   it("raw ingredients blend into the same essence outcomes", () => {

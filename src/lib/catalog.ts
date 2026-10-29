@@ -112,6 +112,33 @@ export const POTIONS: Potion[] = ESSENCES.flatMap((e) =>
   }),
 );
 
+// Raw brewing ingredients for the cauldron class: 4 per essence, priced by rarity (never free).
+export const INGREDIENT_PRICE: Record<Rarity, number> = { common: 1.99, rare: 2.99, legendary: 4.99 };
+const RAW: Record<EssenceId, string[]> = {
+  ember: ["Crushed Dragon Pepper", "Phoenix Ash", "Chili-Chocolate Nibs", "Heartfire Ember"],
+  rose: ["Crushed Rose Petals", "Blushing Dewdrops", "Velvet Petal Sugar", "First-Blush Bud"],
+  moon: ["Moonlight Dew", "Midnight Jasmine", "Silver Tears", "Owl-Feather Down"],
+  star: ["Stardust Sugar", "Comet-Tail Shavings", "Wishbone Honey", "Constellation Salt"],
+  thorn: ["Nightshade Berries", "Bramble Thorns", "Raven Feathers", "Obsession Orchid"],
+  honey: ["Wildflower Honey", "Amber Resin", "Beeswax Hearts", "Golden Treacle"],
+  mist: ["Bottled Fogwater", "Whisper-Smoke", "Veiled Vanilla", "Sphinx Smoke"],
+  storm: ["Lightning-Struck Cocoa", "Thunder Salt", "Lionheart Ginger", "Storm-Charged Sugar"],
+  bloom: ["Giggling Peony", "Butterfly Pollen", "Sunshine Zest", "Popping Fizz Crystals"],
+  frost: ["First-Snow Crystals", "Thawed Icicle Water", "Winter Mint", "Hoarfrost Sugar"],
+};
+export type Ingredient = { id: string; name: string; essence: EssenceId; rarity: Rarity; price: number };
+export const INGREDIENTS: Ingredient[] = ESSENCES.flatMap((e) =>
+  RAW[e.id].map((name, i) => {
+    const rarity: Rarity = i === 3 ? "legendary" : i === 2 ? "rare" : "common";
+    return { id: `raw-${e.id}-${i + 1}`, name, essence: e.id, rarity, price: INGREDIENT_PRICE[rarity] };
+  }),
+);
+
+// Anything that can go into the cauldron: a bottled potion or a raw ingredient.
+export function findBrewable(id: string): Potion | Ingredient | undefined {
+  return POTIONS.find((p) => p.id === id) ?? INGREDIENTS.find((p) => p.id === id);
+}
+
 const SYNERGIES: Record<string, { name: string; desc: string }> = {
   "ember+thorn": { name: "Wildfire Obsession", desc: "A love that burns and won't let go. They will chase you." },
   "moon+star": { name: "Written in the Stars", desc: "They'll believe the universe sent you, and wait for you forever." },
@@ -131,7 +158,7 @@ const SYNERGIES: Record<string, { name: string; desc: string }> = {
 export type Outcome = { name: string; desc: string; essences: EssenceId[] };
 
 export function blendOutcome(potionIds: string[]): Outcome | null {
-  const ps = potionIds.map((id) => POTIONS.find((p) => p.id === id)).filter((p): p is Potion => !!p);
+  const ps = potionIds.map(findBrewable).filter((p): p is Potion | Ingredient => !!p);
   if (!ps.length) return null;
   const order = ESSENCES.map((e) => e.id) as EssenceId[];
   const counts = new Map<EssenceId, number>();
@@ -152,7 +179,7 @@ export function blendOutcome(potionIds: string[]): Outcome | null {
 }
 
 export function potionsTotal(potionIds: string[]) {
-  return Math.round(potionIds.reduce((s, id) => s + (POTIONS.find((p) => p.id === id)?.price ?? 0), 0) * 100) / 100;
+  return Math.round(potionIds.reduce((s, id) => s + (findBrewable(id)?.price ?? 0), 0) * 100) / 100;
 }
 
 function cap(s: string) {

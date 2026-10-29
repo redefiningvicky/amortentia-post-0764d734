@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PotionCabinet } from "@/components/potion-cabinet";
+import { IngredientShelf } from "@/components/ingredient-shelf";
 import { GoldButton } from "@/components/kit";
 import { Button } from "@/components/ui/button";
 import { OptArt } from "@/components/opt-art";
@@ -14,7 +14,8 @@ export function BrewClass({ value, onChange, onReady }: { value: string[]; onCha
   return <section className="space-y-4" aria-label="Cauldron class">
     <p className="text-sm uppercase text-gold">Cauldron Class · {stage === "ingredients" ? "1 · Choose" : stage === "stir" ? "2 · Stir" : "3 · Bottle"}</p>
     {stage === "ingredients" ? <>
-      <PotionCabinet value={value} onChange={(ids) => { onChange(ids); setStirs(0); onReady?.(false); }} />
+      <p className="text-sm text-muted-foreground">Start from scratch: pick raw ingredients and brew a potion no one has ever tasted.</p>
+      <IngredientShelf value={value} onChange={(ids) => { onChange(ids); setStirs(0); onReady?.(false); }} />
       <GoldButton disabled={!value.length} onClick={() => { setStage("stir"); window.scrollTo(0, 0); }}>Into the Cauldron · +${potionsTotal(value).toFixed(2)}</GoldButton>
     </> : <>
       <div key={stirs} className={`relative overflow-hidden rounded-lg ${stage === "stir" && stirs > 0 ? "brew-stir" : ""}`}>

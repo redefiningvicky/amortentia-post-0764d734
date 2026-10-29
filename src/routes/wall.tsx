@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { POTIONS, STRENGTHS, ALL_BOXES } from "@/lib/catalog";
+import { findBrewable, STRENGTHS, ALL_BOXES } from "@/lib/catalog";
 import { GoldButton, Shell } from "@/components/kit";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -21,6 +21,10 @@ import sampleBiteHand from "@/assets/album-bite-hand.jpg";
 import sampleDoorstep from "@/assets/album-doorstep.jpg";
 import sampleTrain from "@/assets/album-train.jpg";
 import sampleRain from "@/assets/album-rain.jpg";
+import sampleFireplace from "@/assets/album-fireplace.jpg";
+import sampleBeach from "@/assets/album-beach.jpg";
+import sampleMorning from "@/assets/album-morning.jpg";
+import sampleRooftop from "@/assets/album-rooftop.jpg";
 import { OptArt } from "@/components/opt-art";
 import { cn } from "@/lib/utils";
 
@@ -40,18 +44,22 @@ export const Route = createFileRoute("/wall")({
 
 const name = (list: { id: string; name: string }[], id: string) => list.find((x) => x.id === id)?.name ?? id;
 const SAMPLE_PHOTOS = [
-  { id: "sample-unboxing", url: sampleUnboxing, caption: "The group chat demanded an unboxing." },
-  { id: "sample-bite", url: sampleBite, caption: "One bite. Seventeen drafts of a text." },
-  { id: "sample-keepsake", url: sampleKeepsake, caption: "Kept the box. Still checking my phone." },
-  { id: "sample-friends", url: sampleFriends, caption: "She made us promise not to tell. We told everyone." },
-  { id: "sample-desk", url: sampleDesk, caption: "Started a reply letter. Ate three instead." },
-  { id: "sample-dinner", url: sampleDinner, caption: "He set two places. I only brought the chocolates." },
-  { id: "sample-park", url: samplePark, caption: "Left on our bench. I sat there anyway." },
-  { id: "sample-bed", url: sampleBed, caption: "Breakfast in bed, courtesy of a secret admirer." },
-  { id: "sample-bite-hand", url: sampleBiteHand, caption: "The exact moment the potion kicked in." },
-  { id: "sample-doorstep", url: sampleDoorstep, caption: "The owl barely made it out alive." },
-  { id: "sample-train", url: sampleTrain, caption: "Nine-hour train ride. The box lasted nine minutes." },
-  { id: "sample-rain", url: sampleRain, caption: "Raining outside. Warm in here. Suspiciously warm." },
+  { id: "sample-unboxing", url: sampleUnboxing, label: "The Unboxing", caption: "The group chat demanded an unboxing." },
+  { id: "sample-bite", url: sampleBite, label: "The First Bite", caption: "One bite. Seventeen drafts of a text." },
+  { id: "sample-keepsake", url: sampleKeepsake, label: "The Keepsake", caption: "Kept the box. Still checking my phone." },
+  { id: "sample-friends", url: sampleFriends, label: "The Spilled Secret", caption: "She made us promise not to tell. We told everyone." },
+  { id: "sample-desk", url: sampleDesk, label: "The Unsent Reply", caption: "Started a reply letter. Ate three instead." },
+  { id: "sample-dinner", url: sampleDinner, label: "The Third Wheel", caption: "He set two places. I only brought the chocolates." },
+  { id: "sample-park", url: samplePark, label: "The Bench", caption: "Left on our bench. I sat there anyway." },
+  { id: "sample-bed", url: sampleBed, label: "The Morning After", caption: "Breakfast in bed, courtesy of a secret admirer." },
+  { id: "sample-bite-hand", url: sampleBiteHand, label: "The Moment It Hit", caption: "The exact moment the potion kicked in." },
+  { id: "sample-doorstep", url: sampleDoorstep, label: "The Delivery", caption: "The owl barely made it out alive." },
+  { id: "sample-train", url: sampleTrain, label: "The Long Ride", caption: "Nine-hour train ride. The box lasted nine minutes." },
+  { id: "sample-rain", url: sampleRain, label: "The Rainy Day", caption: "Raining outside. Warm in here. Suspiciously warm." },
+  { id: "sample-fireplace", url: sampleFireplace, label: "The Last Chocolate", caption: "We both reached for the last one. Now we're engaged." },
+  { id: "sample-beach", url: sampleBeach, label: "The Sunset Picnic", caption: "Sunset, a rose, and twelve tiny life choices." },
+  { id: "sample-morning", url: sampleMorning, label: "The Missing Bite", caption: "Found a bite missing before breakfast. I know who did it." },
+  { id: "sample-rooftop", url: sampleRooftop, label: "The Midnight Toast", caption: "New Year's toast. The chocolates were the real fireworks." },
 ];
 
 function Wall() {
@@ -210,7 +218,7 @@ function Wall() {
             {SAMPLE_PHOTOS.map((photo) => (
               <figure key={photo.id} className="overflow-hidden rounded-lg border bg-card">
                 <img src={photo.url} alt={photo.caption} width={816} height={816} loading="lazy" className="aspect-square w-full object-cover" />
-                <figcaption className="p-3 text-sm text-muted-foreground"><span className="mb-1 block text-xs uppercase text-gold">Generated sample</span>{photo.caption}</figcaption>
+                <figcaption className="p-3 text-sm text-muted-foreground"><span className="mb-1 block text-xs uppercase text-gold">Sample story · {photo.label}</span>{photo.caption}</figcaption>
               </figure>
             ))}
           </div>
@@ -243,7 +251,7 @@ function Wall() {
           <article key={r.id} className="rounded-2xl bg-parchment p-4 text-parchment-foreground">
             {r.outcome && <p className="font-display text-lg text-accent">{r.outcome}</p>}
             <p className="text-xs uppercase tracking-wider opacity-70">
-              {r.tier === "confession" ? "A secret, straight from the heart" : <>{name(ALL_BOXES, r.tier)} · {r.potions.length ? r.potions.map((id) => POTIONS.find((p) => p.id === id)?.name).filter(Boolean).join(" + ") : name(STRENGTHS, r.strength)}</>}
+              {r.tier === "confession" ? "A secret, straight from the heart" : <>{name(ALL_BOXES, r.tier)} · {r.potions.length ? r.potions.map((id) => findBrewable(id)?.name).filter(Boolean).join(" + ") : name(STRENGTHS, r.strength)}</>}
             </p>
             {r.note && <p className="mt-2 text-lg italic">"{r.note}"</p>}
             <div className="mt-3 flex items-center justify-between">

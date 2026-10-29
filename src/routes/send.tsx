@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { TIERS, SEASONAL, ALL_BOXES, POTIONS, MAX_BLEND, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
+import { TIERS, SEASONAL, ALL_BOXES, MAX_BLEND, findBrewable, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { BrewClass } from "@/components/brew-class";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/send")({
   validateSearch: (s: Record<string, unknown>): { box?: string | undefined; bundle?: string | undefined; blend?: string | undefined } => ({
     box: typeof s["box"] === "string" && ALL_BOXES.some((b) => b.id === s["box"]) ? s["box"] : undefined,
     bundle: typeof s["bundle"] === "string" && BUNDLES.some((b) => b.id === s["bundle"]) ? s["bundle"] : undefined,
-    blend: typeof s["blend"] === "string" ? [...new Set(s["blend"].split(","))].filter((id) => POTIONS.some((p) => p.id === id)).slice(0, MAX_BLEND).join(",") : undefined,
+    blend: typeof s["blend"] === "string" ? [...new Set(s["blend"].split(","))].filter((id) => findBrewable(id)).slice(0, MAX_BLEND).join(",") : undefined,
   }),
   head: () => ({
     meta: [

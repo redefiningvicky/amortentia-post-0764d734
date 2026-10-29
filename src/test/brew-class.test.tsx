@@ -17,4 +17,12 @@ describe("cauldron class", () => {
     fireEvent.click(screen.getByRole("button", { name: "Change Ingredients" }));
     expect(onReady).toHaveBeenLastCalledWith(false);
   });
+
+  it("brews from raw ingredients, not bottled potions", () => {
+    const onChange = vi.fn();
+    render(<BrewClass value={[]} onChange={onChange} onReady={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: /Dragon's Blush/ })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /Crushed Dragon Pepper/ }));
+    expect(onChange).toHaveBeenLastCalledWith(["raw-ember-1"]);
+  });
 });

@@ -44,22 +44,22 @@ export const Route = createFileRoute("/wall")({
 
 const name = (list: { id: string; name: string }[], id: string) => list.find((x) => x.id === id)?.name ?? id;
 const SAMPLE_PHOTOS = [
-  { id: "sample-unboxing", url: sampleUnboxing, caption: "The group chat demanded an unboxing." },
-  { id: "sample-bite", url: sampleBite, caption: "One bite. Seventeen drafts of a text." },
-  { id: "sample-keepsake", url: sampleKeepsake, caption: "Kept the box. Still checking my phone." },
-  { id: "sample-friends", url: sampleFriends, caption: "She made us promise not to tell. We told everyone." },
-  { id: "sample-desk", url: sampleDesk, caption: "Started a reply letter. Ate three instead." },
-  { id: "sample-dinner", url: sampleDinner, caption: "He set two places. I only brought the chocolates." },
-  { id: "sample-park", url: samplePark, caption: "Left on our bench. I sat there anyway." },
-  { id: "sample-bed", url: sampleBed, caption: "Breakfast in bed, courtesy of a secret admirer." },
-  { id: "sample-bite-hand", url: sampleBiteHand, caption: "The exact moment the potion kicked in." },
-  { id: "sample-doorstep", url: sampleDoorstep, caption: "The owl barely made it out alive." },
-  { id: "sample-train", url: sampleTrain, caption: "Nine-hour train ride. The box lasted nine minutes." },
-  { id: "sample-rain", url: sampleRain, caption: "Raining outside. Warm in here. Suspiciously warm." },
-  { id: "sample-fireplace", url: sampleFireplace, caption: "We both reached for the last one. Now we're engaged." },
-  { id: "sample-beach", url: sampleBeach, caption: "Sunset, a rose, and twelve tiny life choices." },
-  { id: "sample-morning", url: sampleMorning, caption: "Found a bite missing before breakfast. I know who did it." },
-  { id: "sample-rooftop", url: sampleRooftop, caption: "New Year's toast. The chocolates were the real fireworks." },
+  { id: "sample-unboxing", url: sampleUnboxing, label: "The Unboxing", caption: "The group chat demanded an unboxing." },
+  { id: "sample-bite", url: sampleBite, label: "The First Bite", caption: "One bite. Seventeen drafts of a text." },
+  { id: "sample-keepsake", url: sampleKeepsake, label: "The Keepsake", caption: "Kept the box. Still checking my phone." },
+  { id: "sample-friends", url: sampleFriends, label: "The Spilled Secret", caption: "She made us promise not to tell. We told everyone." },
+  { id: "sample-desk", url: sampleDesk, label: "The Unsent Reply", caption: "Started a reply letter. Ate three instead." },
+  { id: "sample-dinner", url: sampleDinner, label: "The Third Wheel", caption: "He set two places. I only brought the chocolates." },
+  { id: "sample-park", url: samplePark, label: "The Bench", caption: "Left on our bench. I sat there anyway." },
+  { id: "sample-bed", url: sampleBed, label: "The Morning After", caption: "Breakfast in bed, courtesy of a secret admirer." },
+  { id: "sample-bite-hand", url: sampleBiteHand, label: "The Moment It Hit", caption: "The exact moment the potion kicked in." },
+  { id: "sample-doorstep", url: sampleDoorstep, label: "The Delivery", caption: "The owl barely made it out alive." },
+  { id: "sample-train", url: sampleTrain, label: "The Long Ride", caption: "Nine-hour train ride. The box lasted nine minutes." },
+  { id: "sample-rain", url: sampleRain, label: "The Rainy Day", caption: "Raining outside. Warm in here. Suspiciously warm." },
+  { id: "sample-fireplace", url: sampleFireplace, label: "The Last Chocolate", caption: "We both reached for the last one. Now we're engaged." },
+  { id: "sample-beach", url: sampleBeach, label: "The Sunset Picnic", caption: "Sunset, a rose, and twelve tiny life choices." },
+  { id: "sample-morning", url: sampleMorning, label: "The Missing Bite", caption: "Found a bite missing before breakfast. I know who did it." },
+  { id: "sample-rooftop", url: sampleRooftop, label: "The Midnight Toast", caption: "New Year's toast. The chocolates were the real fireworks." },
 ];
 
 function Wall() {
@@ -218,7 +218,7 @@ function Wall() {
             {SAMPLE_PHOTOS.map((photo) => (
               <figure key={photo.id} className="overflow-hidden rounded-lg border bg-card">
                 <img src={photo.url} alt={photo.caption} width={816} height={816} loading="lazy" className="aspect-square w-full object-cover" />
-                <figcaption className="p-3 text-sm text-muted-foreground"><span className="mb-1 block text-xs uppercase text-gold">Generated sample</span>{photo.caption}</figcaption>
+                <figcaption className="p-3 text-sm text-muted-foreground"><span className="mb-1 block text-xs uppercase text-gold">Sample story · {photo.label}</span>{photo.caption}</figcaption>
               </figure>
             ))}
           </div>

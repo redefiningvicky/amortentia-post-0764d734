@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Prices and add-ons live only in src/lib/catalog.ts with tests in src/test/catalog.test.ts — one source of truth for totals.
+- Community wall reads a separate public `confessions` table filled by a DB trigger from orders, so sender/recipient identity never becomes public.

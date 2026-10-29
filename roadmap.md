@@ -7,4 +7,5 @@
 - [ ] Text notifications — skipped for now
 - [x] 100 potions with blend outcomes
 - [x] Five chocolate box options
+- [x] Max upsells: 5-potion blends, keepsakes, packaging, delivery, Antidote Guarantee
 - [ ] Real payments — not started

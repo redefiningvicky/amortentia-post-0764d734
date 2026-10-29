@@ -53,6 +53,27 @@ export type Database = {
         }
         Relationships: []
       }
+      gifts: {
+        Row: {
+          bitten_at: string | null
+          created_at: string
+          id: string
+          opened_at: string | null
+        }
+        Insert: {
+          bitten_at?: string | null
+          created_at?: string
+          id?: string
+          opened_at?: string | null
+        }
+        Update: {
+          bitten_at?: string | null
+          created_at?: string
+          id?: string
+          opened_at?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           addons: string[]
@@ -165,7 +186,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      gift_status: {
+        Args: { _ids: string[] }
+        Returns: {
+          bitten_at: string
+          id: string
+          opened_at: string
+        }[]
+      }
+      mark_gift: { Args: { _event: string; _id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

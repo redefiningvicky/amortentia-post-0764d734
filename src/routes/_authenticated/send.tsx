@@ -38,7 +38,7 @@ function Send() {
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const durId = DURATIONS.find((d) => d.id === duration) ? duration : DURATIONS[0].id;
+  const durId = DURATIONS.find((d) => d.id === duration) ? duration : DURATIONS[0]!.id;
   const total = Math.round((orderTotal(tier, strength, durId) + addonsTotal(handwritten, card)) * 100) / 100;
   const canNext =
     (step !== 2 || !handwritten || handText.trim().length > 0) &&
@@ -54,7 +54,7 @@ function Send() {
       handwritten_text: handwritten ? handText.trim() : null,
     });
     setBusy(false);
-    if (error) return toast.error("The owl dropped your box. Try again.");
+    if (error) { toast.error("The owl dropped your box. Try again."); return; }
     setSent(true);
   }
 

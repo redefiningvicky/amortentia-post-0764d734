@@ -8,7 +8,7 @@ import { GoldButton, Shell } from "@/components/kit";
 const safe = (r: unknown) => (typeof r === "string" && r.startsWith("/") && !r.startsWith("//") ? r : "/send");
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>) => ({ redirect: safe(s.redirect) }),
+  validateSearch: (s: Record<string, unknown>) => ({ redirect: safe(s['redirect']) }),
   head: () => ({
     meta: [
       { title: "Sign in — Amortentia Post" },
@@ -46,7 +46,7 @@ function AuthPage() {
         ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + redirect, data: { display_name: name } } })
         : await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (res.error) return toast.error(res.error.message);
+    if (res.error) { toast.error(res.error.message); return; }
     if (mode === "up" && !res.data.session) setCheckEmail(true);
   }
 

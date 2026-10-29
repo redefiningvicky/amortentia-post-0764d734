@@ -50,12 +50,12 @@ function Wall() {
   })).sort((a, b) => b.score - a.score);
 
   async function swoon(id: string) {
-    if (!userId) return toast("Sign in to swoon 💘");
+    if (!userId) { toast("Sign in to swoon 💘"); return; }
     const has = mine.includes(id);
     const { error } = has
       ? await supabase.from("swoons").delete().eq("confession_id", id).eq("user_id", userId)
       : await supabase.from("swoons").insert({ confession_id: id });
-    if (error) return toast.error("Couldn't swoon, try again");
+    if (error) { toast.error("Couldn't swoon, try again"); return; }
     qc.invalidateQueries({ queryKey: ["confessions"] });
     qc.invalidateQueries({ queryKey: ["my-swoons"] });
   }

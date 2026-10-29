@@ -47,7 +47,7 @@ function Me() {
   async function upload(f: File) {
     const path = `${data!.user.id}/avatar-${Date.now()}`;
     const { error } = await supabase.storage.from("avatars").upload(path, f, { upsert: true });
-    if (error) return toast.error("Upload failed");
+    if (error) { toast.error("Upload failed"); return; }
     await supabase.from("profiles").update({ avatar_url: path }).eq("id", data!.user.id);
     qc.invalidateQueries({ queryKey: ["me"] });
   }

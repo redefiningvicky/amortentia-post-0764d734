@@ -21,6 +21,10 @@ import sampleBiteHand from "@/assets/album-bite-hand.jpg";
 import sampleDoorstep from "@/assets/album-doorstep.jpg";
 import sampleTrain from "@/assets/album-train.jpg";
 import sampleRain from "@/assets/album-rain.jpg";
+import sampleFireplace from "@/assets/album-fireplace.jpg";
+import sampleBeach from "@/assets/album-beach.jpg";
+import sampleMorning from "@/assets/album-morning.jpg";
+import sampleRooftop from "@/assets/album-rooftop.jpg";
 import { OptArt } from "@/components/opt-art";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +56,10 @@ const SAMPLE_PHOTOS = [
   { id: "sample-doorstep", url: sampleDoorstep, caption: "The owl barely made it out alive." },
   { id: "sample-train", url: sampleTrain, caption: "Nine-hour train ride. The box lasted nine minutes." },
   { id: "sample-rain", url: sampleRain, caption: "Raining outside. Warm in here. Suspiciously warm." },
+  { id: "sample-fireplace", url: sampleFireplace, caption: "We both reached for the last one. Now we're engaged." },
+  { id: "sample-beach", url: sampleBeach, caption: "Sunset, a rose, and twelve tiny life choices." },
+  { id: "sample-morning", url: sampleMorning, caption: "Found a bite missing before breakfast. I know who did it." },
+  { id: "sample-rooftop", url: sampleRooftop, caption: "New Year's toast. The chocolates were the real fireworks." },
 ];
 
 function Wall() {

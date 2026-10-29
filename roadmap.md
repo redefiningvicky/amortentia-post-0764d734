@@ -1,4 +1,9 @@
 # Roadmap
+- [ ] Offer navigation button suggestions; wait for user choice before adding
+- [ ] Generated, labeled sample album memories; working standalone confession form
+- [ ] Full-line results disclaimer; cauldron art; wrapped potion filters
+- [ ] Christmas, New Year, Thanksgiving and birthday boxes; more spell bundles
+- [ ] Verify new choices and refresh pitch screenshots; retain seven sending steps
 - [ ] Accounts — removed for now at user request; re-add before launch
 - [x] Anonymous "Secret Admirer Wall" with swoons + trending potions
 - [x] Save orders to backend

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { TIERS, SEASONAL, ALL_BOXES, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
+import { TIERS, SEASONAL, ALL_BOXES, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,8 @@ export const Route = createFileRoute("/send")({
       { name: "description", content: "Choose a box, brew your potion, add a handwritten note, and send it by owl." },
       { property: "og:title", content: "Send Enchanted Chocolates" },
       { property: "og:description", content: "Brew the potion that makes them yours." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Send,
@@ -136,20 +138,20 @@ function Send() {
       <main className="mt-6 flex-1 space-y-3 pb-36">
         {step === 0 && (
           <>
-            {[{ title: "", list: TIERS }, { title: "Limited Editions · while the heartbreak lasts", list: SEASONAL }].map((g) => (
+            {[{ title: "", list: TIERS }, { title: "Occasion Editions · a spell for every celebration", list: SEASONAL }].map((g) => (
               <div key={g.title} className="space-y-3">
                 {g.title && <Label>{g.title}</Label>}
                 {g.list.map((t) => (
                   <Option key={t.id} active={tier === t.id} onClick={() => setTier(t.id)}>
-                    <img src={BOX_ART[t.id]} alt={t.name} loading="lazy" width={816} height={816} className="h-20 w-20 shrink-0 rounded-xl object-cover" />
-                    <div className="flex-1">
+                    <img src={BOX_ART[t.id]} alt={t.name} loading="lazy" width={816} height={816} className="h-16 w-16 shrink-0 rounded-xl object-cover" />
+                    <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-lg font-semibold leading-tight">{t.name}</span>
                         {t.id === "true" && <span className="rounded-full bg-gold-gradient px-2 py-0.5 text-xs font-bold text-primary-foreground">Popular</span>}
                       </div>
                       <p className="text-sm text-muted-foreground">{t.pieces} chocolates · {t.blurb}</p>
                     </div>
-                    <span className="text-lg font-bold text-gold">${t.price}</span>
+                    <span className="shrink-0 text-base font-bold text-gold">${t.price}</span>
                   </Option>
                 ))}
               </div>
@@ -161,9 +163,11 @@ function Send() {
 
         {step === 2 && (
           <>
+            <OptArt id="cauldron" alt="A chocolatier stirring molten chocolate beside love potion bottles" className="aspect-[4/3] w-full rounded-lg border border-gold object-cover" />
             <Label>How badly do you want them? (Be honest. We can tell.)</Label>
             {STRENGTHS.map((s) => (
               <Option key={s.id} active={strength === s.id} onClick={() => setStrength(s.id)}>
+                <OptArt id={s.id} alt={s.name} className="h-14 w-14 shrink-0 rounded-lg object-cover" />
                 <div className="flex-1"><div className="text-lg font-semibold">{s.name}</div><p className="text-muted-foreground">{s.desc}</p></div>
                 <span className="text-gold">+${s.price}</span>
               </Option>
@@ -172,6 +176,7 @@ function Send() {
             <div className="grid grid-cols-3 gap-2">
               {DURATIONS.map((d) => (
                 <Chip key={d.id} active={durId === d.id} onClick={() => setDuration(d.id)}>
+                  <OptArt id={d.id} alt="" className="mx-auto mb-2 h-12 w-12 rounded-lg object-cover" />
                   {d.name}<br /><span className="text-xs opacity-75">+${d.price}</span>
                 </Chip>
               ))}
@@ -183,19 +188,19 @@ function Send() {
           <>
             <Label>Spell bundles · one tap, real savings</Label>
             {BUNDLES.map((b) => {
-              const on = saving >= b.save && bundleSavings({ handwritten, card, keepsakes, packaging }) === b.save;
+              const on = bundleMatches(b, { handwritten, card, keepsakes, packaging });
               return (
                 <Option key={b.id} active={on} onClick={() => {
                   setHandwritten(b.pick.handwritten); setCard(b.pick.card);
                   setKeepsakes((k) => Array.from(new Set([...k, ...b.pick.keepsakes])));
-                  if ("packaging" in b.pick) setPackaging(b.pick.packaging);
+                  if (b.pick.packaging) setPackaging(b.pick.packaging);
                 }}>
                   <OptArt id={b.id} alt={b.name} />
-                  <div className="flex-1"><div className="text-lg font-semibold">{b.name}</div><p className="text-sm text-muted-foreground">{b.desc}</p></div>
-                  <span className="rounded-full bg-gold-gradient px-2 py-0.5 text-xs font-bold text-primary-foreground">Save ${b.save}</span>
+                  <div className="min-w-0 flex-1"><div className="text-lg font-semibold">{b.name}</div><p className="text-sm text-muted-foreground">{b.desc}</p><p className="mt-1 text-sm text-gold">Extras ${bundlePrice(b).toFixed(2)} · save ${b.save}</p></div>
                 </Option>
               );
             })}
+            <p className="text-xs text-muted-foreground">Box and potions priced separately. Your best matching bundle saving applies; savings don’t stack.</p>
             <Label>Or pick your own · handwritten by our scribes</Label>
             <Option active={handwritten} onClick={() => setHandwritten(!handwritten)}>
               <OptArt id="quill" alt={HANDWRITTEN.name} />

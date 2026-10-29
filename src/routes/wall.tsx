@@ -1,11 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
 import { POTIONS, STRENGTHS, ALL_BOXES } from "@/lib/catalog";
-import { Shell } from "@/components/kit";
+import { GoldButton, Shell } from "@/components/kit";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { CONFESSION_LIMIT, validConfession } from "@/lib/confession";
+import sampleUnboxing from "@/assets/album-unboxing.jpg";
+import sampleBite from "@/assets/album-firstbite.jpg";
+import sampleKeepsake from "@/assets/album-keepsake.jpg";
 import { OptArt } from "@/components/opt-art";
 import { cn } from "@/lib/utils";
 
@@ -16,17 +22,37 @@ export const Route = createFileRoute("/wall")({
       { name: "description", content: "Anonymous love confessions sent with enchanted chocolates. Swoon for your favorites." },
       { property: "og:title", content: "Secret Admirer Wall" },
       { property: "og:description", content: "Read anonymous confessions and see the most-craved love potions." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Wall,
 });
 
 const name = (list: { id: string; name: string }[], id: string) => list.find((x) => x.id === id)?.name ?? id;
+const SAMPLE_PHOTOS = [
+  { id: "sample-unboxing", url: sampleUnboxing, caption: "The group chat demanded an unboxing." },
+  { id: "sample-bite", url: sampleBite, caption: "One bite. Seventeen drafts of a text." },
+  { id: "sample-keepsake", url: sampleKeepsake, caption: "Kept the box. Still checking my phone." },
+];
 
 function Wall() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<"confessions" | "album">("confessions");
   const [sort, setSort] = useState<"hot" | "new">("hot");
+  const [confessing, setConfessing] = useState(false);
+  const [confession, setConfession] = useState("");
+  const [posting, setPosting] = useState(false);
+  async function postConfession() {
+    if (!validConfession(confession) || posting) return;
+    setPosting(true);
+    const { error } = await supabase.from("confessions").insert({ tier: "confession", strength: "swoon", aroma: "rose", note: confession.trim(), potions: [] });
+    setPosting(false);
+    if (error) { toast.error("Your secret is still safe. Please try again."); return; }
+    setConfession(""); setConfessing(false); setSort("new");
+    await qc.invalidateQueries({ queryKey: ["confessions"] });
+    toast.success("Your confession is on the Wall. Names stay secret.");
+  }
   const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {
     setUserId(null);
@@ -105,6 +131,23 @@ function Wall() {
     <Shell>
       <h1 className="font-display text-3xl text-gold-gradient">Secret Admirer Wall</h1>
       <p className="mt-1 text-muted-foreground">Anonymous confessions, sealed in chocolate.</p>
+      <Dialog open={confessing} onOpenChange={setConfessing}>
+        <DialogContent className="max-w-sm border-gold bg-background">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl text-gold">Confess Your Own</DialogTitle>
+            <DialogDescription>No names. No purchase. Just the thing you wish you could say.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(event) => { event.preventDefault(); void postConfession(); }}>
+            <label htmlFor="wall-confession" className="text-sm text-gold">Your secret confession</label>
+            <textarea id="wall-confession" value={confession} onChange={(event) => setConfession(event.target.value)} maxLength={CONFESSION_LIMIT} rows={5}
+              placeholder="I rehearsed saying hello. Then I said ‘you too’ when you said happy birthday."
+              className="mt-2 w-full resize-none rounded-lg bg-parchment p-4 text-lg italic text-parchment-foreground" />
+            <p className="mt-1 text-right text-xs text-muted-foreground">{confession.length}/{CONFESSION_LIMIT}</p>
+            <p className="my-3 text-sm text-muted-foreground">Posted publicly as A Secret Admirer. Leave out names, contact details, and anything that identifies someone.</p>
+            <GoldButton type="submit" disabled={!validConfession(confession) || posting}>{posting ? "Sealing your secret…" : "Post My Confession"}</GoldButton>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <div className="mt-4 flex gap-2">
         {([["confessions", "Confessions"], ["album", "Photo Album"]] as const).map(([t, l]) => (
@@ -126,7 +169,7 @@ function Wall() {
             </button>
           </div>
           {photos.length === 0 ? (
-            <p className="mt-6 text-center text-muted-foreground">No memories yet. Yours could be the first.</p>
+            <p className="mt-6 text-center text-muted-foreground">Your real memory could be the first.</p>
           ) : (
             <div className="mt-4 grid grid-cols-2 gap-3">
               {photos.map((p) => (
@@ -143,10 +186,21 @@ function Wall() {
               ))}
             </div>
           )}
+          <h2 className="mt-6 font-display text-lg text-gold">A little album inspiration</h2>
+          <p className="mt-1 text-xs text-muted-foreground">AI-generated sample memories — not real customer submissions.</p>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            {SAMPLE_PHOTOS.map((photo) => (
+              <figure key={photo.id} className="overflow-hidden rounded-lg border bg-card">
+                <img src={photo.url} alt={photo.caption} width={816} height={816} loading="lazy" className="aspect-square w-full object-cover" />
+                <figcaption className="p-3 text-sm text-muted-foreground"><span className="mb-1 block text-xs uppercase text-gold">Generated sample</span>{photo.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
         </section>
       )}
 
       {tab === "confessions" && (<>
+      <GoldButton className="mt-5" onClick={() => setConfessing(true)}>Confess Your Own</GoldButton>
       <section className="mt-5 rounded-2xl border bg-card p-4">
         <p className="text-sm uppercase tracking-[0.2em] text-gold">Most craved blends</p>
         {trending.map((t, i) => (
@@ -171,7 +225,7 @@ function Wall() {
           <article key={r.id} className="rounded-2xl bg-parchment p-4 text-parchment-foreground">
             {r.outcome && <p className="font-display text-lg text-accent">{r.outcome}</p>}
             <p className="text-xs uppercase tracking-wider opacity-70">
-              {name(ALL_BOXES, r.tier)} · {r.potions.length ? r.potions.map((id) => POTIONS.find((p) => p.id === id)?.name).filter(Boolean).join(" + ") : name(STRENGTHS, r.strength)}
+              {r.tier === "confession" ? "A secret, straight from the heart" : <>{name(ALL_BOXES, r.tier)} · {r.potions.length ? r.potions.map((id) => POTIONS.find((p) => p.id === id)?.name).filter(Boolean).join(" + ") : name(STRENGTHS, r.strength)}</>}
             </p>
             {r.note && <p className="mt-2 text-lg italic">"{r.note}"</p>}
             <div className="mt-3 flex items-center justify-between">
@@ -185,9 +239,9 @@ function Wall() {
         ))}
       </div>
 
-      <Link to="/send" className="mt-6 flex h-14 items-center justify-center rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow">
+      <Button onClick={() => setConfessing(true)} className="mt-6 h-14 rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow">
         Confess Your Own
-      </Link>
+      </Button>
       </>)}
     </Shell>
   );

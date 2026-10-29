@@ -7,6 +7,11 @@ import valentine from "@/assets/box-valentine.jpg";
 import galentine from "@/assets/box-galentine.jpg";
 import revenge from "@/assets/box-revenge.jpg";
 import spooky from "@/assets/box-spooky.jpg";
+import christmas from "@/assets/box-christmas.jpg";
+import newyear from "@/assets/box-newyear.jpg";
+import thanksgiving from "@/assets/box-thanksgiving.jpg";
+import birthday from "@/assets/box-birthday.jpg";
+import cauldron from "@/assets/opt-cauldron.jpg";
 import sheet from "@/assets/potions-sheet.jpg";
 import optQuill from "@/assets/opt-quill.jpg";
 import optCardVintage from "@/assets/opt-card-vintage.jpg";
@@ -35,7 +40,7 @@ import optChart from "@/assets/opt-chart.jpg";
 import optClock from "@/assets/opt-clock.jpg";
 import { ESSENCES } from "@/lib/catalog";
 
-export const BOX_ART: Record<string, string> = { sweet, true: trueBox, eternal, vault, grand, valentine, galentine, revenge, spooky };
+export const BOX_ART: Record<string, string> = { sweet, true: trueBox, eternal, vault, grand, valentine, galentine, revenge, spooky, christmas, newyear, thanksgiving, birthday };
 
 // Realistic storybook artwork (one artist's style: burgundy & gold oil painting on aged parchment),
 // keyed by catalog entry id or UI motif name.
@@ -67,6 +72,16 @@ export const OPT_ART: Record<string, string> = {
   clock: optClock,
   sparkles: optWand,
   charm: optWand,
+  wish: optVial,
+  romance: optBouquet,
+  serenade: optMusicbox,
+  cauldron,
+  flutter: optHeart,
+  swoon: optFlame,
+  besotted: optSpell,
+  hour: optMoon,
+  day: optClock,
+  week: optLocket,
   sweet,
 };
 

@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ALL_BOXES } from "@/lib/catalog";
 import { guest } from "@/lib/guest";
 import { Shell } from "@/components/kit";
-import { Icon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/me")({

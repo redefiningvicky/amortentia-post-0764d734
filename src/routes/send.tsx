@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { BOX_ART } from "@/lib/art";
 import { OptArt } from "@/components/opt-art";
 import { makeShareCard } from "@/lib/share-card";
-import { Icon } from "@/components/icons";
 
 export const Route = createFileRoute("/send")({
   head: () => ({

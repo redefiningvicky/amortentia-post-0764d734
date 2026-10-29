@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
 import { POTIONS, STRENGTHS, ALL_BOXES } from "@/lib/catalog";
 import { Shell } from "@/components/kit";
-import { Icon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/wall")({

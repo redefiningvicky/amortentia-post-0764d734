@@ -3,6 +3,7 @@ import { ESSENCES, MAX_BLEND, POTIONS, blendOutcome, type EssenceId } from "@/li
 import { cn } from "@/lib/utils";
 import { bottleStyle } from "@/lib/art";
 import { Icon } from "@/components/icons";
+import { OptArt } from "@/components/opt-art";
 
 const RARITY_LABEL = { common: "", rare: "Rare", legendary: "Legendary" } as const;
 
@@ -37,7 +38,7 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
                 const e = ESSENCES.find((x) => x.id === p.essence)!;
                 return (
                   <button key={id} onClick={() => toggle(id)} className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-sm" aria-label={`Remove ${p.name}`}>
-                    <Icon name={e.icon} className="h-4 w-4" /> {p.name} <Icon name="x" className="h-3.5 w-3.5 opacity-70" />
+                    <span role="img" aria-label={`${e.name} potion`} className="inline-block h-5 w-4 bg-no-repeat" style={bottleStyle(e.id)} /> {p.name} <Icon name="x" className="h-3.5 w-3.5 opacity-70" />
                   </button>
                 );
               })}
@@ -49,10 +50,13 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search 100 potions…" aria-label="Search potions"
         className="h-12 w-full rounded-xl border bg-card px-4 outline-none focus:border-gold" />
       <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
-        {[{ id: "all" as const, name: "All", icon: "sparkles" }, ...ESSENCES].map((e) => (
+        {[{ id: "all" as const, name: "All" }, ...ESSENCES].map((e) => (
           <button key={e.id} onClick={() => setEssence(e.id)}
             className={cn("flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm", essence === e.id ? "bg-gold-gradient text-primary-foreground" : "bg-card")}>
-            <Icon name={e.icon} className="h-4 w-4" /> {e.name}
+            {e.id === "all"
+              ? <OptArt id="wand" alt="" className="h-6 w-6 rounded-full object-cover" />
+              : <span role="img" aria-label={`${e.name} potion`} className="inline-block h-6 w-5 bg-no-repeat" style={bottleStyle(e.id)} />}
+            {e.name}
           </button>
         ))}
       </div>

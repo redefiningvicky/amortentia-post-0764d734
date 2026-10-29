@@ -51,7 +51,7 @@ function Send() {
 
   async function submit() {
     setBusy(true);
-    const { data: u } = await supabase.auth.getUser();
+    const u = { user: null as null | { id: string } };
     let error: unknown = null;
     if (u.user) {
       ({ error } = await supabase.from("orders").insert({

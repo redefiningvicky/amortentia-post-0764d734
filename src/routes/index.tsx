@@ -17,6 +17,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Potion-brewed chocolates in a vintage heart box. One bite and they finally see you." },
       { property: "og:title", content: "Amortentia Post — Be Loved Back" },
       { property: "og:description", content: "Send enchanted chocolates to the one who hasn't noticed you… yet." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
@@ -50,7 +52,8 @@ function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
       </div>
       <div className="relative -mt-16 text-center">
-        <p className="text-sm uppercase tracking-[0.3em] text-gold">Est. by Owl Post · Results not guaranteed*</p>
+        <p className="text-sm uppercase tracking-[0.3em] text-gold">Est. by Owl Post</p>
+        <p className="mt-1 whitespace-nowrap text-xs uppercase tracking-[0.15em] text-gold">Results Not Guaranteed*</p>
         <h1 className="mt-2 font-display text-4xl leading-tight text-gold-gradient">Amortentia Post</h1>
         <p className="mx-auto mt-3 max-w-xs text-lg text-muted-foreground">
           For everyone who's ever loved someone who didn't notice. Send potion-brewed chocolates. All they have to do is eat one.

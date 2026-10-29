@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { bottleStyle } from "@/lib/art";
 import { Icon } from "@/components/icons";
 import { OptArt } from "@/components/opt-art";
+import { Button } from "@/components/ui/button";
 
 const RARITY_LABEL = { common: "", rare: "Rare", legendary: "Legendary" } as const;
 
@@ -34,8 +35,10 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
           {value.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {value.map((id) => {
-                const p = POTIONS.find((x) => x.id === id)!;
-                const e = ESSENCES.find((x) => x.id === p.essence)!;
+                const p = POTIONS.find((x) => x.id === id);
+                if (!p) return null;
+                const e = ESSENCES.find((x) => x.id === p.essence);
+                if (!e) return null;
                 return (
                   <button key={id} onClick={() => toggle(id)} className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-sm" aria-label={`Remove ${p.name}`}>
                     <span role="img" aria-label={`${e.name} potion`} className="inline-block h-5 w-4 bg-no-repeat" style={bottleStyle(e.id)} /> {p.name} <Icon name="x" className="h-3.5 w-3.5 opacity-70" />
@@ -49,15 +52,15 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
 
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search 100 potions…" aria-label="Search potions"
         className="h-12 w-full rounded-xl border bg-card px-4 outline-none focus:border-gold" />
-      <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+      <div className="grid grid-cols-2 gap-2" aria-label="Potion essences">
         {[{ id: "all" as const, name: "All" }, ...ESSENCES].map((e) => (
-          <button key={e.id} onClick={() => setEssence(e.id)}
-            className={cn("flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm", essence === e.id ? "bg-gold-gradient text-primary-foreground" : "bg-card")}>
+          <Button key={e.id} variant="outline" aria-pressed={essence === e.id} onClick={() => setEssence(e.id)}
+            className={cn("h-11 min-w-0 justify-start gap-1.5 rounded-full px-3 text-sm", essence === e.id ? "bg-gold-gradient text-primary-foreground" : "bg-card")}>
             {e.id === "all"
               ? <OptArt id="wand" alt="" className="h-6 w-6 rounded-full object-cover" />
               : <span role="img" aria-label={`${e.name} potion`} className="inline-block h-6 w-5 bg-no-repeat" style={bottleStyle(e.id)} />}
             {e.name}
-          </button>
+          </Button>
         ))}
       </div>
 

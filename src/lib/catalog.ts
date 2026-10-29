@@ -14,6 +14,10 @@ export const SEASONAL: Tier[] = [
   { id: "valentine", name: "The Heartbreaker", pieces: 24, price: 44.99, blurb: "Valentine's only · for when Feb 14 hurts" },
   { id: "galentine", name: "The Galentine's Gossip", pieces: 20, price: 29.99, blurb: "Galentine's only · love your besties loudly" },
   { id: "revenge", name: "The Revenge Ex Edition", pieces: 18, price: 39.99, blurb: "Limited · make them regret everything" },
+  { id: "christmas", name: "The Mistletoe Spell", pieces: 24, price: 44.99, blurb: "Christmas · suddenly, mistletoe everywhere" },
+  { id: "newyear", name: "The Midnight Kiss", pieces: 24, price: 44.99, blurb: "New Year · one resolution: kiss you" },
+  { id: "thanksgiving", name: "The Grateful Heart", pieces: 20, price: 34.99, blurb: "Thanksgiving · thankful you exist, frankly" },
+  { id: "birthday", name: "The Birthday Wish", pieces: 18, price: 34.99, blurb: "Birthday · you were the wish all along" },
 ];
 export const ALL_BOXES: Tier[] = [...TIERS, ...SEASONAL];
 
@@ -189,18 +193,31 @@ export function upgradesTotal(packagingId: string, deliveryId: string, keepsakeI
 
 // Spell bundles: one tap picks several extras; when every item in a bundle is chosen, the saving applies.
 export type Extras = { handwritten: boolean; card: string | null; keepsakes: string[]; packaging: string };
-export const BUNDLES = [
+export type SpellBundle = { id: string; name: string; desc: string; save: number; pick: { handwritten: boolean; card: string; keepsakes: readonly string[]; packaging?: string } };
+export const BUNDLES: SpellBundle[] = [
   { id: "charm", name: "The Little Charm", desc: "Handwritten note + Vintage Valentine card + wax seal", save: 2,
     pick: { handwritten: true, card: "vintage", keepsakes: ["seal"] } },
   { id: "spell", name: "The Full Love Spell", desc: "Note + Singing Envelope + potion vial + owl plush + velvet heart", save: 10,
     pick: { handwritten: true, card: "singing", keepsakes: ["vial", "plush"], packaging: "velvet" } },
-] as const;
+  { id: "wish", name: "The Bottled Confession", desc: "Note + Vintage Valentine + keepsake potion vial + wax seal", save: 4,
+    pick: { handwritten: true, card: "vintage", keepsakes: ["vial", "seal"] } },
+  { id: "romance", name: "The Grand Gesture", desc: "Note + Vintage Valentine + dozen roses + velvet heart", save: 7,
+    pick: { handwritten: true, card: "vintage", keepsakes: ["bouquet"], packaging: "velvet" } },
+  { id: "serenade", name: "The Midnight Serenade", desc: "Note + Singing Envelope + owl plush + music box heart", save: 12,
+    pick: { handwritten: true, card: "singing", keepsakes: ["plush"], packaging: "music" } },
+];
+
+export function bundleMatches(b: SpellBundle, x: Extras) {
+  const p = b.pick;
+  return x.handwritten === p.handwritten && x.card === p.card && p.keepsakes.every((k) => x.keepsakes.includes(k)) && (!p.packaging || x.packaging === p.packaging);
+}
+
+export function bundlePrice(b: SpellBundle) {
+  return Math.round((addonsTotal(b.pick.handwritten, b.pick.card) + upgradesTotal(b.pick.packaging ?? "kraft", "owl", [...b.pick.keepsakes], false) - b.save) * 100) / 100;
+}
 
 export function bundleSavings(x: Extras) {
-  const hits = BUNDLES.filter((b) => {
-    const p = b.pick as { handwritten: boolean; card: string; keepsakes: readonly string[]; packaging?: string };
-    return x.handwritten === p.handwritten && x.card === p.card && p.keepsakes.every((k) => x.keepsakes.includes(k)) && (!p.packaging || x.packaging === p.packaging);
-  });
+  const hits = BUNDLES.filter((b) => bundleMatches(b, x));
   return Math.max(0, ...hits.map((b) => b.save));
 }
 

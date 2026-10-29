@@ -50,7 +50,7 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
         </div>
       </div>
 
-      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search 100 potions…" aria-label="Search potions"
+      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search 110 potions…" aria-label="Search potions"
         className="h-12 w-full rounded-xl border bg-card px-4 outline-none focus:border-gold" />
       <div className="grid grid-cols-2 gap-2" aria-label="Potion essences">
         {[{ id: "all" as const, name: "All" }, ...ESSENCES].map((e) => (

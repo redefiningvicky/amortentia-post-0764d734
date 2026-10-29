@@ -10,7 +10,7 @@ import { BrewClass } from "@/components/brew-class";
 export const Route = createFileRoute("/spellbook")({
   head: () => ({ meta: [
     { title: "The Spellbook — Amortentia Post" },
-    { name: "description", content: "Explore 100 love potions and discover the playful outcomes of your blend." },
+    { name: "description", content: "Explore 110 love potions and discover the playful outcomes of your blend." },
     { property: "og:title", content: "The Spellbook — Amortentia Post" },
     { property: "og:description", content: "Find the potion blend for your secret longing." },
     { property: "og:type", content: "website" },

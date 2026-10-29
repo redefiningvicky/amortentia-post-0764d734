@@ -72,7 +72,7 @@ export function addonsTotal(handwritten: boolean, cardId: string | null) {
   return Math.round(((handwritten ? HANDWRITTEN.price : 0) + c) * 100) / 100;
 }
 
-// ---------- The Potion Cabinet: 100 potions, 10 essences, blend synergies ----------
+// ---------- The Potion Cabinet: 110 potions, 11 essences, blend synergies ----------
 export type Rarity = "common" | "rare" | "legendary";
 export const RARITY_PRICE: Record<Rarity, number> = { common: 3.99, rare: 6.99, legendary: 11.99 };
 export const MAX_BLEND = 5;
@@ -88,6 +88,7 @@ export const ESSENCES = [
   { id: "storm", name: "Courage", icon: "bolt", adj: "Fearless", noun: "Confession", effect: "they find the nerve to say it first" },
   { id: "bloom", name: "Euphoria", icon: "bloom", adj: "Giddy", noun: "Bliss", effect: "they smile like a fool around you" },
   { id: "frost", name: "Rekindling", icon: "snowflake", adj: "Rekindled", noun: "Second Chance", effect: "old feelings thaw and return" },
+  { id: "charm", name: "Enchantment", icon: "sparkles", adj: "Beguiling", noun: "Enchantment", effect: "they find you utterly irresistible and can't explain why" },
 ] as const;
 export type EssenceId = (typeof ESSENCES)[number]["id"];
 
@@ -102,6 +103,7 @@ const NAMES: Record<EssenceId, string[]> = {
   storm: ["Thunder Courage", "Lightning Confession", "Bold Gale", "Tempest Draught", "Lionheart Tonic", "Spark of Nerve", "Rumbling Vow", "Gale Kiss", "Brave Heart Brew", "Storm King's Roar"],
   bloom: ["Giggle Water", "Butterfly Flutter", "Sunshine Swoon", "Peony Pop", "Cloud Nine", "Fizzing Crush", "Daydream Dew", "Bubblegum Bliss", "Meadow Glee", "Everbloom"],
   frost: ["Thawing Heart", "Frostbite Forgiven", "Winter Return", "Icicle Memory", "First Snow", "Glacier Melt", "Old Flame Thaw", "Hoarfrost Hope", "Snowglobe Wish", "Spring After Winter"],
+  charm: ["Cupid's Mishap", "Charmed Whisper", "Beguiling Glance", "Siren's Sip", "Glimmer Draught", "Lovestruck Tonic", "Enchanted Wink", "Sweet Nothings", "Spellbound Smile", "The Irresistible"],
 };
 
 export type Potion = { id: string; name: string; essence: EssenceId; rarity: Rarity; price: number };
@@ -125,6 +127,7 @@ const RAW: Record<EssenceId, string[]> = {
   storm: ["Lightning-Struck Cocoa", "Thunder Salt", "Lionheart Ginger", "Storm-Charged Sugar"],
   bloom: ["Giggling Peony", "Butterfly Pollen", "Sunshine Zest", "Popping Fizz Crystals"],
   frost: ["First-Snow Crystals", "Thawed Icicle Water", "Winter Mint", "Hoarfrost Sugar"],
+  charm: ["Crushed Cupid Wings", "Charmed Sugar", "Siren-Song Syrup", "Sparkle Dust"],
 };
 export type Ingredient = { id: string; name: string; essence: EssenceId; rarity: Rarity; price: number };
 export const INGREDIENTS: Ingredient[] = ESSENCES.flatMap((e) =>
@@ -153,6 +156,9 @@ const SYNERGIES: Record<string, { name: string; desc: string }> = {
   "bloom+star": { name: "Fairytale Ending", desc: "They'll start planning a future with you in it." },
   "storm+thorn": { name: "Grand Gesture", desc: "Expect serenades, roses at the door, and a public declaration." },
   "honey+moon": { name: "Faithful Moon", desc: "Distance won't matter; they will always come home to you." },
+  "charm+thorn": { name: "Dangerous Allure", desc: "They're obsessed and they don't even know why. Neither do you." },
+  "charm+moon": { name: "Enchanted Ache", desc: "They miss you in a way that feels like magic, because it is." },
+  "charm+bloom": { name: "Head Over Heels", desc: "Giddy, dazzled, hopeless. They trip over their own feet around you." },
 };
 
 export type Outcome = { name: string; desc: string; essences: EssenceId[] };

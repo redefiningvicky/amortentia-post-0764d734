@@ -22,9 +22,9 @@ describe("add-ons", () => {
 
 import { POTIONS } from "@/lib/catalog";
 describe("potion cabinet", () => {
-  it("has exactly 100 potions with unique ids", () => {
-    expect(POTIONS).toHaveLength(100);
-    expect(new Set(POTIONS.map((p) => p.id)).size).toBe(100);
+  it("has exactly 110 potions with unique ids", () => {
+    expect(POTIONS).toHaveLength(110);
+    expect(new Set(POTIONS.map((p) => p.id)).size).toBe(110);
   });
   it("no potion is free", () => expect(POTIONS.every((p) => p.price > 0)).toBe(true));
   it("passion + obsession blends into Wildfire Obsession", () => {
@@ -89,14 +89,14 @@ describe("drawn artwork", () => {
     ...DESPERATION.map((d) => d.icon),
   ];
   it("every catalog icon name has artwork", () => {
-    expect(used.length).toBe(27);
+    expect(used.length).toBe(28);
     for (const name of used) expect(ICON_NAMES).toContain(name);
   });
 });
 
 describe("raw brewing ingredients", () => {
-  it("has 40 ingredients, 4 per essence, and none are free", () => {
-    expect(INGREDIENTS.length).toBe(40);
+  it("has 44 ingredients, 4 per essence, and none are free", () => {
+    expect(INGREDIENTS.length).toBe(44);
     for (const ing of INGREDIENTS) expect(ing.price).toBeGreaterThan(0);
   });
   it("prices raw blends through the same totals as potions", () => {

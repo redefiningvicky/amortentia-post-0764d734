@@ -26,3 +26,6 @@
 - [x] Add 4 more unique sample customer photos to the album (total 16)
 - [ ] Give each album sample photo a unique story label instead of identical "Generated sample" (keep an honest sample marker)
 - [x] Brew My Own uses raw ingredients (not bottled potions); Potion Cabinet unchanged
+- [ ] 11th potion essence (Enchantment): 10 new potions, total 110
+- [x] Remove "Sample story ·" wording from album photo labels
+- [ ] Restyle the last 4 album photos (fireplace, beach, morning, rooftop) to match the first 12's artist style

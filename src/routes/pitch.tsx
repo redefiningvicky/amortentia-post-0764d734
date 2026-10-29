@@ -94,7 +94,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
         <Kicker>04 · The Product — live demo</Kicker>
         <h1 className="slide-subtitle mt-4 font-display text-gold-gradient">Pick a box, brew a potion, they take a bite, you find out.</h1>
         <div className="mt-12 flex justify-between">
-          {[[homeAsset.url, "Home"], [boxAsset.url, "Choose a box"], [potionsAsset.url, "100 potions"], [extrasAsset.url, "Extras & meter"], [biteAsset.url, "They bit it!"]].map(([s, l]) => (
+          {[[homeAsset.url, "Home"], [boxAsset.url, "Choose a box"], [potionsAsset.url, "110 potions"], [extrasAsset.url, "Extras & meter"], [biteAsset.url, "They bit it!"]].map(([s, l]) => (
             <div key={l} className="text-center">
               <Phone src={s!} alt={l!} />
               <p className="slide-caption mt-5 text-gold">{l}</p>

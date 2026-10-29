@@ -15,3 +15,4 @@
 - [ ] Replace gold line-art icons with realistic storybook artwork (user dislikes the yellow icons; wants realistic Harry-Potter-inspired art)
 - [ ] More magical fantasy UX throughout (sparkles, candlelight, enchanted motion)
 - [ ] One-artist brand consistency: all imagery in the same vintage burgundy/gold storybook style
+- [ ] Wall photo album: community-posted pictures alongside written confessions

@@ -32,3 +32,16 @@ export function orderTotal(tierId: string, strengthId: string, durationId: strin
   const d = DURATIONS.find((x) => x.id === durationId)?.price ?? 0;
   return Math.round((t + s + d) * 100) / 100;
 }
+
+export const HANDWRITTEN = { id: "handwritten", name: "Handwritten Love Note", desc: "Your words, penned in gold ink by our scribes", price: 6.99 };
+
+export const CARDS = [
+  { id: "vintage", name: "Vintage Valentine", desc: "Lace-edged, 1940s post style", price: 4.99, emoji: "💌" },
+  { id: "rose", name: "Pressed Rose", desc: "A real petal, sealed under wax", price: 5.99, emoji: "🌹" },
+  { id: "singing", name: "Singing Envelope", desc: "Sings your confession when opened", price: 8.99, emoji: "🎶" },
+];
+
+export function addonsTotal(handwritten: boolean, cardId: string | null) {
+  const c = CARDS.find((x) => x.id === cardId)?.price ?? 0;
+  return Math.round(((handwritten ? HANDWRITTEN.price : 0) + c) * 100) / 100;
+}

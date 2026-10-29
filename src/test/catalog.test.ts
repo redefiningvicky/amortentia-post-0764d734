@@ -12,3 +12,10 @@ describe("box tiers", () => {
     expect(orderTotal("sweet", "besotted", "week")).toBe(53.99);
   });
 });
+
+import { addonsTotal } from "@/lib/catalog";
+describe("add-ons", () => {
+  it("handwritten note costs $6.99", () => expect(addonsTotal(true, null)).toBe(6.99));
+  it("note plus singing card", () => expect(addonsTotal(true, "singing")).toBe(15.98));
+  it("no add-ons is $0", () => expect(addonsTotal(false, null)).toBe(0));
+});

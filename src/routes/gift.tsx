@@ -5,13 +5,13 @@ import { ALL_BOXES } from "@/lib/catalog";
 import { BOX_ART } from "@/lib/art";
 import { GoldButton, Shell } from "@/components/kit";
 
-type Search = { id?: string; to?: string; from?: string; tier?: string; blend?: string; note?: string };
+type Search = { id: string; to: string; from: string; tier: string; blend: string; note: string };
 
 export const Route = createFileRoute("/gift")({
-  validateSearch: (s: Record<string, unknown>): Search => ({
-    id: s.id as string | undefined, to: s.to as string | undefined, from: s.from as string | undefined,
-    tier: s.tier as string | undefined, blend: s.blend as string | undefined, note: s.note as string | undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): Search => {
+    const str = (k: string) => (typeof s[k] === "string" ? (s[k] as string) : "");
+    return { id: str("id"), to: str("to"), from: str("from"), tier: str("tier"), blend: str("blend"), note: str("note") };
+  },
   head: () => ({
     meta: [
       { title: "You've Got Enchanted Chocolates — Amortentia Post" },

@@ -124,7 +124,7 @@ function Me() {
   );
 }
 
-function Tracker({ s, url }: { s?: { opened_at: string | null; bitten_at: string | null }; url?: string }) {
+function Tracker({ s, url }: { s: { opened_at: string | null; bitten_at: string | null } | undefined; url: string | undefined }) {
   const steps = [
     { label: "Owl departed", done: true },
     { label: "Box opened", done: !!s?.opened_at },

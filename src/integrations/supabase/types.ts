@@ -181,6 +181,30 @@ export type Database = {
           },
         ]
       }
+      wall_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          image_path: string
+          swoon_count: number
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_path: string
+          swoon_count?: number
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_path?: string
+          swoon_count?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

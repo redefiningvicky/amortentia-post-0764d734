@@ -14,7 +14,134 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      confessions: {
+        Row: {
+          aroma: string
+          created_at: string
+          id: string
+          note: string | null
+          order_id: string | null
+          strength: string
+          swoon_count: number
+          tier: string
+        }
+        Insert: {
+          aroma: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          order_id?: string | null
+          strength: string
+          swoon_count?: number
+          tier: string
+        }
+        Update: {
+          aroma?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          order_id?: string | null
+          strength?: string
+          swoon_count?: number
+          tier?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          aroma: string
+          created_at: string
+          duration: string
+          id: string
+          note: string | null
+          recipient_email: string
+          recipient_name: string
+          sender_id: string
+          sender_name: string
+          share_on_wall: boolean
+          strength: string
+          tier: string
+          total: number
+        }
+        Insert: {
+          aroma: string
+          created_at?: string
+          duration: string
+          id?: string
+          note?: string | null
+          recipient_email: string
+          recipient_name: string
+          sender_id?: string
+          sender_name: string
+          share_on_wall?: boolean
+          strength: string
+          tier: string
+          total: number
+        }
+        Update: {
+          aroma?: string
+          created_at?: string
+          duration?: string
+          id?: string
+          note?: string | null
+          recipient_email?: string
+          recipient_name?: string
+          sender_id?: string
+          sender_name?: string
+          share_on_wall?: boolean
+          strength?: string
+          tier?: string
+          total?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      swoons: {
+        Row: {
+          confession_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          confession_id: string
+          created_at?: string
+          user_id?: string
+        }
+        Update: {
+          confession_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "swoons_confession_id_fkey"
+            columns: ["confession_id"]
+            isOneToOne: false
+            referencedRelation: "confessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

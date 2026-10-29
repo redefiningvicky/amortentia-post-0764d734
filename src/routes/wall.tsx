@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { guest } from "@/lib/guest";
 import { AROMAS, STRENGTHS, TIERS } from "@/lib/catalog";
 import { Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
@@ -38,11 +39,15 @@ function Wall() {
       return data;
     },
   });
-  const { data: mine = [] } = useQuery({
+  const [guestSwoons, setGuestSwoons] = useState<string[]>([]);
+  useEffect(() => setGuestSwoons(guest.swoons()), []);
+  const { data: dbSwoons = [] } = useQuery({
     queryKey: ["my-swoons", userId],
     enabled: !!userId,
     queryFn: async () => (await supabase.from("swoons").select("confession_id")).data?.map((s) => s.confession_id) ?? [],
   });
+  const mine = userId ? dbSwoons : guestSwoons;
+  const count = (r: { id: string; swoon_count: number }) => r.swoon_count + (!userId && guestSwoons.includes(r.id) ? 1 : 0);
 
   const trending = STRENGTHS.map((s) => ({
     ...s,
@@ -50,8 +55,11 @@ function Wall() {
   })).sort((a, b) => b.score - a.score);
 
   async function swoon(id: string) {
-    if (!userId) { toast("Sign in to swoon 💘"); return; }
     const has = mine.includes(id);
+    if (!userId) {
+      const next = has ? guestSwoons.filter((x) => x !== id) : [...guestSwoons, id];
+      guest.saveSwoons(next); setGuestSwoons(next); return;
+    }
     const { error } = has
       ? await supabase.from("swoons").delete().eq("confession_id", id).eq("user_id", userId)
       : await supabase.from("swoons").insert({ confession_id: id });
@@ -95,7 +103,7 @@ function Wall() {
               <span className="text-sm opacity-70">— A Secret Admirer</span>
               <button onClick={() => swoon(r.id)} aria-pressed={mine.includes(r.id)}
                 className={cn("min-h-11 rounded-full border border-parchment-foreground/30 px-4", mine.includes(r.id) && "bg-accent text-accent-foreground")}>
-                💘 {r.swoon_count}
+                💘 {count(r)}
               </button>
             </div>
           </article>

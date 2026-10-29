@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GiftRouteImport } from './routes/gift'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as SendRouteImport } from './routes/send'
 import { Route as WallRouteImport } from './routes/wall'
@@ -17,6 +18,11 @@ import { Route as WallRouteImport } from './routes/wall'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GiftRoute = GiftRouteImport.update({
+  id: '/gift',
+  path: '/gift',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MeRoute = MeRouteImport.update({
@@ -37,12 +43,14 @@ const WallRoute = WallRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/gift': typeof GiftRoute
   '/me': typeof MeRoute
   '/send': typeof SendRoute
   '/wall': typeof WallRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/gift': typeof GiftRoute
   '/me': typeof MeRoute
   '/send': typeof SendRoute
   '/wall': typeof WallRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/gift': typeof GiftRoute
   '/me': typeof MeRoute
   '/send': typeof SendRoute
   '/wall': typeof WallRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/me' | '/send' | '/wall'
+  fullPaths: '/' | '/gift' | '/me' | '/send' | '/wall'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/me' | '/send' | '/wall'
-  id: '__root__' | '/' | '/me' | '/send' | '/wall'
+  to: '/' | '/gift' | '/me' | '/send' | '/wall'
+  id: '__root__' | '/' | '/gift' | '/me' | '/send' | '/wall'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GiftRoute: typeof GiftRoute
   MeRoute: typeof MeRoute
   SendRoute: typeof SendRoute
   WallRoute: typeof WallRoute
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gift': {
+      id: '/gift'
+      path: '/gift'
+      fullPath: '/gift'
+      preLoaderRoute: typeof GiftRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/me': {
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GiftRoute: GiftRoute,
   MeRoute: MeRoute,
   SendRoute: SendRoute,
   WallRoute: WallRoute,

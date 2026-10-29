@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ALL_BOXES } from "@/lib/catalog";
 import { BOX_ART } from "@/lib/art";
 import { GoldButton, Shell } from "@/components/kit";
-import { cn } from "@/lib/utils";
 
 type Search = { id?: string; to?: string; from?: string; tier?: string; blend?: string; note?: string };
 
@@ -73,7 +72,7 @@ function Gift() {
             <div className="mt-6 space-y-2 text-left">
               <p className="text-sm uppercase tracking-[0.2em] text-gold">Symptoms detected</p>
               {SYMPTOMS.map((x, i) => (
-                <div key={x} className={cn("rounded-xl border bg-card p-3 opacity-0 animate-in fade-in fill-mode-forwards")} style={{ animationDelay: `${0.4 + i * 0.5}s`, animationDuration: "0.6s" }}>✓ {x}</div>
+                <div key={x} className="reveal rounded-xl border bg-card p-3" style={{ animationDelay: `${0.4 + i * 0.5}s` }}>✓ {x}</div>
               ))}
             </div>
             <Link to="/send" className="mt-8 flex h-14 w-full items-center justify-center rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow">

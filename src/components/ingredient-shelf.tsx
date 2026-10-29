@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ESSENCES, INGREDIENTS, MAX_BLEND, type EssenceId } from "@/lib/catalog";
+import { ESSENCES, INGREDIENTS, INGREDIENT_KIND, MAX_BLEND, type EssenceId } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 import { ING_ART } from "@/lib/art";
 import { Icon } from "@/components/icons";
@@ -68,7 +68,7 @@ export function IngredientShelf({ value, onChange }: { value: string[]; onChange
               </div>
               <p className="mt-2 font-semibold leading-tight">{p.name}</p>
               <p className="mt-0.5 text-xs italic text-muted-foreground">{p.note}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{e.name} essence · <span className="text-gold">${p.price}</span></p>
+              <p className="mt-1 text-xs text-muted-foreground">{INGREDIENT_KIND[p.essence]} · {e.name} · <span className="text-gold">${p.price}</span></p>
             </button>
           );
         })}

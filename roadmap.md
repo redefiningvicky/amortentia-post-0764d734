@@ -23,4 +23,5 @@
 - [x] One-artist brand consistency: all imagery in the same vintage burgundy/gold storybook style
 - [x] Wall photo album: community-posted pictures alongside written confessions
 - [x] Realistic, brand-consistent holiday box art (Christmas, New Year, Thanksgiving, Birthday)
-- [ ] Add 4 more unique sample customer photos to the album (total 16)
+- [x] Add 4 more unique sample customer photos to the album (total 16)
+- [ ] Give each album sample photo a unique story label instead of identical "Generated sample" (keep an honest sample marker)

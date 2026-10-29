@@ -12,3 +12,4 @@
 - [x] Streamline base + add-on options for customers (fewer choices, bundles, strong honest sales tactics)
 - [x] 6-slide investor pitch deck (Problem, Solution, Market, Product demo, Company name, Smile one-liner)
 - [x] Remove every emoji from app and deck; replace with drawn gold line-art icons
+- [ ] Replace gold line-art icons with realistic storybook artwork (user dislikes the yellow icons; wants realistic Harry-Potter-inspired art)

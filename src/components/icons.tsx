@@ -169,8 +169,8 @@ const ART: Record<string, ReactNode> = {
   ),
   choco: (
     <>
-      <path d="M4.5 7.5h15v11h-17v-11" />
-      <path d="M4 13h16M9 7.5v11M15 7.5v11" />
+      <path d="M4.5 7.5h15v11h-15Z" />
+      <path d="M4.5 13h15M9.5 7.5v11M14.5 7.5v11" />
     </>
   ),
   fleur: (
@@ -202,7 +202,7 @@ export function Icon({ name, className }: { name: string; className?: string }) 
       strokeLinejoin="round"
       className={cn("inline-block h-6 w-6 shrink-0", className)}
     >
-      {ART[name] ?? ART.sparkles}
+      {ART[name] ?? ART["sparkles"]}
     </svg>
   );
 }

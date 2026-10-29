@@ -15,7 +15,7 @@ function MagicDust() {
 
 export function Shell({ children }: { children: ReactNode }) {
   return (
-    <div className="relative mx-auto flex min-h-screen max-w-md flex-col border-x-2 border-gold/50 px-5 pb-24 pt-6 shadow-frame">
+    <div className="relative mx-auto flex min-h-screen max-w-md flex-col border-2 border-gold/50 px-5 pb-24 pt-6 shadow-frame">
       <MagicDust />
       <div className="relative z-10 flex flex-1 flex-col">{children}</div>
     </div>

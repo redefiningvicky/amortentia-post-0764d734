@@ -218,7 +218,7 @@ function Wall() {
             {SAMPLE_PHOTOS.map((photo) => (
               <figure key={photo.id} className="overflow-hidden rounded-lg border bg-card">
                 <img src={photo.url} alt={photo.caption} width={816} height={816} loading="lazy" className="aspect-square w-full object-cover" />
-                <figcaption className="p-3 text-sm text-muted-foreground"><span className="mb-1 block text-xs uppercase text-gold">Sample story · {photo.label}</span>{photo.caption}</figcaption>
+                <figcaption className="p-3 text-sm text-muted-foreground"><span className="mb-1 block text-xs uppercase text-gold">{photo.label}</span>{photo.caption}</figcaption>
               </figure>
             ))}
           </div>

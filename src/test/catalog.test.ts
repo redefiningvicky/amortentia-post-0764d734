@@ -93,3 +93,20 @@ describe("drawn artwork", () => {
     for (const name of used) expect(ICON_NAMES).toContain(name);
   });
 });
+
+describe("raw brewing ingredients", () => {
+  it("has 40 ingredients, 4 per essence, and none are free", () => {
+    expect(INGREDIENTS.length).toBe(40);
+    for (const ing of INGREDIENTS) expect(ing.price).toBeGreaterThan(0);
+  });
+  it("prices raw blends through the same totals as potions", () => {
+    expect(potionsTotal(["raw-ember-1", "raw-rose-1"])).toBe(3.98);
+    expect(potionsTotal(["raw-ember-4"])).toBe(4.99);
+    expect(potionsTotal(["ember-1", "raw-thorn-1"])).toBe(5.98);
+  });
+  it("raw ingredients blend into the same essence outcomes", () => {
+    expect(findBrewable("raw-ember-1")?.name).toBe("Crushed Dragon Pepper");
+    expect(blendOutcome(["raw-ember-1", "raw-thorn-1"])?.name).toBe("Wildfire Obsession");
+    expect(blendOutcome(["raw-moon-1", "raw-star-1"])?.name).toBe("Written in the Stars");
+  });
+});

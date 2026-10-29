@@ -7,7 +7,7 @@ import { TIERS, SEASONAL, ALL_BOXES, desperationLevel, STRENGTHS, DURATIONS, CAR
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
-import { BOX_ART } from "@/lib/art";
+import { BOX_ART, OptArt } from "@/lib/art";
 import { makeShareCard } from "@/lib/share-card";
 import { Icon } from "@/components/icons";
 
@@ -190,7 +190,7 @@ function Send() {
                   setKeepsakes((k) => Array.from(new Set([...k, ...b.pick.keepsakes])));
                   if ("packaging" in b.pick) setPackaging(b.pick.packaging);
                 }}>
-                  <Icon name={b.id === "spell" ? "wand" : "sparkles"} className="h-8 w-8 text-gold" />
+                  <OptArt id={b.id} alt={b.name} />
                   <div className="flex-1"><div className="text-lg font-semibold">{b.name}</div><p className="text-sm text-muted-foreground">{b.desc}</p></div>
                   <span className="rounded-full bg-gold-gradient px-2 py-0.5 text-xs font-bold text-primary-foreground">Save ${b.save}</span>
                 </Option>
@@ -198,7 +198,7 @@ function Send() {
             })}
             <Label>Or pick your own · handwritten by our scribes</Label>
             <Option active={handwritten} onClick={() => setHandwritten(!handwritten)}>
-              <Icon name="quill" className="h-8 w-8 text-gold" />
+              <OptArt id="quill" alt={HANDWRITTEN.name} />
               <div className="flex-1"><div className="text-lg font-semibold">{HANDWRITTEN.name}</div><p className="text-muted-foreground">{HANDWRITTEN.desc}</p></div>
               <span className="text-gold">+${HANDWRITTEN.price}</span>
             </Option>
@@ -210,7 +210,7 @@ function Send() {
             <Label>Pick a card (optional)</Label>
             {CARDS.map((c) => (
               <Option key={c.id} active={card === c.id} onClick={() => setCard(card === c.id ? null : c.id)}>
-                <Icon name={c.icon} className="h-8 w-8 text-gold" />
+                <OptArt id={c.id} alt={c.name} />
                 <div className="flex-1"><div className="text-lg font-semibold">{c.name}</div><p className="text-muted-foreground">{c.desc}</p></div>
                 <span className="text-gold">+${c.price}</span>
               </Option>
@@ -219,7 +219,7 @@ function Send() {
             <p className="text-sm text-muted-foreground">Every bite counts. Make the box too beautiful to ignore.</p>
             {KEEPSAKES.map((k) => (
               <Option key={k.id} active={keepsakes.includes(k.id)} onClick={() => toggleKeepsake(k.id)}>
-                <Icon name={k.icon} className="h-8 w-8 text-gold" />
+                <OptArt id={k.id} alt={k.name} />
                 <div className="flex-1"><div className="text-lg font-semibold">{k.name}</div><p className="text-muted-foreground">{k.desc}</p></div>
                 <span className="text-gold">+${k.price}</span>
               </Option>
@@ -232,7 +232,7 @@ function Send() {
             <Label>The moment they first see it (and hopefully eat it)</Label>
             {PACKAGING.map((k) => (
               <Option key={k.id} active={packaging === k.id} onClick={() => setPackaging(k.id)}>
-                <Icon name={k.icon} className="h-8 w-8 text-gold" />
+                <OptArt id={k.id} alt={k.name} />
                 <div className="flex-1"><div className="text-lg font-semibold">{k.name}</div><p className="text-muted-foreground">{k.desc}</p></div>
                 <span className="text-gold">{k.price ? `+$${k.price}` : "Included"}</span>
               </Option>
@@ -240,7 +240,7 @@ function Send() {
             <Label>How long can you possibly wait?</Label>
             {DELIVERY.map((k) => (
               <Option key={k.id} active={delivery === k.id} onClick={() => setDelivery(k.id)}>
-                <Icon name={k.icon} className="h-8 w-8 text-gold" />
+                <OptArt id={k.id} alt={k.name} />
                 <div className="flex-1"><div className="text-lg font-semibold">{k.name}</div><p className="text-muted-foreground">{k.desc}</p></div>
                 <span className="text-gold">{k.price ? `+$${k.price}` : "Included"}</span>
               </Option>

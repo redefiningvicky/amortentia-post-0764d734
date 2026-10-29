@@ -27,6 +27,29 @@ import { ESSENCES } from "@/lib/catalog";
 
 export const BOX_ART: Record<string, string> = { sweet, true: trueBox, eternal, vault, grand, valentine, galentine, revenge, spooky };
 
+// Realistic storybook artwork for purchasable options, keyed by catalog entry id.
+export const OPT_ART: Record<string, string> = {
+  quill: optQuill,
+  vintage: optCardVintage,
+  singing: optCardSinging,
+  seal: optSeal,
+  vial: optVial,
+  plush: optPlush,
+  bouquet: optBouquet,
+  kraft: optKraft,
+  velvet: optVelvet,
+  music: optMusicbox,
+  owl: optOwl,
+  express: optExpress,
+  courier: optCourier,
+  wand: optWand,
+  spell: optSpell,
+};
+
+export function OptArt({ id, alt, className }: { id: string; alt: string; className?: string }) {
+  return <img src={OPT_ART[id]} alt={alt} loading="lazy" width={512} height={512} className={className ?? "h-14 w-14 shrink-0 rounded-xl object-cover"} />;
+}
+
 // Potion bottles live on one 5x2 sprite sheet, in ESSENCES order.
 export function bottleStyle(essence: string): React.CSSProperties {
   const i = Math.max(0, ESSENCES.findIndex((e) => e.id === essence));

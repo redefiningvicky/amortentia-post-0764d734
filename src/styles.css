@@ -63,7 +63,7 @@
   --gradient-gold: linear-gradient(135deg, oklch(0.86 0.12 88), oklch(0.68 0.13 70));
   --gradient-night: radial-gradient(ellipse at top, oklch(0.32 0.11 22), oklch(0.16 0.05 20) 70%);
   --shadow-glow: 0 10px 40px -10px oklch(0.78 0.13 80 / 55%);
-  --shadow-frame: 0 0 0 1px oklch(0.78 0.13 80 / 38%), 0 0 90px 8px oklch(0.08 0.03 20 / 70%);
+  --shadow-frame: 0 0 110px 26px oklch(0.06 0.02 20 / 82%);
 }
 
 @layer base {

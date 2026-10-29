@@ -41,10 +41,10 @@ function App() {
           <p className="text-sm uppercase tracking-[0.3em] text-gold">Est. by Owl Post</p>
           <h1 className="mt-2 font-display text-4xl leading-tight text-gold-gradient">Amortentia Post</h1>
           <p className="mx-auto mt-3 max-w-xs text-lg text-muted-foreground">
-            A heart-shaped box of chocolates, brewed with love potion. One bite and they're yours.
+            You've waited long enough to be loved back. One bite of our potion-brewed chocolates, and they'll finally see you.
           </p>
         </div>
-        <CTA onClick={() => setStep(0)}>Begin a Love Letter ✦</CTA>
+        <CTA onClick={() => setStep(0)}>Make Them Mine ✦</CTA>
       </Shell>
     );
   }
@@ -72,7 +72,7 @@ function App() {
         <button aria-label="Back" onClick={() => setStep(step - 1)} className="grid h-11 w-11 place-items-center rounded-full border text-gold">‹</button>
         <div className="flex-1">
           <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Step {step + 1} of 4</p>
-          <h2 className="font-display text-xl text-gold">{["Choose Your Box", "Brew the Potion", "Pen Your Letter", "Seal & Send"][step]}</h2>
+          <h2 className="font-display text-xl text-gold">{["Choose Your Box", "Brew Your Longing", "Confess Your Heart", "Seal & Send"][step]}</h2>
         </div>
       </header>
       <div className="mt-4 flex gap-1.5">

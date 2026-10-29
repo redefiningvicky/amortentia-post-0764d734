@@ -7,9 +7,9 @@ export const TIERS: Tier[] = [
 ];
 
 export const STRENGTHS = [
-  { id: "flutter", name: "Flutter", desc: "Lingering glances, soft blushes", price: 0 },
-  { id: "swoon", name: "Swoon", desc: "Poetry-writing levels of fondness", price: 5 },
-  { id: "besotted", name: "Utterly Besotted", desc: "Ron-on-his-birthday intensity", price: 10 },
+  { id: "flutter", name: "Flutter", desc: "They can't stop thinking of you", price: 7 },
+  { id: "swoon", name: "Swoon", desc: "They ache when you leave the room", price: 12 },
+  { id: "besotted", name: "Utterly Besotted", desc: "Hopelessly, desperately yours", price: 19 },
 ];
 
 export const AROMAS = [
@@ -21,9 +21,9 @@ export const AROMAS = [
 ];
 
 export const DURATIONS = [
-  { id: "hour", name: "One Hour", price: 0 },
-  { id: "day", name: "A Full Day", price: 3 },
-  { id: "week", name: "A Fortnight", price: 8 },
+  { id: "hour", name: "One Night", price: 4 },
+  { id: "day", name: "A Full Moon", price: 9 },
+  { id: "week", name: "Forever-ish", price: 15 },
 ];
 
 export function orderTotal(tierId: string, strengthId: string, durationId: string) {

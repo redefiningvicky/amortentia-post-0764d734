@@ -9,6 +9,6 @@ describe("box tiers", () => {
     expect(TIERS).toHaveLength(3);
   });
   it("adds potion add-ons to total", () => {
-    expect(orderTotal("sweet", "besotted", "week")).toBe(37.99);
+    expect(orderTotal("sweet", "besotted", "week")).toBe(53.99);
   });
 });

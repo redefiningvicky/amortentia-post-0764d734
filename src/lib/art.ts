@@ -66,6 +66,7 @@ export const OPT_ART: Record<string, string> = {
   chart: optChart,
   clock: optClock,
   sparkles: optWand,
+  charm: optWand,
   sweet,
 };
 

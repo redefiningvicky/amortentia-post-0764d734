@@ -13,6 +13,7 @@ import thanksgiving from "@/assets/box-thanksgiving.jpg";
 import birthday from "@/assets/box-birthday.jpg";
 import cauldron from "@/assets/opt-cauldron.jpg";
 import sheet from "@/assets/potions-sheet.jpg";
+import bottleCharm from "@/assets/opt-bottle-charm.jpg";
 import optQuill from "@/assets/opt-quill.jpg";
 import optCardVintage from "@/assets/opt-card-vintage.jpg";
 import optCardSinging from "@/assets/opt-card-singing.jpg";
@@ -85,8 +86,10 @@ export const OPT_ART: Record<string, string> = {
   sweet,
 };
 
-// Potion bottles live on one 5x2 sprite sheet, in ESSENCES order.
+// Potion bottles: the first 10 essences live on one 5x2 sprite sheet, in ESSENCES order;
+// the 11th (charm) uses its own standalone painting.
 export function bottleStyle(essence: string): React.CSSProperties {
   const i = Math.max(0, ESSENCES.findIndex((e) => e.id === essence));
+  if (i >= 10) return { backgroundImage: `url(${bottleCharm})`, backgroundSize: "cover", backgroundPosition: "center" };
   return { backgroundImage: `url(${sheet})`, backgroundSize: "500% 200%", backgroundPosition: `${(i % 5) * 25}% ${Math.floor(i / 5) * 100}%` };
 }

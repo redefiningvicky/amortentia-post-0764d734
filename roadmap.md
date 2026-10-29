@@ -24,9 +24,15 @@
 - [x] Wall photo album: community-posted pictures alongside written confessions
 - [x] Realistic, brand-consistent holiday box art (Christmas, New Year, Thanksgiving, Birthday)
 - [x] Add 4 more unique sample customer photos to the album (total 16)
-- [ ] Give each album sample photo a unique story label instead of identical "Generated sample" (keep an honest sample marker)
+- [x] Give each album sample photo a unique story label instead of identical "Generated sample" (keep an honest sample marker)
 - [x] Brew My Own uses raw ingredients (not bottled potions); Potion Cabinet unchanged
 - [x] 11th potion essence (Enchantment): 10 new potions, total 110
 - [x] Remove "Sample story ·" wording from album photo labels
 - [x] Restyle the last 4 album photos (fireplace, beach, morning, rooftop) to match the first 12's artist style
 - [x] Reset guest order memory so previously sent boxes no longer show on Me
+- [x] Wall "Choose a Photo" should offer sample photos, not open the device's file picker
+- [x] Brew My Own: 11 specific raw ingredient types (flowers, leaves, roots...) x 10 flavors = 110 total
+- [x] Wall confessions: every post must be a full-sentence quote (some are empty or just "love")
+- [x] Fix stray "preview test" confession to match other post format
+- [x] Confess Your Own: pretend-post only, do not save to DB
+- [x] Match Enchantment bottle art (proportions, lighting, background) to original ten essences

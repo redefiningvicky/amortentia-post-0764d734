@@ -30,3 +30,4 @@
 - [x] Remove "Sample story ·" wording from album photo labels
 - [x] Restyle the last 4 album photos (fireplace, beach, morning, rooftop) to match the first 12's artist style
 - [x] Reset guest order memory so previously sent boxes no longer show on Me
+- [ ] Wall "Choose a Photo" should offer sample photos, not open the device's file picker

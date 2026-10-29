@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ALL_BOXES } from "@/lib/catalog";
 import { guest } from "@/lib/guest";
 import { Shell } from "@/components/kit";
+import { Icon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/me")({
@@ -84,8 +85,8 @@ function Me() {
   return (
     <Shell>
       <div className="flex items-center gap-4">
-        <label className="relative grid h-20 w-20 cursor-pointer place-items-center overflow-hidden rounded-full border-2 border-gold bg-card text-3xl">
-          {data.avatar ? <img src={data.avatar} alt="Your photo" className="h-full w-full object-cover" /> : "🪶"}
+        <label className="relative grid h-20 w-20 cursor-pointer place-items-center overflow-hidden rounded-full border-2 border-gold bg-card">
+          {data.avatar ? <img src={data.avatar} alt="Your photo" className="h-full w-full object-cover" /> : <Icon name="quill" className="h-9 w-9 text-gold" />}
           <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
         </label>
         <div className="flex-1">
@@ -129,9 +130,9 @@ function Tracker({ s, url }: { s: { opened_at: string | null; bitten_at: string 
     { label: "Owl departed", done: true },
     { label: "Box opened", done: !!s?.opened_at },
     { label: "First bite taken", done: !!s?.bitten_at },
-    { label: "Symptoms detected 💘", done: !!s?.bitten_at },
+    { label: "Symptoms detected", done: !!s?.bitten_at },
   ];
-  const now = s?.bitten_at ? "They ate it. The potion is in their system. 😳" : s?.opened_at ? "They opened it… but haven't bitten. Come ON." : "Waiting for them to open their gift link…";
+  const now = s?.bitten_at ? "They ate it. The potion is in their system." : s?.opened_at ? "They opened it… but haven't bitten. Come ON." : "Waiting for them to open their gift link…";
   return (
     <div className="mt-3 border-t pt-3">
       <p className="text-sm text-gold">Did they eat it yet?</p>
@@ -145,7 +146,7 @@ function Tracker({ s, url }: { s: { opened_at: string | null; bitten_at: string 
       </ol>
       <p className="mt-2 text-sm text-muted-foreground">{now}</p>
       {url && !s?.opened_at && (
-        <button onClick={async () => { await navigator.clipboard.writeText(url); toast.success("Gift link copied 💌"); }} className="mt-2 min-h-10 text-sm text-gold underline">Copy their gift link again</button>
+        <button onClick={async () => { await navigator.clipboard.writeText(url); toast.success("Gift link copied"); }} className="mt-2 min-h-10 text-sm text-gold underline">Copy their gift link again</button>
       )}
     </div>
   );

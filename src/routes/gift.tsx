@@ -5,6 +5,7 @@ import { ALL_BOXES } from "@/lib/catalog";
 import { BOX_ART } from "@/lib/art";
 import { GoldButton, Shell } from "@/components/kit";
 import { Icon } from "@/components/icons";
+import { OptArt } from "@/components/opt-art";
 
 type Search = { id: string; to: string; from: string; tier: string; blend: string; note: string };
 
@@ -45,10 +46,10 @@ function Gift() {
           <>
             <p className="text-sm uppercase tracking-[0.3em] text-gold">Special Owl Delivery</p>
             <h1 className="mt-2 font-display text-3xl text-gold-gradient">{s.to ? `${s.to}, someone has a crush on you` : "Someone has a crush on you"}</h1>
-            <button onClick={() => setStage("open")} aria-label="Open the box" className="mx-auto mt-8 block w-64 animate-bounce">
-              <img src={BOX_ART[box.id]} alt={box.name} width={816} height={816} className="rounded-3xl shadow-glow" />
+            <button onClick={() => setStage("open")} aria-label="Open the box" className="mx-auto mt-10 block w-64">
+              <img src={BOX_ART[box.id]} alt={box.name} width={816} height={816} className="float-soft candle-flicker rounded-3xl" />
             </button>
-            <p className="mt-4 flex items-center justify-center gap-2 text-muted-foreground">Tap the box to open it <Icon name="tap" className="h-5 w-5 text-gold" /></p>
+            <p className="mt-4 flex items-center justify-center gap-2 text-muted-foreground">Tap the box to open it <OptArt id="wand" alt="" className="h-8 w-8 rounded-full object-cover" /></p>
           </>
         )}
         {stage === "open" && (
@@ -66,7 +67,7 @@ function Gift() {
             <div className="relative h-40">
               {Array.from({ length: 14 }).map((_, i) => (
                 <span key={i} className="absolute sparkle" style={{ left: `${(i * 37) % 95}%`, top: `${(i * 53) % 90}%`, animationDelay: `${i * 0.15}s` }}>
-                  <Icon name="heart" className="h-7 w-7 text-gold" />
+                  <OptArt id="heart" alt="" className="h-8 w-8 rounded-full object-cover" />
                 </span>
               ))}
             </div>

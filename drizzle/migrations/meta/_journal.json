@@ -36,6 +36,13 @@
       "when": 1793241737274,
       "tag": "0004_gift_tracking",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793244551340,
+      "tag": "0005_wall_photo_album",
+      "breakpoints": true
     }
   ]
 }

@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ALL_BOXES } from "@/lib/catalog";
 import { guest } from "@/lib/guest";
 import { Shell } from "@/components/kit";
-import { Icon } from "@/components/icons";
+import { OptArt } from "@/components/opt-art";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/me")({
@@ -86,7 +86,7 @@ function Me() {
     <Shell>
       <div className="flex items-center gap-4">
         <label className="relative grid h-20 w-20 cursor-pointer place-items-center overflow-hidden rounded-full border-2 border-gold bg-card">
-          {data.avatar ? <img src={data.avatar} alt="Your photo" className="h-full w-full object-cover" /> : <Icon name="quill" className="h-9 w-9 text-gold" />}
+          {data.avatar ? <img src={data.avatar} alt="Your photo" className="h-full w-full object-cover" /> : <OptArt id="quill" alt="" className="h-full w-full object-cover" />}
           <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
         </label>
         <div className="flex-1">

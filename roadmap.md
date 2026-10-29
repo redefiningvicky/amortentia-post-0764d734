@@ -12,3 +12,7 @@
 - [x] Streamline base + add-on options for customers (fewer choices, bundles, strong honest sales tactics)
 - [x] 6-slide investor pitch deck (Problem, Solution, Market, Product demo, Company name, Smile one-liner)
 - [x] Remove every emoji from app and deck; replace with drawn gold line-art icons
+- [x] Replace gold line-art icons with realistic storybook artwork
+- [x] More magical fantasy UX (floating golden dust, levitating art, candlelight flicker)
+- [x] One-artist brand consistency: all imagery in the same vintage burgundy/gold storybook style
+- [x] Wall photo album: community-posted pictures alongside written confessions

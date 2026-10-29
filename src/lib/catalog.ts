@@ -153,7 +153,7 @@ export type Ingredient = { id: string; name: string; note: string; essence: Esse
 export const INGREDIENTS: Ingredient[] = ESSENCES.flatMap((e) =>
   RAW[e.id].map((name, i) => {
     const rarity: Rarity = i === 9 ? "legendary" : i >= 6 ? "rare" : "common";
-    return { id: `raw-${e.id}-${i + 1}`, name, note: RAW_NOTES[e.id][i], essence: e.id, rarity, price: INGREDIENT_PRICE[rarity] };
+    return { id: `raw-${e.id}-${i + 1}`, name, note: RAW_NOTES[e.id][i] ?? "", essence: e.id, rarity, price: INGREDIENT_PRICE[rarity] };
   }),
 );
 

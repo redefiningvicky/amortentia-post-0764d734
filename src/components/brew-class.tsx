@@ -2,13 +2,20 @@ import { useState } from "react";
 import { IngredientShelf } from "@/components/ingredient-shelf";
 import { GoldButton } from "@/components/kit";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { OptArt } from "@/components/opt-art";
 import { MAX_BLEND, blendOutcome, potionsTotal } from "@/lib/catalog";
 
 export function BrewClass({ value, onChange, onReady }: { value: string[]; onChange: (ids: string[]) => void; onReady?: (ready: boolean) => void }) {
   const [stage, setStage] = useState<"ingredients" | "stir" | "bottled">("ingredients");
   const [stirs, setStirs] = useState(0);
+  const [cauldronPrompt, setCauldronPrompt] = useState(false);
   const outcome = blendOutcome(value);
+  function startBrewing() { setCauldronPrompt(false); setStage("stir"); window.scrollTo(0, 0); }
+  function chooseIngredients(ids: string[]) {
+    onChange(ids); setStirs(0); onReady?.(false);
+    if (value.length < MAX_BLEND && ids.length === MAX_BLEND) setCauldronPrompt(true);
+  }
   function editIngredients() { setStage("ingredients"); setStirs(0); onReady?.(false); }
 
   return <section className="space-y-4" aria-label="Cauldron class">
@@ -19,8 +26,8 @@ export function BrewClass({ value, onChange, onReady }: { value: string[]; onCha
       </div>
     </div>
     {stage === "ingredients" ? <>
-      <IngredientShelf value={value} onChange={(ids) => { onChange(ids); setStirs(0); onReady?.(false); }} />
-      <GoldButton disabled={!value.length} onClick={() => { setStage("stir"); window.scrollTo(0, 0); }}>Into the Cauldron · +${potionsTotal(value).toFixed(2)}</GoldButton>
+      <IngredientShelf value={value} onChange={chooseIngredients} />
+      <GoldButton disabled={!value.length} onClick={startBrewing}>Into the Cauldron · +${potionsTotal(value).toFixed(2)}</GoldButton>
     </> : <>
       <div key={stirs} className={`relative overflow-hidden rounded-lg ${stage === "stir" && stirs > 0 ? "brew-stir" : ""}`}>
         <OptArt id={stage === "bottled" ? "vial" : "cauldron"} alt={stage === "bottled" ? "Your bottled love potion" : "An antique cauldron of molten chocolate and potion bottles"} className="aspect-[4/3] w-full object-cover" />
@@ -33,5 +40,16 @@ export function BrewClass({ value, onChange, onReady }: { value: string[]; onCha
       <Button variant="outline" className="h-11 w-full" onClick={editIngredients}>Change Ingredients</Button>
       <p className="text-xs italic text-muted-foreground">A playful chocolate spell. Real feelings stay delightfully beyond our control.</p>
     </>}
+    <Dialog open={cauldronPrompt} onOpenChange={setCauldronPrompt}>
+      <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-sm overflow-y-auto rounded-lg border-gold bg-card shadow-glow">
+        <OptArt id="cauldron" alt="An antique cauldron ready for your ingredients" className="aspect-[16/9] w-full rounded-lg object-cover" />
+        <DialogHeader>
+          <DialogTitle className="font-display text-2xl tracking-normal text-gold">Into the Cauldron?</DialogTitle>
+          <DialogDescription>Your five ingredients are chosen. Time to stir a little longing into chocolate.</DialogDescription>
+        </DialogHeader>
+        <GoldButton onClick={startBrewing}>Into the Cauldron · +${potionsTotal(value).toFixed(2)}</GoldButton>
+        <Button variant="outline" className="h-11 w-full" onClick={() => setCauldronPrompt(false)}>Keep Choosing</Button>
+      </DialogContent>
+    </Dialog>
   </section>;
 }

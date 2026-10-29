@@ -7,6 +7,7 @@ import potions from "@/assets/shot-potions.jpg";
 import extras from "@/assets/shot-extras.jpg";
 import bite from "@/assets/shot-bite.jpg";
 import grand from "@/assets/box-grand.jpg";
+import { Icon } from "@/components/icons";
 
 export const Route = createFileRoute("/pitch")({
   validateSearch: (s: Record<string, unknown>) => ({ slide: Math.max(1, Math.min(6, Number(s["slide"]) || 1)) }),
@@ -44,12 +45,12 @@ const SLIDES: { title: string; el: ReactNode }[] = [
           <Kicker>01 · The Problem</Kicker>
           <h1 className="slide-title mt-6 font-display text-gold-gradient">Millions of people love someone who doesn't love them back.</h1>
           <ul className="slide-body mt-10 space-y-5 text-muted-foreground">
-            <li>💔 <b className="text-foreground">Who's hurting:</b> the hopeless crushers, the left-on-read, the "we're just friends" crowd.</li>
-            <li>🛠️ <b className="text-foreground">What's broken:</b> gifting is generic, confessing is terrifying, and nothing makes heartache <i>fun</i>.</li>
+            <li className="flex gap-4"><Icon name="fleur" className="mt-1 h-8 w-8 shrink-0 text-gold" /><span><b className="text-foreground">Who's hurting:</b> the hopeless crushers, the left-on-read, the "we're just friends" crowd.</span></li>
+            <li className="flex gap-4"><Icon name="fleur" className="mt-1 h-8 w-8 shrink-0 text-gold" /><span><b className="text-foreground">What's broken:</b> gifting is generic, confessing is terrifying, and nothing makes heartache <i>fun</i>.</span></li>
           </ul>
         </div>
         <div className="text-center">
-          <div className="text-[260px] leading-none">🥺</div>
+          <Icon name="broken-heart" className="mx-auto h-[260px] w-[260px] text-gold" />
           <p className="slide-subtitle mt-6 font-serif italic text-gold">"Why won't they notice me?"</p>
         </div>
       </div>
@@ -73,12 +74,12 @@ const SLIDES: { title: string; el: ReactNode }[] = [
         <h1 className="slide-title mt-6 font-display text-gold-gradient">Everyone with a crush is a customer.</h1>
         <div className="mt-14 grid grid-cols-3 gap-10">
           {[
-            ["Who pays", "Senders aged 18–40 buying for a crush, partner, ex… or bestie", "💳"],
-            ["How many", <>Valentine's spend: <Ph>[US $ figure — add source]</Ph></>, "📈"],
-            ["Why now", "Gifting went social: people buy what makes a great share, not just a great present", "⏰"],
+            ["Who pays", "Senders aged 18–40 buying for a crush, partner, ex… or bestie", "card"],
+            ["How many", <>Valentine's spend: <Ph>[US $ figure — add source]</Ph></>, "chart"],
+            ["Why now", "Gifting went social: people buy what makes a great share, not just a great present", "clock"],
           ].map(([h, b, e]) => (
             <div key={String(h)} className="min-h-[300px] rounded-[32px] border border-gold/40 bg-card p-10">
-              <div className="text-7xl">{e}</div>
+              <Icon name={String(e)} className="h-20 w-20 text-gold" />
               <p className="slide-subtitle mt-4 font-display text-gold">{h}</p>
               <p className="slide-body mt-4 text-muted-foreground">{b}</p>
             </div>
@@ -91,7 +92,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
     <Slide>
       <div className="absolute inset-0 flex flex-col px-[100px] pt-[80px]">
         <Kicker>04 · The Product — live demo</Kicker>
-        <h1 className="slide-subtitle mt-4 font-display text-gold-gradient">Pick a box → brew a potion → they take a bite → you find out.</h1>
+        <h1 className="slide-subtitle mt-4 font-display text-gold-gradient">Pick a box, brew a potion, they take a bite, you find out.</h1>
         <div className="mt-12 flex justify-between">
           {[[home, "Home"], [box, "Choose a box"], [potions, "100 potions"], [extras, "Extras & meter"], [bite, "They bit it!"]].map(([s, l]) => (
             <div key={l} className="text-center">
@@ -114,7 +115,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
   { title: "Smile", el: (
     <Slide>
       <div className="absolute inset-0 flex flex-col items-center justify-center px-[200px] text-center">
-        <div className="text-[180px] leading-none">🍫💘</div>
+        <Icon name="emblem" className="mx-auto h-[180px] w-[180px] text-gold" />
         <h1 className="slide-title mt-10 font-display text-gold-gradient">We can't make them love you…</h1>
         <p className="slide-subtitle mt-6 font-serif italic">…but we can make them eat the chocolate.</p>
       </div>
@@ -157,7 +158,7 @@ function Pitch() {
         <button onClick={() => go(slide - 1)} aria-label="Previous slide" className="h-11 w-11 rounded-full border text-gold">‹</button>
         <span className="text-sm text-muted-foreground">{slide} / {SLIDES.length} · {SLIDES[i]!.title}</span>
         <button onClick={() => go(slide + 1)} aria-label="Next slide" className="h-11 w-11 rounded-full border text-gold">›</button>
-        <button onClick={() => void document.documentElement.requestFullscreen?.()} className="h-11 rounded-full border px-4 text-sm text-gold">Present ⛶</button>
+        <button onClick={() => void document.documentElement.requestFullscreen?.()} className="h-11 rounded-full border px-4 text-sm text-gold">Present</button>
       </div>
     </div>
   );

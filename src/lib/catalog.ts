@@ -129,11 +129,25 @@ const RAW: Record<EssenceId, string[]> = {
   frost: ["First-Snow Crystals", "Thawed Icicle Water", "Winter Mint", "Hoarfrost Sugar"],
   charm: ["Crushed Cupid Wings", "Charmed Sugar", "Siren-Song Syrup", "Sparkle Dust"],
 };
-export type Ingredient = { id: string; name: string; essence: EssenceId; rarity: Rarity; price: number };
+// Apothecary notes (kind + lore) shown on each raw ingredient card, in the same order as RAW.
+const RAW_NOTES: Record<EssenceId, string[]> = {
+  ember: ["A fierce spice that sets the brew simmering with want.", "Reborn heat; keeps the flame of longing alive.", "Bitter-sweet spice with a slow, burning finish.", "A legendary coal that never cools for its chosen."],
+  rose: ["A classic flower of courtship, dried at first bloom.", "Morning dew gathered from a blushing rose.", "Flower-sweet sugar that softens any heart.", "A legendary bud that opens only for true adoration."],
+  moon: ["Collected at midnight; makes the heart ache sweetly.", "A night flower that blooms for the one you miss.", "Moonlit drops for loves kept secret.", "Legendary softness; carries dreams to the beloved."],
+  star: ["The spice of wishes; sweetens fate itself.", "Rare shavings that pull two hearts into orbit.", "Stir counterclockwise and make a wish.", "Legendary salt that aligns destinies."],
+  thorn: ["A dangerous plant; handle obsession with care.", "They cling, like a thought you can't shake.", "Dark plumage for darker fixations.", "A legendary bloom that flowers only for one."],
+  honey: ["Devotion, gathered one flower at a time.", "Ancient tree-gold; preserves loyalty forever.", "Melted into the brew to seal a promise.", "Legendary syrup: slow, patient, eternal."],
+  mist: ["Keeps the beloved mysteriously out of reach.", "Carries your name to their ear at night.", "A spice hidden under gauze, like a secret crush.", "Legendary vapor; they must solve you to have you."],
+  storm: ["Courage, harvested mid-thunderstorm.", "A pinch gives a timid heart its voice.", "A root for those who finally say it.", "Legendary crystals that crackle with nerve."],
+  bloom: ["A flower that laughs when you say their name.", "One pinch and the stomach flutters.", "Bright citrus spice for hopeless romantics.", "Legendary fizz; joy that cannot be corked."],
+  frost: ["Cold crystals that thaw into second chances.", "Melted from the eaves of an old heart.", "A cool herb for rekindling old warmth.", "Legendary sugar; spring after the longest winter."],
+  charm: ["Mischief in powdered form; aim carefully.", "One spoonful and glances linger.", "A sea-spice that calls them to your shore.", "Legendary shimmer; impossible to look away."],
+};
+export type Ingredient = { id: string; name: string; note: string; essence: EssenceId; rarity: Rarity; price: number };
 export const INGREDIENTS: Ingredient[] = ESSENCES.flatMap((e) =>
   RAW[e.id].map((name, i) => {
     const rarity: Rarity = i === 3 ? "legendary" : i === 2 ? "rare" : "common";
-    return { id: `raw-${e.id}-${i + 1}`, name, essence: e.id, rarity, price: INGREDIENT_PRICE[rarity] };
+    return { id: `raw-${e.id}-${i + 1}`, name, note: RAW_NOTES[e.id][i], essence: e.id, rarity, price: INGREDIENT_PRICE[rarity] };
   }),
 );
 

@@ -15,7 +15,7 @@ function MagicDust() {
 
 export function Shell({ children }: { children: ReactNode }) {
   return (
-    <div className="relative mx-auto flex min-h-screen max-w-md flex-col px-5 pb-24 pt-6">
+    <div className="relative mx-auto flex min-h-screen max-w-md flex-col border-x border-gold/40 px-5 pb-24 pt-6 shadow-frame">
       <MagicDust />
       <div className="relative z-10 flex flex-1 flex-col">{children}</div>
     </div>
@@ -67,7 +67,7 @@ export function BottomNav() {
   const { pathname } = useLocation();
   if (pathname.startsWith("/pitch")) return null;
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-md border-t bg-background/95 backdrop-blur">
+    <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-md border-x border-t border-gold/40 bg-background/95 backdrop-blur">
       {TABS.map((t) => {
         const active = t.to === "/" ? pathname === "/" : pathname.startsWith(t.to);
         return (

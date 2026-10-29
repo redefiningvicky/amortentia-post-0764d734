@@ -79,6 +79,8 @@
 
 @utility bg-gold-gradient { background: var(--gradient-gold); }
 @utility shadow-glow { box-shadow: var(--shadow-glow); }
+/* Gilded frame that separates the app column from the page behind it */
+@utility shadow-frame { box-shadow: var(--shadow-frame); }
 @utility text-gold-gradient {
   background: var(--gradient-gold);
   -webkit-background-clip: text;

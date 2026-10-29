@@ -49,9 +49,11 @@ export type Database = {
       }
       orders: {
         Row: {
+          addons: string[]
           aroma: string
           created_at: string
           duration: string
+          handwritten_text: string | null
           id: string
           note: string | null
           recipient_email: string
@@ -64,9 +66,11 @@ export type Database = {
           total: number
         }
         Insert: {
+          addons?: string[]
           aroma: string
           created_at?: string
           duration: string
+          handwritten_text?: string | null
           id?: string
           note?: string | null
           recipient_email: string
@@ -79,9 +83,11 @@ export type Database = {
           total: number
         }
         Update: {
+          addons?: string[]
           aroma?: string
           created_at?: string
           duration?: string
+          handwritten_text?: string | null
           id?: string
           note?: string | null
           recipient_email?: string

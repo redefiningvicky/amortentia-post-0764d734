@@ -5,6 +5,7 @@ import { ALL_BOXES } from "@/lib/catalog";
 import { BOX_ART } from "@/lib/art";
 import { GoldButton, Shell } from "@/components/kit";
 import { Icon } from "@/components/icons";
+import { OptArt } from "@/components/opt-art";
 
 type Search = { id: string; to: string; from: string; tier: string; blend: string; note: string };
 

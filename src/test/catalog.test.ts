@@ -43,7 +43,7 @@ import { upgradesTotal, MAX_BLEND } from "@/lib/catalog";
 describe("upgrades", () => {
   it("blend allows up to 5 potions", () => expect(MAX_BLEND).toBe(5));
   it("default kraft + standard owl is free", () => expect(upgradesTotal("kraft", "owl", [], false)).toBe(0));
-  it("music box + courier + locket + antidote", () => expect(upgradesTotal("music", "courier", ["locket"], true)).toBe(142.96));
+  it("music box + courier + plush + antidote", () => expect(upgradesTotal("music", "courier", ["plush"], true)).toBe(116.96));
 });
 
 import { SEASONAL, desperationLevel } from "@/lib/catalog";
@@ -52,4 +52,14 @@ describe("seasonal boxes & desperation meter", () => {
   it("has four seasonal boxes", () => expect(SEASONAL).toHaveLength(4));
   it("cheap order is Mildly Hopeful", () => expect(desperationLevel(40).label).toBe("Mildly Hopeful"));
   it("$400 order is Unhinged Romantic", () => expect(desperationLevel(400).label).toBe("Unhinged Romantic"));
+});
+
+import { bundleSavings, expressWaiver } from "@/lib/catalog";
+describe("bundles & free express", () => {
+  it("Full Love Spell saves $10 when all its items are picked", () =>
+    expect(bundleSavings({ handwritten: true, card: "singing", keepsakes: ["vial", "plush"], packaging: "velvet" })).toBe(10));
+  it("no saving if a bundle item is removed", () =>
+    expect(bundleSavings({ handwritten: true, card: "singing", keepsakes: ["vial"], packaging: "velvet" })).toBe(0));
+  it("express is free over $99", () => expect(expressWaiver("express", 99)).toBe(14.99));
+  it("express is paid under $99", () => expect(expressWaiver("express", 98.99)).toBe(0));
 });

@@ -118,9 +118,9 @@ export const POTIONS: Potion[] = ESSENCES.flatMap((e) =>
 export const INGREDIENT_PRICE: Record<Rarity, number> = { common: 1.99, rare: 2.99, legendary: 4.99 };
 // Each essence is one raw-ingredient type (spices, flowers, herbs…), 10 flavors each = 110 total.
 export const INGREDIENT_KIND: Record<EssenceId, string> = {
-  ember: "Spices", rose: "Flowers", moon: "Herbs", star: "Crystals", thorn: "Forbidden Plants",
-  honey: "Syrups & Nectars", mist: "Waters & Vapors", storm: "Roots & Beans", bloom: "Fruits & Zests",
-  frost: "Minerals & Frosts", charm: "Curios & Charms",
+  ember: "Spices", rose: "Flowers", moon: "Leaves", star: "Crystals", thorn: "Vines & Thorns",
+  honey: "Nectars", mist: "Waters", storm: "Roots", bloom: "Fruits",
+  frost: "Mints", charm: "Curios",
 };
 const RAW: Record<EssenceId, string[]> = {
   ember: ["Crushed Dragon Pepper", "Phoenix Ash", "Chili-Chocolate Nibs", "Heartfire Ember", "Smoked Cinnamon Bark", "Saffron Threads of Longing", "Blazing Clove Buds", "Fire-Roasted Cardamom", "Volcano Salt", "Dragonscale Pepper"],
@@ -137,22 +137,22 @@ const RAW: Record<EssenceId, string[]> = {
 };
 // Apothecary notes (kind + lore) shown on each raw ingredient card, in the same order as RAW.
 const RAW_NOTES: Record<EssenceId, string[]> = {
-  ember: ["A fierce spice that sets the brew simmering with want.", "Reborn heat; keeps the flame of longing alive.", "Bitter-sweet spice with a slow, burning finish.", "A legendary coal that never cools for its chosen."],
-  rose: ["A classic flower of courtship, dried at first bloom.", "Morning dew gathered from a blushing rose.", "Flower-sweet sugar that softens any heart.", "A legendary bud that opens only for true adoration."],
-  moon: ["Collected at midnight; makes the heart ache sweetly.", "A night flower that blooms for the one you miss.", "Moonlit drops for loves kept secret.", "Legendary softness; carries dreams to the beloved."],
-  star: ["The spice of wishes; sweetens fate itself.", "Rare shavings that pull two hearts into orbit.", "Stir counterclockwise and make a wish.", "Legendary salt that aligns destinies."],
-  thorn: ["A dangerous plant; handle obsession with care.", "They cling, like a thought you can't shake.", "Dark plumage for darker fixations.", "A legendary bloom that flowers only for one."],
-  honey: ["Devotion, gathered one flower at a time.", "Ancient tree-gold; preserves loyalty forever.", "Melted into the brew to seal a promise.", "Legendary syrup: slow, patient, eternal."],
-  mist: ["Keeps the beloved mysteriously out of reach.", "Carries your name to their ear at night.", "A spice hidden under gauze, like a secret crush.", "Legendary vapor; they must solve you to have you."],
-  storm: ["Courage, harvested mid-thunderstorm.", "A pinch gives a timid heart its voice.", "A root for those who finally say it.", "Legendary crystals that crackle with nerve."],
-  bloom: ["A flower that laughs when you say their name.", "One pinch and the stomach flutters.", "Bright citrus spice for hopeless romantics.", "Legendary fizz; joy that cannot be corked."],
-  frost: ["Cold crystals that thaw into second chances.", "Melted from the eaves of an old heart.", "A cool herb for rekindling old warmth.", "Legendary sugar; spring after the longest winter."],
-  charm: ["Mischief in powdered form; aim carefully.", "One spoonful and glances linger.", "A sea-spice that calls them to your shore.", "Legendary shimmer; impossible to look away."],
+  ember: ["A fierce spice that sets the brew simmering with want.", "Reborn heat; keeps the flame of longing alive.", "Bitter-sweet spice with a slow, burning finish.", "A coal that never cools for its chosen.", "Bark smoked over a lover's hearth.", "Threads worth more than gold, and almost as rare as their attention.", "Buds that spark on the tongue.", "Pods cracked open under a full moon.", "Crystals scraped from a volcano's heart.", "Legendary pepper; one flake and they burn for you."],
+  rose: ["A classic flower of courtship, dried at first bloom.", "Morning dew gathered from a blushing rose.", "Flower-sweet sugar that softens any heart.", "A bud that opens only for true adoration.", "Petals pressed between love letters.", "Calming hearts and hoping hearts since forever.", "A flower that only blooms after dark.", "Scattered at weddings; swept up by the hopeful.", "Fruit of the rose, gilded and patient.", "Legendary bloom; whoever it opens for is yours."],
+  moon: ["Collected at midnight; makes the heart ache sweetly.", "A night flower that blooms for the one you miss.", "Moonlit drops for loves kept secret.", "Softness that carries dreams to the beloved.", "Leaves brushed by moonbeams only.", "Brewed by dreamers who whisper names in sleep.", "Tiny silver leaves for quiet devotion.", "A leaf that grows only in shadow.", "Herb of visions; shows their face in dreams.", "Legendary herb; rest only comes when they arrive."],
+  star: ["The sugar of wishes; sweetens fate itself.", "Shavings that pull two hearts into orbit.", "Stir counterclockwise and make a wish.", "Salt that aligns destinies.", "Crystals grown on comet tails.", "Ground from a fallen star.", "Crystals that shimmer with the northern lights.", "Twelve stones, one for every sign of them.", "Sugar spun from a swirling galaxy.", "Legendary dust; destiny itself takes your side."],
+  thorn: ["A dangerous plant; handle obsession with care.", "They cling, like a thought you can't shake.", "Dark plumage for darker fixations.", "A bloom that flowers only for one.", "It screams when pulled; so will they, for you.", "A fern that grows where love was lost.", "Beauty with a shadow; love with a grip.", "Lovely, lethal, unforgettable.", "It winds around whatever it wants.", "Legendary root; once tasted, never forgotten."],
+  honey: ["Devotion, gathered one flower at a time.", "Ancient tree-gold; preserves loyalty forever.", "Melted into the brew to seal a promise.", "Slow, patient, eternal sweetness.", "Tapped under a harvest moon.", "A vow you can drizzle.", "Golden and impossible to resist.", "Fit for a queen, meant for one.", "Campfire sweetness for cold nights apart.", "Legendary nectar; an oath that cannot break."],
+  mist: ["Keeps the beloved mysteriously out of reach.", "Carries your name to their ear at night.", "A sweetness hidden under gauze, like a secret crush.", "They must solve you to have you.", "Caught drop by drop while the world slept.", "Whipped from a passing cloud.", "Wept by incense at midnight mass.", "Bottled where two paths secretly meet.", "Water that shows what you long for.", "Legendary mist; nobody who breathes it forgets you."],
+  storm: ["Courage, harvested mid-thunderstorm.", "A pinch gives a timid heart its voice.", "A root for those who finally say it.", "Crystals that crackle with nerve.", "Golden root ground in a gale.", "For hearts that dare greatly.", "Calms the storm so the confession comes clear.", "Pulled from a cliffside in high wind.", "One crack and the knees stop shaking.", "Legendary root; courage fit for a king's confession."],
+  bloom: ["A flower that laughs when you say their name.", "One pinch and the stomach flutters.", "Bright citrus for hopeless romantics.", "Joy that cannot be corked.", "Summer berries crushed into blush-pink dust.", "Sweetness shaped like what you're after.", "Berries that burst with nervous laughter.", "Sharp, bright, impossible to ignore.", "A rare golden berry for rare golden feelings.", "Legendary fruit; it ripens only when love is near."],
+  frost: ["Cold crystals that thaw into second chances.", "Melted from the eaves of an old heart.", "A cool herb for rekindling old warmth.", "Sugar for spring after the longest winter.", "Raked from a glacier's shoulder.", "Berries picked under the first frost.", "Cool, clean, and quietly hopeful.", "Berries that waited out the winter.", "Sap frozen mid-sigh.", "Legendary crystal; winter ends the moment they bite."],
+  charm: ["Mischief in powdered form; aim carefully.", "One spoonful and glances linger.", "A sea-song that calls them to your shore.", "Shimmer impossible to look away from.", "Shed by birds who mate for life.", "Gilding for the sweetest words.", "Shaved from the arrow that started it all.", "Ground from a pearl that heard a siren.", "One thread tied around a willing heart.", "Legendary vial; the moment your eyes first met."],
 };
 export type Ingredient = { id: string; name: string; note: string; essence: EssenceId; rarity: Rarity; price: number };
 export const INGREDIENTS: Ingredient[] = ESSENCES.flatMap((e) =>
   RAW[e.id].map((name, i) => {
-    const rarity: Rarity = i === 3 ? "legendary" : i === 2 ? "rare" : "common";
+    const rarity: Rarity = i === 9 ? "legendary" : i >= 6 ? "rare" : "common";
     return { id: `raw-${e.id}-${i + 1}`, name, note: RAW_NOTES[e.id][i], essence: e.id, rarity, price: INGREDIENT_PRICE[rarity] };
   }),
 );

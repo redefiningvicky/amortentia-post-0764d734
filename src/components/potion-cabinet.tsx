@@ -78,6 +78,7 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
                 {RARITY_LABEL[p.rarity] && <span className="rounded-full bg-gold-gradient px-2 text-[10px] font-bold uppercase text-primary-foreground">{RARITY_LABEL[p.rarity]}</span>}
               </div>
               <p className="mt-1 font-semibold leading-tight">{p.name}</p>
+              <p className="mt-0.5 text-xs italic text-muted-foreground">{p.note}</p>
               <p className="text-xs text-muted-foreground">{e.name}</p>
               <p className="mt-1 text-gold">${p.price}</p>
             </button>

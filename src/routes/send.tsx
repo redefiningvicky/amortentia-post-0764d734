@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { TIERS, STRENGTHS, AROMAS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome } from "@/lib/catalog";
+import { TIERS, STRENGTHS, AROMAS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
@@ -20,12 +20,17 @@ export const Route = createFileRoute("/send")({
   component: Send,
 });
 
-const TITLES = ["Choose Your Box", "The Potion Cabinet", "Brew Your Longing", "Add a Little Extra", "Confess Your Heart", "Seal & Send"];
+const TITLES = ["Choose Your Box", "The Potion Cabinet", "Brew Your Longing", "Make It Unforgettable", "Wrap & Deliver", "Confess Your Heart", "Seal & Send"];
 
 function Send() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [potions, setPotions] = useState<string[]>([]);
+  const [keepsakes, setKeepsakes] = useState<string[]>([]);
+  const [packaging, setPackaging] = useState("kraft");
+  const [delivery, setDelivery] = useState("owl");
+  const [antidote, setAntidote] = useState(false);
+  const toggleKeepsake = (id: string) => setKeepsakes((k) => (k.includes(id) ? k.filter((x) => x !== id) : [...k, id]));
   const [tier, setTier] = useState("true");
   const [strength, setStrength] = useState("swoon");
   const [aroma, setAroma] = useState("rose");
@@ -42,12 +47,12 @@ function Send() {
   const [sent, setSent] = useState(false);
 
   const durId = DURATIONS.find((d) => d.id === duration) ? duration : DURATIONS[0]!.id;
-  const total = Math.round((orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card)) * 100) / 100;
+  const total = Math.round((orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, delivery, keepsakes, antidote)) * 100) / 100;
   const outcome = blendOutcome(potions);
   const canNext =
     (step !== 1 || potions.length > 0) &&
     (step !== 3 || !handwritten || handText.trim().length > 0) &&
-    (step !== 4 || (to.trim() && from.trim() && /\S+@\S+\.\S+/.test(toEmail)));
+    (step !== 5 || (to.trim() && from.trim() && /\S+@\S+\.\S+/.test(toEmail)));
 
   async function submit() {
     setBusy(true);
@@ -58,7 +63,7 @@ function Send() {
         tier, strength, aroma, duration: durId,
         sender_name: from.trim(), recipient_name: to.trim(), recipient_email: toEmail.trim(),
         note: note.trim() || null, total, share_on_wall: share,
-        addons: [handwritten ? "handwritten" : null, card ? `card:${card}` : null].filter(Boolean) as string[],
+        addons: [handwritten ? "handwritten" : null, card ? `card:${card}` : null, `pack:${packaging}`, `ship:${delivery}`, antidote ? "antidote" : null, ...keepsakes.map((k) => `keep:${k}`)].filter(Boolean) as string[],
         handwritten_text: handwritten ? handText.trim() : null,
         potions, outcome: outcome?.name ?? null,
       }));
@@ -161,10 +166,40 @@ function Send() {
                 <span className="text-gold">+${c.price}</span>
               </Option>
             ))}
+            <Label>Keepsakes they'll treasure</Label>
+            <p className="text-sm text-muted-foreground">Little reminders of you, long after the last chocolate.</p>
+            {KEEPSAKES.map((k) => (
+              <Option key={k.id} active={keepsakes.includes(k.id)} onClick={() => toggleKeepsake(k.id)}>
+                <div className="text-3xl">{k.emoji}</div>
+                <div className="flex-1"><div className="text-lg font-semibold">{k.name}</div><p className="text-muted-foreground">{k.desc}</p></div>
+                <span className="text-gold">+${k.price}</span>
+              </Option>
+            ))}
           </>
         )}
 
         {step === 4 && (
+          <>
+            <Label>The moment they first see it</Label>
+            {PACKAGING.map((k) => (
+              <Option key={k.id} active={packaging === k.id} onClick={() => setPackaging(k.id)}>
+                <div className="text-3xl">{k.emoji}</div>
+                <div className="flex-1"><div className="text-lg font-semibold">{k.name}</div><p className="text-muted-foreground">{k.desc}</p></div>
+                <span className="text-gold">{k.price ? `+$${k.price}` : "Included"}</span>
+              </Option>
+            ))}
+            <Label>How soon should they be yours?</Label>
+            {DELIVERY.map((k) => (
+              <Option key={k.id} active={delivery === k.id} onClick={() => setDelivery(k.id)}>
+                <div className="text-3xl">{k.emoji}</div>
+                <div className="flex-1"><div className="text-lg font-semibold">{k.name}</div><p className="text-muted-foreground">{k.desc}</p></div>
+                <span className="text-gold">{k.price ? `+$${k.price}` : "Included"}</span>
+              </Option>
+            ))}
+          </>
+        )}
+
+        {step === 5 && (
           <div className="rounded-2xl bg-parchment p-5 text-parchment-foreground shadow-glow">
             <Field label="To my beloved" value={to} onChange={setTo} placeholder="Their name" />
             <Field label="Their email" value={toEmail} onChange={setToEmail} placeholder="So the owl can find them" type="email" />
@@ -176,7 +211,7 @@ function Send() {
           </div>
         )}
 
-        {step === 5 && (
+        {step === 6 && (
           <>
             <div className="space-y-2 rounded-2xl border bg-card p-5">
               <Row k="Box" v={TIERS.find((t) => t.id === tier)!.name} />
@@ -187,8 +222,19 @@ function Send() {
               <Row k="Lasts" v={DURATIONS.find((d) => d.id === durId)!.name} />
               {handwritten && <Row k="Extra" v="Handwritten note" />}
               {card && <Row k="Card" v={CARDS.find((c) => c.id === card)!.name} />}
+              {keepsakes.length > 0 && <Row k="Keepsakes" v={`${keepsakes.length} added`} />}
+              <Row k="Wrapping" v={PACKAGING.find((x) => x.id === packaging)!.name} />
+              <Row k="Delivery" v={DELIVERY.find((x) => x.id === delivery)!.name} />
               <Row k="To" v={to} />
             </div>
+            <Option active={antidote} onClick={() => setAntidote(!antidote)}>
+              <div className="text-2xl">🛡️</div>
+              <div className="flex-1">
+                <div className="font-semibold">{ANTIDOTE.name}</div>
+                <p className="text-sm text-muted-foreground">{ANTIDOTE.desc}</p>
+              </div>
+              <span className="text-gold">+${ANTIDOTE.price}</span>
+            </Option>
             <Option active={share} onClick={() => setShare(!share)}>
               <div className="text-2xl">{share ? "💘" : "🤫"}</div>
               <div className="flex-1">
@@ -204,8 +250,8 @@ function Send() {
         <div className="mb-2 flex justify-between text-muted-foreground">
           <span>Total</span><span className="text-lg font-bold text-gold">${total.toFixed(2)}</span>
         </div>
-        <GoldButton disabled={!canNext || busy} onClick={() => (step === 5 ? submit() : setStep(step + 1))}>
-          {step === 5 ? (busy ? "Summoning owl…" : "Send by Owl 🦉") : "Continue"}
+        <GoldButton disabled={!canNext || busy} onClick={() => (step === 6 ? submit() : setStep(step + 1))}>
+          {step === 6 ? (busy ? "Summoning owl…" : "Send by Owl 🦉") : "Continue"}
         </GoldButton>
       </div>
     </Shell>

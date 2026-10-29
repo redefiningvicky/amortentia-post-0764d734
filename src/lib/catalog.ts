@@ -116,18 +116,24 @@ export const POTIONS: Potion[] = ESSENCES.flatMap((e) =>
 
 // Raw brewing ingredients for the cauldron class: 4 per essence, priced by rarity (never free).
 export const INGREDIENT_PRICE: Record<Rarity, number> = { common: 1.99, rare: 2.99, legendary: 4.99 };
+// Each essence is one raw-ingredient type (spices, flowers, herbs…), 10 flavors each = 110 total.
+export const INGREDIENT_KIND: Record<EssenceId, string> = {
+  ember: "Spices", rose: "Flowers", moon: "Herbs", star: "Crystals", thorn: "Forbidden Plants",
+  honey: "Syrups & Nectars", mist: "Waters & Vapors", storm: "Roots & Beans", bloom: "Fruits & Zests",
+  frost: "Minerals & Frosts", charm: "Curios & Charms",
+};
 const RAW: Record<EssenceId, string[]> = {
-  ember: ["Crushed Dragon Pepper", "Phoenix Ash", "Chili-Chocolate Nibs", "Heartfire Ember"],
-  rose: ["Crushed Rose Petals", "Blushing Dewdrops", "Velvet Petal Sugar", "First-Blush Bud"],
-  moon: ["Moonlight Dew", "Midnight Jasmine", "Silver Tears", "Owl-Feather Down"],
-  star: ["Stardust Sugar", "Comet-Tail Shavings", "Wishbone Honey", "Constellation Salt"],
-  thorn: ["Nightshade Berries", "Bramble Thorns", "Raven Feathers", "Obsession Orchid"],
-  honey: ["Wildflower Honey", "Amber Resin", "Beeswax Hearts", "Golden Treacle"],
-  mist: ["Bottled Fogwater", "Whisper-Smoke", "Veiled Vanilla", "Sphinx Smoke"],
-  storm: ["Lightning-Struck Cocoa", "Thunder Salt", "Lionheart Ginger", "Storm-Charged Sugar"],
-  bloom: ["Giggling Peony", "Butterfly Pollen", "Sunshine Zest", "Popping Fizz Crystals"],
-  frost: ["First-Snow Crystals", "Thawed Icicle Water", "Winter Mint", "Hoarfrost Sugar"],
-  charm: ["Crushed Cupid Wings", "Charmed Sugar", "Siren-Song Syrup", "Sparkle Dust"],
+  ember: ["Crushed Dragon Pepper", "Phoenix Ash", "Chili-Chocolate Nibs", "Heartfire Ember", "Smoked Cinnamon Bark", "Saffron Threads of Longing", "Blazing Clove Buds", "Fire-Roasted Cardamom", "Volcano Salt", "Dragonscale Pepper"],
+  rose: ["Crushed Rose Petals", "Blushing Dewdrops", "Velvet Petal Sugar", "First-Blush Bud", "Sweetheart Peony Petals", "Dried Lavender Hearts", "Midnight Camellia", "Carnation Confetti", "Gilded Rosehips", "The Unopened Bloom"],
+  moon: ["Moonlight Dew", "Midnight Jasmine", "Silver Tears", "Owl-Feather Down", "Moonlit Sage", "Dreamer's Chamomile", "Silverleaf Thyme", "Shadow Basil", "Lunar Mugwort", "The Sleepless Herb"],
+  star: ["Stardust Sugar", "Comet-Tail Shavings", "Wishbone Honey", "Constellation Salt", "Celestial Rock Candy", "Meteorite Dust", "Aurora Crystals", "Zodiac Quartz", "Nebula Sugar", "Destiny Diamond Dust"],
+  thorn: ["Nightshade Berries", "Bramble Thorns", "Raven Feathers", "Obsession Orchid", "Mandrake Slivers", "Widow's Fern", "Black Dahlia", "Hemlock Petals", "Raven's Ivy", "The Unforgettable Root"],
+  honey: ["Wildflower Honey", "Amber Resin", "Beeswax Hearts", "Golden Treacle", "Maple Moon Syrup", "Caramel Oath", "Butterscotch Nectar", "Royal Jelly", "Toasted Marshmallow Syrup", "Eternal Oath Nectar"],
+  mist: ["Bottled Fogwater", "Whisper-Smoke", "Veiled Vanilla", "Sphinx Smoke", "Midnight Rainwater", "Cloud Cream", "Incense Tears", "Fog from a Secret Garden", "Mirage Droplets", "The Enigma Mist"],
+  storm: ["Lightning-Struck Cocoa", "Thunder Salt", "Lionheart Ginger", "Storm-Charged Sugar", "Thunder Turmeric", "Daredevil Ginseng", "Valor Valerian", "Gale Root", "Peppercorn of Pluck", "Storm King's Heartroot"],
+  bloom: ["Giggling Peony", "Butterfly Pollen", "Sunshine Zest", "Popping Fizz Crystals", "Blushing Strawberry Dust", "Candied Cherry Hearts", "Raspberry Fizz", "Pink Grapefruit Peel", "Golden Gooseberry", "Everbloom Fruit"],
+  frost: ["First-Snow Crystals", "Thawed Icicle Water", "Winter Mint", "Hoarfrost Sugar", "Glacial Salt", "Snowberry Dust", "Iced Spearmint", "Frozen Juniper", "Silver Fir Resin", "Spring-After-Winter Crystal"],
+  charm: ["Crushed Cupid Wings", "Charmed Sugar", "Siren-Song Syrup", "Sparkle Dust", "Lovebird Feather", "Enchanted Rose-Gold Leaf", "Cupid's Arrowhead Shavings", "Siren Pearl Dust", "Heartstring Filament", "Bottled First Glance"],
 };
 // Apothecary notes (kind + lore) shown on each raw ingredient card, in the same order as RAW.
 const RAW_NOTES: Record<EssenceId, string[]> = {

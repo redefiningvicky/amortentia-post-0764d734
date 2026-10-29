@@ -104,6 +104,16 @@
   50% { transform: translateY(-8px); }
 }
 
+@utility brew-stir { animation: brew-stir 650ms ease-in-out; }
+@keyframes brew-stir {
+  0%, 100% { transform: rotate(0); }
+  30% { transform: rotate(-1deg); }
+  65% { transform: rotate(1deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brew-stir { animation: none; }
+}
+
 /* Candlelight flicker on glowing surfaces */
 @utility candle-flicker {
   animation: candle-flicker 3.2s ease-in-out infinite;

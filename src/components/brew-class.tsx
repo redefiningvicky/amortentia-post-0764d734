@@ -17,7 +17,7 @@ export function BrewClass({ value, onChange, onReady }: { value: string[]; onCha
       <PotionCabinet value={value} onChange={(ids) => { onChange(ids); setStirs(0); onReady?.(false); }} />
       <GoldButton disabled={!value.length} onClick={() => { setStage("stir"); window.scrollTo(0, 0); }}>Into the Cauldron · +${potionsTotal(value).toFixed(2)}</GoldButton>
     </> : <>
-      <div className="relative overflow-hidden rounded-lg">
+      <div key={stirs} className={`relative overflow-hidden rounded-lg ${stage === "stir" && stirs > 0 ? "brew-stir" : ""}`}>
         <OptArt id={stage === "bottled" ? "vial" : "cauldron"} alt={stage === "bottled" ? "Your bottled love potion" : "An antique cauldron of molten chocolate and potion bottles"} className="aspect-[4/3] w-full object-cover" />
         {stage === "stir" && <Button variant="outline" aria-label="Stir the cauldron" disabled={stirs >= 3} onClick={() => setStirs((n) => Math.min(3, n + 1))}
           className="absolute bottom-4 left-1/2 h-12 -translate-x-1/2 rounded-full border-gold bg-background/95 px-6 text-gold">{stirs >= 3 ? "Your blend is ready" : `Stir · ${stirs}/3`}</Button>}

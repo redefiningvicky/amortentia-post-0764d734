@@ -20,7 +20,7 @@ describe("add-ons", () => {
   it("no add-ons is $0", () => expect(addonsTotal(false, null)).toBe(0));
 });
 
-import { POTIONS, blendOutcome, potionsTotal } from "@/lib/catalog";
+import { POTIONS } from "@/lib/catalog";
 describe("potion cabinet", () => {
   it("has exactly 100 potions with unique ids", () => {
     expect(POTIONS).toHaveLength(100);

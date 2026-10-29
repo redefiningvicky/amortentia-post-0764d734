@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { ESSENCES, INGREDIENTS, MAX_BLEND, type EssenceId } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
-import { bottleStyle } from "@/lib/art";
+import { ING_ART } from "@/lib/art";
 import { Icon } from "@/components/icons";
 import { OptArt } from "@/components/opt-art";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ export function IngredientShelf({ value, onChange }: { value: string[]; onChange
 
   return (
     <div className="space-y-3">
-      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search 40 raw ingredients…" aria-label="Search ingredients"
+      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search ${INGREDIENTS.length} raw ingredients…`} aria-label="Search ingredients"
         className="h-12 w-full rounded-xl border bg-card px-4 outline-none focus:border-gold" />
       <div className="grid grid-cols-2 gap-2" aria-label="Ingredient essences">
         {[{ id: "all" as const, name: "All" }, ...ESSENCES].map((e) => (
@@ -28,7 +28,7 @@ export function IngredientShelf({ value, onChange }: { value: string[]; onChange
             className={cn("h-11 min-w-0 justify-start gap-1.5 rounded-full px-3 text-sm", essence === e.id ? "bg-gold-gradient text-primary-foreground" : "bg-card")}>
             {e.id === "all"
               ? <OptArt id="wand" alt="" className="h-6 w-6 rounded-full object-cover" />
-              : <span role="img" aria-label={`${e.name} essence`} className="inline-block h-6 w-5 bg-no-repeat" style={bottleStyle(e.id)} />}
+              : <img src={ING_ART[`raw-${e.id}-1`]} alt="" loading="lazy" className="h-6 w-6 rounded-full object-cover" />}
             {e.name}
           </Button>
         ))}
@@ -57,13 +57,18 @@ export function IngredientShelf({ value, onChange }: { value: string[]; onChange
             <button key={p.id} onClick={() => toggle(p.id)} disabled={full} aria-pressed={on}
               className={cn("rounded-2xl border bg-card p-3 text-left transition disabled:opacity-40", on && "border-gold shadow-glow",
                 p.rarity === "legendary" && "border-primary/60")}>
-              <div className="flex items-start justify-between">
-                <span role="img" aria-label={`${e.name} essence`} className="block h-14 w-11 bg-no-repeat" style={bottleStyle(e.id)} />
-                {RARITY_LABEL[p.rarity] && <span className="rounded-full bg-gold-gradient px-2 text-[10px] font-bold uppercase text-primary-foreground">{RARITY_LABEL[p.rarity]}</span>}
+              <div className="relative">
+                <img src={ING_ART[p.id]} alt={p.name} loading="lazy" width={460} height={460}
+                  className="aspect-square w-full rounded-xl border border-gold/30 object-cover" />
+                {RARITY_LABEL[p.rarity] && (
+                  <span className="absolute right-1.5 top-1.5 rounded-full bg-gold-gradient px-2 text-[10px] font-bold uppercase text-primary-foreground">
+                    {RARITY_LABEL[p.rarity]}
+                  </span>
+                )}
               </div>
-              <p className="mt-1 font-semibold leading-tight">{p.name}</p>
-              <p className="text-xs text-muted-foreground">{e.name} essence</p>
-              <p className="mt-1 text-gold">${p.price}</p>
+              <p className="mt-2 font-semibold leading-tight">{p.name}</p>
+              <p className="mt-0.5 text-xs italic text-muted-foreground">{p.note}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{e.name} essence · <span className="text-gold">${p.price}</span></p>
             </button>
           );
         })}

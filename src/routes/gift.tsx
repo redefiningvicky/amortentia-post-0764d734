@@ -34,7 +34,7 @@ function Gift() {
   const from = s.from || "A Secret Admirer";
 
   useEffect(() => {
-    if (stage !== "closed" && s.id) void supabase.rpc("mark_gift", { _id: s.id, _event: stage === "bitten" ? "bite" : "open" });
+    if (stage !== "closed" && s.id) void supabase.rpc("mark_gift", { _id: s.id, _event: stage === "bitten" ? "bite" : "open" }).then(() => undefined);
   }, [stage, s.id]);
 
   return (

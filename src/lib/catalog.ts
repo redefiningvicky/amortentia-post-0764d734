@@ -8,6 +8,27 @@ export const TIERS: Tier[] = [
   { id: "grand", name: "The Grand Amortentia", pieces: 72, price: 119.99, blurb: "Love beyond reason" },
 ];
 
+// Limited-edition seasonal boxes (proposed prices, unconfirmed).
+export const SEASONAL: Tier[] = [
+  { id: "spooky", name: "The Spooky Crush", pieces: 16, price: 34.99, blurb: "Halloween only · scary how much you like them" },
+  { id: "valentine", name: "The Heartbreaker", pieces: 24, price: 44.99, blurb: "Valentine's only · for when Feb 14 hurts" },
+  { id: "galentine", name: "The Galentine's Gossip", pieces: 20, price: 29.99, blurb: "Galentine's only · love your besties loudly" },
+  { id: "revenge", name: "The Revenge Ex Edition", pieces: 18, price: 39.99, blurb: "Limited · make them regret everything" },
+];
+export const ALL_BOXES: Tier[] = [...TIERS, ...SEASONAL];
+
+// Funny gauge that rises with the order total.
+export const DESPERATION = [
+  { min: 0, label: "Mildly Hopeful", emoji: "🙂" },
+  { min: 60, label: "Lovesick", emoji: "🥺" },
+  { min: 120, label: "Hopelessly Devoted", emoji: "😩" },
+  { min: 220, label: "Writing Their Name in Notebooks", emoji: "📓" },
+  { min: 350, label: "Unhinged Romantic", emoji: "🫠" },
+];
+export function desperationLevel(total: number) {
+  return [...DESPERATION].reverse().find((d) => total >= d.min)!;
+}
+
 export const STRENGTHS = [
   { id: "flutter", name: "Flutter", desc: "They can't stop thinking of you", price: 7 },
   { id: "swoon", name: "Swoon", desc: "They ache when you leave the room", price: 12 },
@@ -29,7 +50,7 @@ export const DURATIONS = [
 ];
 
 export function orderTotal(tierId: string, strengthId: string, durationId: string) {
-  const t = TIERS.find((x) => x.id === tierId)?.price ?? 0;
+  const t = ALL_BOXES.find((x) => x.id === tierId)?.price ?? 0;
   const s = STRENGTHS.find((x) => x.id === strengthId)?.price ?? 0;
   const d = DURATIONS.find((x) => x.id === durationId)?.price ?? 0;
   return Math.round((t + s + d) * 100) / 100;

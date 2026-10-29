@@ -45,3 +45,11 @@ describe("upgrades", () => {
   it("default kraft + standard owl is free", () => expect(upgradesTotal("kraft", "owl", [], false)).toBe(0));
   it("music box + courier + locket + antidote", () => expect(upgradesTotal("music", "courier", ["locket"], true)).toBe(142.96));
 });
+
+import { SEASONAL, desperationLevel } from "@/lib/catalog";
+describe("seasonal boxes & desperation meter", () => {
+  it("seasonal box prices count in total", () => expect(orderTotal("valentine", "flutter", "hour")).toBe(55.99));
+  it("has four seasonal boxes", () => expect(SEASONAL).toHaveLength(4));
+  it("cheap order is Mildly Hopeful", () => expect(desperationLevel(40).label).toBe("Mildly Hopeful"));
+  it("$400 order is Unhinged Romantic", () => expect(desperationLevel(400).label).toBe("Unhinged Romantic"));
+});

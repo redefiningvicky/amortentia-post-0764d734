@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
 import { POTIONS, STRENGTHS, ALL_BOXES } from "@/lib/catalog";
 import { Shell } from "@/components/kit";
+import { Icon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/wall")({
@@ -78,7 +79,7 @@ function Wall() {
           <div key={t.id} className="mt-2 flex items-center gap-3">
             <span className="w-6 font-display text-gold">{i + 1}</span>
             <span className="flex-1 text-lg">{t.name}</span>
-            <span className="text-muted-foreground">{t.score} 💘</span>
+            <span className="flex items-center gap-1.5 text-muted-foreground"><Icon name="heart" className="h-4 w-4 text-gold" /> {t.score}</span>
           </div>
         ))}
       </section>
@@ -86,7 +87,7 @@ function Wall() {
       <div className="mt-5 flex gap-2">
         {(["hot", "new"] as const).map((s) => (
           <button key={s} onClick={() => setSort(s)} className={cn("min-h-11 rounded-full border px-4", sort === s ? "bg-gold-gradient text-primary-foreground" : "bg-card")}>
-            {s === "hot" ? "🔥 Most Smitten" : "✨ Newest"}
+            {s === "hot" ? "Most Smitten" : "Newest"}
           </button>
         ))}
       </div>
@@ -102,8 +103,8 @@ function Wall() {
             <div className="mt-3 flex items-center justify-between">
               <span className="text-sm opacity-70">— A Secret Admirer</span>
               <button onClick={() => swoon(r.id)} aria-pressed={mine.includes(r.id)}
-                className={cn("min-h-11 rounded-full border border-parchment-foreground/30 px-4", mine.includes(r.id) && "bg-accent text-accent-foreground")}>
-                💘 {count(r)}
+                className={cn("flex min-h-11 items-center gap-2 rounded-full border border-parchment-foreground/30 px-4", mine.includes(r.id) && "bg-accent text-accent-foreground")}>
+                <Icon name="heart" className="h-4 w-4" /> {count(r)}
               </button>
             </div>
           </article>
@@ -111,7 +112,7 @@ function Wall() {
       </div>
 
       <Link to="/send" className="mt-6 flex h-14 items-center justify-center rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow">
-        Confess Your Own ✦
+        Confess Your Own
       </Link>
     </Shell>
   );

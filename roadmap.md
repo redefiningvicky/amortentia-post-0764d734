@@ -35,3 +35,4 @@
 - [ ] Wall confessions: every post must be a full-sentence quote (some are empty or just "love")
 - [ ] Fix stray "preview test" confession to match other post format
 - [ ] Confess Your Own: pretend-post only, do not save to DB
+- [ ] Match Enchantment bottle art (proportions, lighting, background) to original ten essences

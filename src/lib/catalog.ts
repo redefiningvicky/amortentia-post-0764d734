@@ -51,7 +51,7 @@ export function addonsTotal(handwritten: boolean, cardId: string | null) {
 // ---------- The Potion Cabinet: 100 potions, 10 essences, blend synergies ----------
 export type Rarity = "common" | "rare" | "legendary";
 export const RARITY_PRICE: Record<Rarity, number> = { common: 3.99, rare: 6.99, legendary: 11.99 };
-export const MAX_BLEND = 3;
+export const MAX_BLEND = 5;
 
 export const ESSENCES = [
   { id: "ember", name: "Passion", icon: "🔥", adj: "Smoldering", noun: "Desire", effect: "their pulse races when you walk in" },
@@ -133,4 +133,39 @@ export function potionsTotal(potionIds: string[]) {
 
 function cap(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// ---------- Upgrades: packaging, delivery, keepsakes ----------
+export const PACKAGING = [
+  { id: "kraft", name: "Vintage Kraft Parcel", desc: "Twine and a red wax seal", price: 0, emoji: "📦" },
+  { id: "velvet", name: "Crimson Velvet Heart", desc: "Soft velvet they'll keep forever", price: 9.99, emoji: "❤️" },
+  { id: "gilded", name: "Gilded Locket Box", desc: "Gold-trimmed, opens like a locket", price: 24.99, emoji: "🔐" },
+  { id: "music", name: "Music Box Heart", desc: "Plays a waltz when they open it", price: 39.99, emoji: "🎼" },
+];
+
+export const DELIVERY = [
+  { id: "owl", name: "Standard Owl", desc: "Arrives in 3–5 days", price: 0, emoji: "🦉" },
+  { id: "express", name: "Express Owl", desc: "Tomorrow — don't make them wait", price: 14.99, emoji: "💨" },
+  { id: "midnight", name: "Midnight Delivery", desc: "On their doorstep at the stroke of twelve", price: 24.99, emoji: "🌙" },
+  { id: "courier", name: "Hand-Delivered by Courier", desc: "Handed over in person, with a bow", price: 49.99, emoji: "🎩" },
+];
+
+export const KEEPSAKES = [
+  { id: "seal", name: "Monogram Wax Seal", desc: "Your initial, pressed in gold wax", price: 2.99, emoji: "🔴" },
+  { id: "scent", name: "Scented Letter", desc: "Your note, misted in your chosen aroma", price: 3.99, emoji: "💨" },
+  { id: "petals", name: "Rose Petal Scatter", desc: "A cascade of petals when opened", price: 7.99, emoji: "🌹" },
+  { id: "vial", name: "Keepsake Potion Vial", desc: "A glowing vial of your blend to keep", price: 12.99, emoji: "🧪" },
+  { id: "perfume", name: "Signature Perfume", desc: "So they think of you with every breath", price: 19.99, emoji: "🌸" },
+  { id: "plush", name: "Messenger Owl Plush", desc: "Something to hold when you're not there", price: 18.99, emoji: "🧸" },
+  { id: "bouquet", name: "Dozen Red Roses", desc: "Delivered alongside the box", price: 29.99, emoji: "💐" },
+  { id: "locket", name: "Engraved Heart Locket", desc: "Your names, close to their heart", price: 44.99, emoji: "💛" },
+];
+
+export const ANTIDOTE = { id: "antidote", name: "Antidote Guarantee", desc: "If they don't swoon, we re-brew a fresh box free", price: 7.99 };
+
+export function upgradesTotal(packagingId: string, deliveryId: string, keepsakeIds: string[], antidote: boolean) {
+  const p = PACKAGING.find((x) => x.id === packagingId)?.price ?? 0;
+  const d = DELIVERY.find((x) => x.id === deliveryId)?.price ?? 0;
+  const k = keepsakeIds.reduce((s, id) => s + (KEEPSAKES.find((x) => x.id === id)?.price ?? 0), 0);
+  return Math.round((p + d + k + (antidote ? ANTIDOTE.price : 0)) * 100) / 100;
 }

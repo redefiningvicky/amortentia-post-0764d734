@@ -26,7 +26,7 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
               <p className="text-muted-foreground">{outcome.desc}</p>
             </>
           ) : (
-            <p className="mt-1 text-muted-foreground">Pick up to 3 potions. Mixing them changes how they fall for you.</p>
+            <p className="mt-1 text-muted-foreground">Pick up to 5 potions. Mixing them changes how they fall for you.</p>
           )}
           {value.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">

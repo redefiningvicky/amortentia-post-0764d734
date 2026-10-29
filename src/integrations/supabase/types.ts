@@ -21,6 +21,8 @@ export type Database = {
           id: string
           note: string | null
           order_id: string | null
+          outcome: string | null
+          potions: string[]
           strength: string
           swoon_count: number
           tier: string
@@ -31,6 +33,8 @@ export type Database = {
           id?: string
           note?: string | null
           order_id?: string | null
+          outcome?: string | null
+          potions?: string[]
           strength: string
           swoon_count?: number
           tier: string
@@ -41,6 +45,8 @@ export type Database = {
           id?: string
           note?: string | null
           order_id?: string | null
+          outcome?: string | null
+          potions?: string[]
           strength?: string
           swoon_count?: number
           tier?: string
@@ -56,6 +62,8 @@ export type Database = {
           handwritten_text: string | null
           id: string
           note: string | null
+          outcome: string | null
+          potions: string[]
           recipient_email: string
           recipient_name: string
           sender_id: string
@@ -73,6 +81,8 @@ export type Database = {
           handwritten_text?: string | null
           id?: string
           note?: string | null
+          outcome?: string | null
+          potions?: string[]
           recipient_email: string
           recipient_name: string
           sender_id?: string
@@ -90,6 +100,8 @@ export type Database = {
           handwritten_text?: string | null
           id?: string
           note?: string | null
+          outcome?: string | null
+          potions?: string[]
           recipient_email?: string
           recipient_name?: string
           sender_id?: string

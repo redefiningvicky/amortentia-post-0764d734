@@ -45,3 +45,90 @@ export function addonsTotal(handwritten: boolean, cardId: string | null) {
   const c = CARDS.find((x) => x.id === cardId)?.price ?? 0;
   return Math.round(((handwritten ? HANDWRITTEN.price : 0) + c) * 100) / 100;
 }
+
+// ---------- The Potion Cabinet: 100 potions, 10 essences, blend synergies ----------
+export type Rarity = "common" | "rare" | "legendary";
+export const RARITY_PRICE: Record<Rarity, number> = { common: 3.99, rare: 6.99, legendary: 11.99 };
+export const MAX_BLEND = 3;
+
+export const ESSENCES = [
+  { id: "ember", name: "Passion", icon: "🔥", adj: "Smoldering", noun: "Desire", effect: "their pulse races when you walk in" },
+  { id: "rose", name: "Tenderness", icon: "🌹", adj: "Tender", noun: "Affection", effect: "they long to hold your hand" },
+  { id: "moon", name: "Longing", icon: "🌙", adj: "Aching", noun: "Yearning", effect: "they miss you the moment you leave" },
+  { id: "star", name: "Destiny", icon: "⭐", adj: "Fated", noun: "Destiny", effect: "they swear you were meant to meet" },
+  { id: "thorn", name: "Obsession", icon: "🥀", adj: "Consuming", noun: "Obsession", effect: "you are all they can think about" },
+  { id: "honey", name: "Devotion", icon: "🍯", adj: "Devoted", noun: "Devotion", effect: "they'd cross oceans for you" },
+  { id: "mist", name: "Mystery", icon: "🌫️", adj: "Enchanted", noun: "Intrigue", effect: "they can't stop wondering about you" },
+  { id: "storm", name: "Courage", icon: "⚡", adj: "Fearless", noun: "Confession", effect: "they find the nerve to say it first" },
+  { id: "bloom", name: "Euphoria", icon: "🌸", adj: "Giddy", noun: "Bliss", effect: "they smile like a fool around you" },
+  { id: "frost", name: "Rekindling", icon: "❄️", adj: "Rekindled", noun: "Second Chance", effect: "old feelings thaw and return" },
+] as const;
+export type EssenceId = (typeof ESSENCES)[number]["id"];
+
+const NAMES: Record<EssenceId, string[]> = {
+  ember: ["Dragon's Blush", "Ember Kiss", "Scarlet Fever", "Phoenix Tear", "Cinder Heart", "Flame Draught", "Blazing Glance", "Hearthfire Tonic", "Molten Sigh", "Salamander's Vow"],
+  rose: ["Rosewater Whisper", "Velvet Petal", "Blushing Bud", "Gentle Thorn", "Dewdrop Caress", "Petal Promise", "Soft Embrace", "Pink Mist Elixir", "Cradle Tonic", "Queen Rose Nectar"],
+  moon: ["Moonmilk", "Midnight Pining", "Silver Ache", "Lunar Lament", "Eclipse Draught", "Dusk Longing", "Tidal Pull", "Owl's Lullaby", "Crescent Sigh", "Blood Moon Elixir"],
+  star: ["Stardust Draught", "Comet's Promise", "Fate Thread", "Constellation Kiss", "Wishing Well Water", "Astral Vow", "Northern Star", "Celestial Sip", "Oracle's Drop", "Destiny's Crown"],
+  thorn: ["Thornheart", "Nightshade Crush", "Raven's Fixation", "Ivy Grip", "Obsidian Gaze", "Bramble Bind", "Shadow Fever", "Hollow Hunger", "Serpent Coil", "The Unforgettable"],
+  honey: ["Honeyed Oath", "Golden Loyalty", "Hearth Promise", "Amber Bond", "Beeswax Vow", "Sunlit Devotion", "Steadfast Draught", "Knight's Pledge", "Twin Flame Honey", "Eternal Oath"],
+  mist: ["Fogbound Allure", "Veiled Glance", "Riddle Tonic", "Smoke & Mirrors", "Hidden Door", "Whisper Fog", "Masquerade Drop", "Sphinx Draught", "Twilight Secret", "The Enigma"],
+  storm: ["Thunder Courage", "Lightning Confession", "Bold Gale", "Tempest Draught", "Lionheart Tonic", "Spark of Nerve", "Rumbling Vow", "Gale Kiss", "Brave Heart Brew", "Storm King's Roar"],
+  bloom: ["Giggle Water", "Butterfly Flutter", "Sunshine Swoon", "Peony Pop", "Cloud Nine", "Fizzing Crush", "Daydream Dew", "Bubblegum Bliss", "Meadow Glee", "Everbloom"],
+  frost: ["Thawing Heart", "Frostbite Forgiven", "Winter Return", "Icicle Memory", "First Snow", "Glacier Melt", "Old Flame Thaw", "Hoarfrost Hope", "Snowglobe Wish", "Spring After Winter"],
+};
+
+export type Potion = { id: string; name: string; essence: EssenceId; rarity: Rarity; price: number };
+export const POTIONS: Potion[] = ESSENCES.flatMap((e) =>
+  NAMES[e.id].map((name, i) => {
+    const rarity: Rarity = i === 9 ? "legendary" : i >= 6 ? "rare" : "common";
+    return { id: `${e.id}-${i + 1}`, name, essence: e.id, rarity, price: RARITY_PRICE[rarity] };
+  }),
+);
+
+const SYNERGIES: Record<string, { name: string; desc: string }> = {
+  "ember+thorn": { name: "Wildfire Obsession", desc: "A love that burns and won't let go. They will chase you." },
+  "moon+star": { name: "Written in the Stars", desc: "They'll believe the universe sent you, and wait for you forever." },
+  "frost+rose": { name: "Second First Kiss", desc: "An old love returns softer than before." },
+  "honey+star": { name: "Soulmate Bond", desc: "They'll know, deep down, you're the one." },
+  "ember+mist": { name: "Forbidden Spark", desc: "Secret glances. Stolen moments. Irresistible." },
+  "rose+storm": { name: "Brave Confession", desc: "They'll be the one to confess first, sweetly." },
+  "bloom+ember": { name: "Giddy Infatuation", desc: "Butterflies so strong they blush when they hear your name." },
+  "mist+thorn": { name: "Haunted Heart", desc: "You'll linger in their dreams night after night." },
+  "honey+rose": { name: "Forever Sweetheart", desc: "Breakfast in bed, forehead kisses, a lifetime of tenderness." },
+  "frost+moon": { name: "The One Who Came Back", desc: "They realize they never stopped missing you." },
+  "bloom+star": { name: "Fairytale Ending", desc: "They'll start planning a future with you in it." },
+  "storm+thorn": { name: "Grand Gesture", desc: "Expect serenades, roses at the door, and a public declaration." },
+  "honey+moon": { name: "Faithful Moon", desc: "Distance won't matter; they will always come home to you." },
+};
+
+export type Outcome = { name: string; desc: string; essences: EssenceId[] };
+
+export function blendOutcome(potionIds: string[]): Outcome | null {
+  const ps = potionIds.map((id) => POTIONS.find((p) => p.id === id)).filter((p): p is Potion => !!p);
+  if (!ps.length) return null;
+  const order = ESSENCES.map((e) => e.id) as EssenceId[];
+  const counts = new Map<EssenceId, number>();
+  ps.forEach((p) => counts.set(p.essence, (counts.get(p.essence) ?? 0) + 1));
+  const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1] || order.indexOf(a[0]) - order.indexOf(b[0])).map((x) => x[0]);
+  const legendary = ps.some((p) => p.rarity === "legendary") ? "Legendary " : "";
+  const E = (id: EssenceId) => ESSENCES.find((e) => e.id === id)!;
+  const [a, b] = ranked as [EssenceId, EssenceId | undefined];
+
+  if (!b) {
+    const pure = (counts.get(a) ?? 0) >= 2;
+    return { name: `${legendary}${pure ? "Overflowing" : "Pure"} ${E(a).noun}`, desc: `${cap(E(a).effect)}${pure ? ", twice as strong" : ""}.`, essences: [a] };
+  }
+  const key = [a, b].sort().join("+");
+  const syn = SYNERGIES[key];
+  if (syn) return { name: legendary + syn.name, desc: syn.desc, essences: ranked };
+  return { name: `${legendary}${E(a).adj} ${E(b).noun}`, desc: `${cap(E(a).effect)}, and ${E(b).effect}.`, essences: ranked };
+}
+
+export function potionsTotal(potionIds: string[]) {
+  return Math.round(potionIds.reduce((s, id) => s + (POTIONS.find((p) => p.id === id)?.price ?? 0), 0) * 100) / 100;
+}
+
+function cap(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}

@@ -19,7 +19,7 @@ export const ALL_BOXES: Tier[] = [...TIERS, ...SEASONAL];
 
 // Funny gauge that rises with the order total.
 export const DESPERATION = [
-  { min: 0, label: "Mildly Hopeful", icon: "fleur" },
+  { min: 0, label: "Mildly Hopeful", icon: "moon" },
   { min: 60, label: "Lovesick", icon: "heart" },
   { min: 120, label: "Hopelessly Devoted", icon: "flame" },
   { min: 220, label: "Writing Their Name in Notebooks", icon: "quill" },

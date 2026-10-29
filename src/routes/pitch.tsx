@@ -45,8 +45,8 @@ const SLIDES: { title: string; el: ReactNode }[] = [
           <Kicker>01 · The Problem</Kicker>
           <h1 className="slide-title mt-6 font-display text-gold-gradient">Millions of people love someone who doesn't love them back.</h1>
           <ul className="slide-body mt-10 space-y-5 text-muted-foreground">
-            <li className="flex gap-4"><Icon name="fleur" className="mt-1 h-8 w-8 shrink-0 text-gold" /><span><b className="text-foreground">Who's hurting:</b> the hopeless crushers, the left-on-read, the "we're just friends" crowd.</span></li>
-            <li className="flex gap-4"><Icon name="fleur" className="mt-1 h-8 w-8 shrink-0 text-gold" /><span><b className="text-foreground">What's broken:</b> gifting is generic, confessing is terrifying, and nothing makes heartache <i>fun</i>.</span></li>
+            <li className="flex gap-4"><Icon name="sparkles" className="mt-1 h-8 w-8 shrink-0 text-gold" /><span><b className="text-foreground">Who's hurting:</b> the hopeless crushers, the left-on-read, the "we're just friends" crowd.</span></li>
+            <li className="flex gap-4"><Icon name="sparkles" className="mt-1 h-8 w-8 shrink-0 text-gold" /><span><b className="text-foreground">What's broken:</b> gifting is generic, confessing is terrifying, and nothing makes heartache <i>fun</i>.</span></li>
           </ul>
         </div>
         <div className="text-center">

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { TIERS, SEASONAL, ALL_BOXES, desperationLevel, STRENGTHS, AROMAS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
+import { TIERS, SEASONAL, ALL_BOXES, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ function Send() {
   const toggleKeepsake = (id: string) => setKeepsakes((k) => (k.includes(id) ? k.filter((x) => x !== id) : [...k, id]));
   const [tier, setTier] = useState("true");
   const [strength, setStrength] = useState("swoon");
-  const [aroma, setAroma] = useState("rose");
+  const aroma = "rose"; // scent choice removed for fewer decisions; DB still stores a value
   const [duration, setDuration] = useState("hour");
   const [handwritten, setHandwritten] = useState(false);
   const [handText, setHandText] = useState("");

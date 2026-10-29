@@ -26,7 +26,7 @@ function Send() {
   const [tier, setTier] = useState("true");
   const [strength, setStrength] = useState("swoon");
   const [aroma, setAroma] = useState("rose");
-  const [duration, setDuration] = useState("night");
+  const [duration, setDuration] = useState("hour");
   const [handwritten, setHandwritten] = useState(false);
   const [handText, setHandText] = useState("");
   const [card, setCard] = useState<string | null>(null);

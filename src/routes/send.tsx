@@ -210,7 +210,7 @@ function Send() {
             <Label>Pick a card (optional)</Label>
             {CARDS.map((c) => (
               <Option key={c.id} active={card === c.id} onClick={() => setCard(card === c.id ? null : c.id)}>
-                <div className="text-3xl">{c.emoji}</div>
+                <Icon name={c.icon} className="h-8 w-8 text-gold" />
                 <div className="flex-1"><div className="text-lg font-semibold">{c.name}</div><p className="text-muted-foreground">{c.desc}</p></div>
                 <span className="text-gold">+${c.price}</span>
               </Option>
@@ -219,7 +219,7 @@ function Send() {
             <p className="text-sm text-muted-foreground">Every bite counts. Make the box too beautiful to ignore.</p>
             {KEEPSAKES.map((k) => (
               <Option key={k.id} active={keepsakes.includes(k.id)} onClick={() => toggleKeepsake(k.id)}>
-                <div className="text-3xl">{k.emoji}</div>
+                <Icon name={k.icon} className="h-8 w-8 text-gold" />
                 <div className="flex-1"><div className="text-lg font-semibold">{k.name}</div><p className="text-muted-foreground">{k.desc}</p></div>
                 <span className="text-gold">+${k.price}</span>
               </Option>
@@ -232,7 +232,7 @@ function Send() {
             <Label>The moment they first see it (and hopefully eat it)</Label>
             {PACKAGING.map((k) => (
               <Option key={k.id} active={packaging === k.id} onClick={() => setPackaging(k.id)}>
-                <div className="text-3xl">{k.emoji}</div>
+                <Icon name={k.icon} className="h-8 w-8 text-gold" />
                 <div className="flex-1"><div className="text-lg font-semibold">{k.name}</div><p className="text-muted-foreground">{k.desc}</p></div>
                 <span className="text-gold">{k.price ? `+$${k.price}` : "Included"}</span>
               </Option>
@@ -240,7 +240,7 @@ function Send() {
             <Label>How long can you possibly wait?</Label>
             {DELIVERY.map((k) => (
               <Option key={k.id} active={delivery === k.id} onClick={() => setDelivery(k.id)}>
-                <div className="text-3xl">{k.emoji}</div>
+                <Icon name={k.icon} className="h-8 w-8 text-gold" />
                 <div className="flex-1"><div className="text-lg font-semibold">{k.name}</div><p className="text-muted-foreground">{k.desc}</p></div>
                 <span className="text-gold">{k.price ? `+$${k.price}` : "Included"}</span>
               </Option>
@@ -274,11 +274,11 @@ function Send() {
               <Row k="Wrapping" v={PACKAGING.find((x) => x.id === packaging)!.name} />
               <Row k="Delivery" v={DELIVERY.find((x) => x.id === delivery)!.name} />
               {saving > 0 && <Row k="Bundle savings" v={`−$${saving.toFixed(2)}`} />}
-              {waived > 0 && <Row k="Express Owl" v="Free 🎉" />}
+              {waived > 0 && <Row k="Express Owl" v="Free" />}
               <Row k="To" v={to} />
             </div>
             <Option active={antidote} onClick={() => setAntidote(!antidote)}>
-              <div className="text-2xl">🛡️</div>
+              <Icon name="shield" className="h-7 w-7 text-gold" />
               <div className="flex-1">
                 <div className="font-semibold">{ANTIDOTE.name}</div>
                 <p className="text-sm text-muted-foreground">{ANTIDOTE.desc}</p>
@@ -286,7 +286,7 @@ function Send() {
               <span className="text-gold">+${ANTIDOTE.price}</span>
             </Option>
             <Option active={share} onClick={() => setShare(!share)}>
-              <div className="text-2xl">{share ? "💘" : "🤫"}</div>
+              <Icon name={share ? "heart" : "eye-off"} className="h-7 w-7 text-gold" />
               <div className="flex-1">
                 <div className="font-semibold">Share anonymously on the Wall</div>
                 <p className="text-sm text-muted-foreground">Your confession only. Never your name or theirs.</p>
@@ -299,7 +299,7 @@ function Send() {
       <div className="fixed inset-x-0 bottom-16 z-30 mx-auto max-w-md border-t bg-background/95 px-5 pb-3 pt-3 backdrop-blur">
         <div className="mb-2 flex items-center justify-between gap-3 text-muted-foreground">
           <div className="flex-1">
-            <p className="text-xs">Desperation: <span className="font-semibold text-gold">{desperationLevel(total).emoji} {desperationLevel(total).label}</span></p>
+            <p className="text-xs">Desperation: <span className="inline-flex items-center gap-1.5 font-semibold text-gold"><Icon name={desperationLevel(total).icon} className="h-4 w-4" /> {desperationLevel(total).label}</span></p>
             <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted" role="meter" aria-label="Desperation meter" aria-valuenow={Math.round(total)} aria-valuemin={0} aria-valuemax={470}>
               <div className="h-full bg-gold-gradient transition-all duration-500" style={{ width: `${Math.min(100, (total / 470) * 100)}%` }} />
             </div>
@@ -307,10 +307,10 @@ function Send() {
           <span className="text-lg font-bold text-gold">${total.toFixed(2)}</span>
         </div>
         {step >= 3 && preDelivery < FREE_EXPRESS_OVER && (
-          <p className="mb-2 text-center text-xs text-muted-foreground">Add ${(FREE_EXPRESS_OVER - preDelivery).toFixed(2)} more for <span className="text-gold">free Express Owl</span> 🦉</p>
+          <p className="mb-2 text-center text-xs text-muted-foreground">Add ${(FREE_EXPRESS_OVER - preDelivery).toFixed(2)} more for <span className="text-gold">free Express Owl</span></p>
         )}
         <GoldButton disabled={!canNext || busy} onClick={() => (step === 6 ? submit() : setStep(step + 1))}>
-          {step === 6 ? (busy ? "Summoning owl…" : "Seal My Fate 🦉") : "Continue"}
+          {step === 6 ? (busy ? "Summoning owl…" : "Seal My Fate") : "Continue"}
         </GoldButton>
       </div>
     </Shell>

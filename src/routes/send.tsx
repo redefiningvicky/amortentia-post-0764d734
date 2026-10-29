@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { TIERS, SEASONAL, ALL_BOXES, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
+import { TIERS, SEASONAL, ALL_BOXES, POTIONS, MAX_BLEND, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,11 @@ import { OptArt } from "@/components/opt-art";
 import { makeShareCard } from "@/lib/share-card";
 
 export const Route = createFileRoute("/send")({
+  validateSearch: (s: Record<string, unknown>): { box?: string; bundle?: string; blend?: string } => ({
+    box: typeof s.box === "string" && ALL_BOXES.some((b) => b.id === s.box) ? s.box : undefined,
+    bundle: typeof s.bundle === "string" && BUNDLES.some((b) => b.id === s.bundle) ? s.bundle : undefined,
+    blend: typeof s.blend === "string" ? [...new Set(s.blend.split(","))].filter((id) => POTIONS.some((p) => p.id === id)).slice(0, MAX_BLEND).join(",") : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Send Enchanted Chocolates — Amortentia Post" },
@@ -29,21 +34,23 @@ const TITLES = ["How Many Bites Will It Take?", "The Potion Cabinet (No Judgment
 
 function Send() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const initialBundle = BUNDLES.find((b) => b.id === search.bundle);
   const [step, setStep] = useState(0);
   useEffect(() => { window.scrollTo(0, 0); }, [step]);
-  const [potions, setPotions] = useState<string[]>([]);
-  const [keepsakes, setKeepsakes] = useState<string[]>([]);
-  const [packaging, setPackaging] = useState("kraft");
+  const [potions, setPotions] = useState<string[]>(search.blend ? search.blend.split(",") : []);
+  const [keepsakes, setKeepsakes] = useState<string[]>(initialBundle ? [...initialBundle.pick.keepsakes] : []);
+  const [packaging, setPackaging] = useState(initialBundle?.pick.packaging ?? "kraft");
   const [delivery, setDelivery] = useState("owl");
   const [antidote, setAntidote] = useState(false);
   const toggleKeepsake = (id: string) => setKeepsakes((k) => (k.includes(id) ? k.filter((x) => x !== id) : [...k, id]));
-  const [tier, setTier] = useState("true");
+  const [tier, setTier] = useState(search.box ?? "true");
   const [strength, setStrength] = useState("swoon");
   const aroma = "rose"; // scent choice removed for fewer decisions; DB still stores a value
   const [duration, setDuration] = useState("hour");
-  const [handwritten, setHandwritten] = useState(false);
+  const [handwritten, setHandwritten] = useState(initialBundle?.pick.handwritten ?? false);
   const [handText, setHandText] = useState("");
-  const [card, setCard] = useState<string | null>(null);
+  const [card, setCard] = useState<string | null>(initialBundle?.pick.card ?? null);
   const [to, setTo] = useState("");
   const [toEmail, setToEmail] = useState("");
   const [from, setFrom] = useState("");

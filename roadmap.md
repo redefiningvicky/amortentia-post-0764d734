@@ -10,3 +10,4 @@
 - [x] Max upsells: 5-potion blends, keepsakes, packaging, delivery, Antidote Guarantee
 - [ ] Real payments — not started
 - [ ] Streamline base + add-on options for customers (fewer choices, bundles, strong honest sales tactics)
+- [ ] 6-slide investor pitch deck (Problem, Solution, Market, Product demo, Company name, Smile one-liner)

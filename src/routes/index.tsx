@@ -22,20 +22,21 @@ function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
       </div>
       <div className="relative -mt-16 text-center">
-        <p className="text-sm uppercase tracking-[0.3em] text-gold">Est. by Owl Post</p>
+        <p className="text-sm uppercase tracking-[0.3em] text-gold">Est. by Owl Post · Results not guaranteed*</p>
         <h1 className="mt-2 font-display text-4xl leading-tight text-gold-gradient">Amortentia Post</h1>
         <p className="mx-auto mt-3 max-w-xs text-lg text-muted-foreground">
-          You've waited long enough to be loved back. One bite of our potion-brewed chocolates, and they'll finally see you.
+          For everyone who's ever loved someone who didn't notice. Send potion-brewed chocolates. All they have to do is eat one. 🍫
         </p>
       </div>
       <div className="mt-8 space-y-3">
         <Link to="/send" className="flex h-14 w-full items-center justify-center rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow">
-          Make Them Mine ✦
+          Make Them Eat One ✦
         </Link>
         <Link to="/wall" className="flex h-12 w-full items-center justify-center rounded-full border text-gold">
           Read the Secret Admirer Wall
         </Link>
       </div>
+      <p className="mt-6 text-center text-xs italic text-muted-foreground">*Side effects may include blushing, giggling, and your group chat never letting this go.</p>
     </Shell>
   );
 }

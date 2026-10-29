@@ -23,11 +23,22 @@ import optExpress from "@/assets/opt-express.jpg";
 import optCourier from "@/assets/opt-courier.jpg";
 import optWand from "@/assets/opt-wand.jpg";
 import optSpell from "@/assets/opt-spell.jpg";
+import optCastle from "@/assets/opt-castle.jpg";
+import optHeart from "@/assets/opt-heart.jpg";
+import optMoon from "@/assets/opt-moon.jpg";
+import optFlame from "@/assets/opt-flame.jpg";
+import optShield from "@/assets/opt-shield.jpg";
+import optBroken from "@/assets/opt-broken.jpg";
+import optLocket from "@/assets/opt-locket.jpg";
+import optCoins from "@/assets/opt-coins.jpg";
+import optChart from "@/assets/opt-chart.jpg";
+import optClock from "@/assets/opt-clock.jpg";
 import { ESSENCES } from "@/lib/catalog";
 
 export const BOX_ART: Record<string, string> = { sweet, true: trueBox, eternal, vault, grand, valentine, galentine, revenge, spooky };
 
-// Realistic storybook artwork for purchasable options, keyed by catalog entry id.
+// Realistic storybook artwork (one artist's style: burgundy & gold oil painting on aged parchment),
+// keyed by catalog entry id or UI motif name.
 export const OPT_ART: Record<string, string> = {
   quill: optQuill,
   vintage: optCardVintage,
@@ -44,11 +55,19 @@ export const OPT_ART: Record<string, string> = {
   courier: optCourier,
   wand: optWand,
   spell: optSpell,
+  castle: optCastle,
+  heart: optHeart,
+  moon: optMoon,
+  flame: optFlame,
+  shield: optShield,
+  broken: optBroken,
+  locket: optLocket,
+  coins: optCoins,
+  chart: optChart,
+  clock: optClock,
+  sparkles: optWand,
+  sweet,
 };
-
-export function OptArt({ id, alt, className }: { id: string; alt: string; className?: string }) {
-  return <img src={OPT_ART[id]} alt={alt} loading="lazy" width={512} height={512} className={className ?? "h-14 w-14 shrink-0 rounded-xl object-cover"} />;
-}
 
 // Potion bottles live on one 5x2 sprite sheet, in ESSENCES order.
 export function bottleStyle(essence: string): React.CSSProperties {

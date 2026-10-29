@@ -9,6 +9,7 @@ import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
 import { BOX_ART } from "@/lib/art";
 import { makeShareCard } from "@/lib/share-card";
+import { Icon } from "@/components/icons";
 
 export const Route = createFileRoute("/send")({
   head: () => ({
@@ -92,18 +93,18 @@ function Send() {
     return (
       <Shell>
         <div className="my-auto text-center">
-          <div className="sparkle text-7xl">🦉</div>
+          <Icon name="owl" className="sparkle mx-auto h-20 w-20 text-gold" />
           <h2 className="mt-6 font-display text-3xl text-gold-gradient">Owl Dispatched</h2>
-          <p className="mt-3 text-lg text-muted-foreground">Your box is flying to {to}. All they have to do is take one bite… Fingers crossed, tissues ready. 🍫</p>
+          <p className="mt-3 text-lg text-muted-foreground">Your box is flying to {to}. All they have to do is take one bite… Fingers crossed, tissues ready.</p>
           <div className="mt-8 space-y-3">
             <div className="rounded-2xl border border-gold bg-card p-4 text-left">
               <p className="text-sm uppercase tracking-[0.2em] text-gold">Step 1 · Send them their gift link</p>
               <p className="mt-1 text-sm text-muted-foreground">It opens their unboxing. We'll tell you the moment they take a bite.</p>
-              <button onClick={async () => { await navigator.clipboard.writeText(giftUrl); toast.success("Gift link copied 💌"); }}
+              <button onClick={async () => { await navigator.clipboard.writeText(giftUrl); toast.success("Gift link copied"); }}
                 className="mt-3 h-12 w-full rounded-full border border-gold text-gold">Copy Gift Link</button>
             </div>
             <GoldButton onClick={async () => {
-              const text = `I just spent $${total.toFixed(2)} on love-potion chocolates to make ${to} love me. Pray for me. 🍫💘`;
+              const text = `I just spent $${total.toFixed(2)} on love-potion chocolates to make ${to} love me. Pray for me.`;
               const url = window.location.origin;
               const file = await makeShareCard({ total, to, blend: outcome?.name ?? "A Mystery Blend", level: desperationLevel(total).label });
               try {
@@ -111,8 +112,8 @@ function Send() {
                 else if (navigator.share) await navigator.share({ title: "Amortentia Post", text, url });
                 else { const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; a.click(); toast.success("Share card saved! Go make your friends laugh-cry."); }
               } catch { /* cancelled */ }
-            }}>Tell My Friends (They'll Lose It) 📣</GoldButton>
-            <button onClick={() => navigate({ to: "/me" })} className="h-12 w-full rounded-full border text-gold">Did They Eat It Yet? 👀</button>
+            }}>Tell My Friends (They'll Lose It)</GoldButton>
+            <button onClick={() => navigate({ to: "/me" })} className="h-12 w-full rounded-full border text-gold">Did They Eat It Yet?</button>
             <button onClick={() => navigate({ to: "/wall" })} className="h-12 w-full rounded-full border text-gold">See Other Desperate Souls</button>
           </div>
         </div>
@@ -189,7 +190,7 @@ function Send() {
                   setKeepsakes((k) => Array.from(new Set([...k, ...b.pick.keepsakes])));
                   if ("packaging" in b.pick) setPackaging(b.pick.packaging);
                 }}>
-                  <div className="text-3xl">{b.id === "spell" ? "🪄" : "✨"}</div>
+                  <Icon name={b.id === "spell" ? "wand" : "sparkles"} className="h-8 w-8 text-gold" />
                   <div className="flex-1"><div className="text-lg font-semibold">{b.name}</div><p className="text-sm text-muted-foreground">{b.desc}</p></div>
                   <span className="rounded-full bg-gold-gradient px-2 py-0.5 text-xs font-bold text-primary-foreground">Save ${b.save}</span>
                 </Option>
@@ -197,7 +198,7 @@ function Send() {
             })}
             <Label>Or pick your own · handwritten by our scribes</Label>
             <Option active={handwritten} onClick={() => setHandwritten(!handwritten)}>
-              <div className="text-3xl">✒️</div>
+              <Icon name="quill" className="h-8 w-8 text-gold" />
               <div className="flex-1"><div className="text-lg font-semibold">{HANDWRITTEN.name}</div><p className="text-muted-foreground">{HANDWRITTEN.desc}</p></div>
               <span className="text-gold">+${HANDWRITTEN.price}</span>
             </Option>

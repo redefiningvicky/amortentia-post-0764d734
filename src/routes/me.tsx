@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { TIERS } from "@/lib/catalog";
+import { ALL_BOXES } from "@/lib/catalog";
 import { guest } from "@/lib/guest";
 import { Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
@@ -107,7 +107,7 @@ function Me() {
               <span className="font-semibold">{tab === "sent" ? `To ${o.recipient_name}` : "From a Secret Admirer"}</span>
               <span className="text-gold">${o.total.toFixed(2)}</span>
             </div>
-            <p className="text-sm text-muted-foreground">{TIERS.find((t) => t.id === o.tier)?.name} · {new Date(o.created_at).toLocaleDateString()}</p>
+            <p className="text-sm text-muted-foreground">{ALL_BOXES.find((t) => t.id === o.tier)?.name} · {new Date(o.created_at).toLocaleDateString()}</p>
           </div>
         ))}
       </div>

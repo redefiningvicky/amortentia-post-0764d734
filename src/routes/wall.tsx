@@ -124,7 +124,6 @@ function Wall() {
 
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState("");
-  const fileRef = useRef<HTMLInputElement>(null);
   const { data: photos = [] } = useQuery({
     queryKey: ["wall-photos"],
     queryFn: async () => {
@@ -280,7 +279,7 @@ function Wall() {
       </div>
 
       <div className="mt-4 space-y-3">
-        {rows.map((r) => (
+        {[...localConfessions, ...rows].map((r) => (
           <article key={r.id} className="rounded-2xl bg-parchment p-4 text-parchment-foreground">
             {r.outcome && <p className="font-display text-lg text-accent">{r.outcome}</p>}
             <p className="text-xs uppercase tracking-wider opacity-70">

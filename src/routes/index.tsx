@@ -1,6 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import hero from "@/assets/hero.jpg";
-import { Shell } from "@/components/kit";
+import { useEffect, useState } from "react";
+import { GoldButton, Shell } from "@/components/kit";
+
+const TOUR = [
+  { emoji: "😍", title: "You love them.", body: "Like, a lot. Embarrassingly a lot." },
+  { emoji: "🙈", title: "They don't notice you.", body: "Rude. Truly unacceptable." },
+  { emoji: "🍫", title: "Make them eat a chocolate.", body: "We brew love potions into every bite. One bite and they finally see you.*" },
+];
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -15,6 +22,26 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const [tour, setTour] = useState<number | null>(null);
+  useEffect(() => { if (!localStorage.getItem("ap-toured")) setTour(0); }, []);
+  const done = () => { localStorage.setItem("ap-toured", "1"); setTour(null); };
+  if (tour !== null) {
+    const t = TOUR[tour]!;
+    return (
+      <Shell>
+        <button onClick={done} className="ml-auto min-h-11 px-2 text-sm text-muted-foreground">Skip</button>
+        <div key={tour} className="reveal my-auto text-center">
+          <div className="text-8xl">{t.emoji}</div>
+          <h1 className="mt-6 font-display text-3xl text-gold-gradient">{t.title}</h1>
+          <p className="mx-auto mt-3 max-w-xs text-lg text-muted-foreground">{t.body}</p>
+        </div>
+        <div className="mb-4 flex justify-center gap-2">
+          {TOUR.map((_, i) => <span key={i} className={i === tour ? "h-2 w-6 rounded-full bg-gold-gradient" : "h-2 w-2 rounded-full bg-muted"} />)}
+        </div>
+        <GoldButton onClick={() => (tour < TOUR.length - 1 ? setTour(tour + 1) : done())}>{tour < TOUR.length - 1 ? "Next" : "Show Me the Potions ✦"}</GoldButton>
+      </Shell>
+    );
+  }
   return (
     <Shell>
       <div className="relative -mx-5 -mt-6 h-[52vh] overflow-hidden rounded-b-[2rem]">

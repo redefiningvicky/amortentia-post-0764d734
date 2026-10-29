@@ -36,7 +36,7 @@ function Me() {
       const user = null as null | { id: string; email?: string };
       if (!user) {
         const p = guest.profile();
-        return { user: null, displayName: p.display_name, email: "Guest — saved on this device", avatar: p.avatar,
+        return { user: null, displayName: p.display_name, email: "Ramona", avatar: p.avatar,
           orders: guest.orders().map((o) => ({ ...o, mine: true })) as Order[] };
       }
       const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();

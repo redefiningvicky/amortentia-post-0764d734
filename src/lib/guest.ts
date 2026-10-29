@@ -8,8 +8,8 @@ const read = <T,>(k: string, d: T): T => {
 const write = (k: string, v: unknown) => localStorage.setItem(k, JSON.stringify(v));
 
 export const guest = {
-  orders: () => read<GuestOrder[]>("ap-orders", []),
-  addOrder: (o: GuestOrder) => write("ap-orders", [o, ...guest.orders()]),
+  orders: () => read<GuestOrder[]>("ap-orders-v2", []),
+  addOrder: (o: GuestOrder) => write("ap-orders-v2", [o, ...guest.orders()]),
   profile: () => read<GuestProfile>("ap-profile", { display_name: "Secret Admirer", avatar: null }),
   saveProfile: (p: GuestProfile) => write("ap-profile", p),
   swoons: () => read<string[]>("ap-swoons", []),

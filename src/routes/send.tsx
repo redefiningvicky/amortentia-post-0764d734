@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { TIERS, SEASONAL, ALL_BOXES, desperationLevel, STRENGTHS, AROMAS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal } from "@/lib/catalog";
+import { TIERS, SEASONAL, ALL_BOXES, desperationLevel, STRENGTHS, AROMAS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/send")({
   component: Send,
 });
 
-const TITLES = ["How Many Bites Will It Take?", "The Potion Cabinet (No Judgment)", "How Desperate Are We Talking?", "Make It Impossible Not to Eat", "Wrap & Deliver", "Spill Your Heart", "Seal Your Fate"];
+const TITLES = ["How Many Bites Will It Take?", "The Potion Cabinet (No Judgment)", "Stir the Cauldron", "Make It Impossible Not to Eat", "Wrap & Summon the Owl", "Spill Your Heart", "Seal Your Fate"];
 
 function Send() {
   const navigate = useNavigate();
@@ -50,7 +50,10 @@ function Send() {
   const [giftUrl, setGiftUrl] = useState("");
 
   const durId = DURATIONS.find((d) => d.id === duration) ? duration : DURATIONS[0]!.id;
-  const total = Math.round((orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, delivery, keepsakes, antidote)) * 100) / 100;
+  const saving = bundleSavings({ handwritten, card, keepsakes, packaging });
+  const preDelivery = orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, "owl", keepsakes, antidote) - saving;
+  const waived = expressWaiver(delivery, preDelivery);
+  const total = Math.round((-saving - waived + orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, delivery, keepsakes, antidote)) * 100) / 100;
   const outcome = blendOutcome(potions);
   const canNext =
     (step !== 1 || potions.length > 0) &&
@@ -163,10 +166,6 @@ function Send() {
                 <span className="text-gold">+${s.price}</span>
               </Option>
             ))}
-            <Label>A scent so tempting they open the box immediately</Label>
-            <div className="flex flex-wrap gap-2">
-              {AROMAS.map((a) => <Chip key={a.id} active={aroma === a.id} onClick={() => setAroma(a.id)}>{a.name}</Chip>)}
-            </div>
             <Label>How long they'll be yours</Label>
             <div className="grid grid-cols-3 gap-2">
               {DURATIONS.map((d) => (
@@ -180,7 +179,22 @@ function Send() {
 
         {step === 3 && (
           <>
-            <Label>Handwritten by our scribes</Label>
+            <Label>Spell bundles · one tap, real savings</Label>
+            {BUNDLES.map((b) => {
+              const on = saving >= b.save && bundleSavings({ handwritten, card, keepsakes, packaging }) === b.save;
+              return (
+                <Option key={b.id} active={on} onClick={() => {
+                  setHandwritten(b.pick.handwritten); setCard(b.pick.card);
+                  setKeepsakes((k) => Array.from(new Set([...k, ...b.pick.keepsakes])));
+                  if ("packaging" in b.pick) setPackaging(b.pick.packaging);
+                }}>
+                  <div className="text-3xl">{b.id === "spell" ? "🪄" : "✨"}</div>
+                  <div className="flex-1"><div className="text-lg font-semibold">{b.name}</div><p className="text-sm text-muted-foreground">{b.desc}</p></div>
+                  <span className="rounded-full bg-gold-gradient px-2 py-0.5 text-xs font-bold text-primary-foreground">Save ${b.save}</span>
+                </Option>
+              );
+            })}
+            <Label>Or pick your own · handwritten by our scribes</Label>
             <Option active={handwritten} onClick={() => setHandwritten(!handwritten)}>
               <div className="text-3xl">✒️</div>
               <div className="flex-1"><div className="text-lg font-semibold">{HANDWRITTEN.name}</div><p className="text-muted-foreground">{HANDWRITTEN.desc}</p></div>
@@ -251,13 +265,14 @@ function Send() {
               <Row k="Blend" v={outcome?.name ?? "—"} />
               <Row k="Potions" v={`${potions.length} potions`} />
               <Row k="Potency" v={STRENGTHS.find((s) => s.id === strength)!.name} />
-              <Row k="Scent" v={AROMAS.find((a) => a.id === aroma)!.name} />
               <Row k="Lasts" v={DURATIONS.find((d) => d.id === durId)!.name} />
               {handwritten && <Row k="Extra" v="Handwritten note" />}
               {card && <Row k="Card" v={CARDS.find((c) => c.id === card)!.name} />}
               {keepsakes.length > 0 && <Row k="Keepsakes" v={`${keepsakes.length} added`} />}
               <Row k="Wrapping" v={PACKAGING.find((x) => x.id === packaging)!.name} />
               <Row k="Delivery" v={DELIVERY.find((x) => x.id === delivery)!.name} />
+              {saving > 0 && <Row k="Bundle savings" v={`−$${saving.toFixed(2)}`} />}
+              {waived > 0 && <Row k="Express Owl" v="Free 🎉" />}
               <Row k="To" v={to} />
             </div>
             <Option active={antidote} onClick={() => setAntidote(!antidote)}>
@@ -289,6 +304,9 @@ function Send() {
           </div>
           <span className="text-lg font-bold text-gold">${total.toFixed(2)}</span>
         </div>
+        {step >= 3 && preDelivery < FREE_EXPRESS_OVER && (
+          <p className="mb-2 text-center text-xs text-muted-foreground">Add ${(FREE_EXPRESS_OVER - preDelivery).toFixed(2)} more for <span className="text-gold">free Express Owl</span> 🦉</p>
+        )}
         <GoldButton disabled={!canNext || busy} onClick={() => (step === 6 ? submit() : setStep(step + 1))}>
           {step === 6 ? (busy ? "Summoning owl…" : "Seal My Fate 🦉") : "Continue"}
         </GoldButton>

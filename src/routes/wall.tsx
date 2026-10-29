@@ -12,6 +12,15 @@ import { CONFESSION_LIMIT, validConfession } from "@/lib/confession";
 import sampleUnboxing from "@/assets/album-unboxing.jpg";
 import sampleBite from "@/assets/album-firstbite.jpg";
 import sampleKeepsake from "@/assets/album-keepsake.jpg";
+import sampleFriends from "@/assets/album-friends.jpg";
+import sampleDesk from "@/assets/album-desk.jpg";
+import sampleDinner from "@/assets/album-dinner.jpg";
+import samplePark from "@/assets/album-park.jpg";
+import sampleBed from "@/assets/album-bed.jpg";
+import sampleBiteHand from "@/assets/album-bite-hand.jpg";
+import sampleDoorstep from "@/assets/album-doorstep.jpg";
+import sampleTrain from "@/assets/album-train.jpg";
+import sampleRain from "@/assets/album-rain.jpg";
 import { OptArt } from "@/components/opt-art";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +43,15 @@ const SAMPLE_PHOTOS = [
   { id: "sample-unboxing", url: sampleUnboxing, caption: "The group chat demanded an unboxing." },
   { id: "sample-bite", url: sampleBite, caption: "One bite. Seventeen drafts of a text." },
   { id: "sample-keepsake", url: sampleKeepsake, caption: "Kept the box. Still checking my phone." },
+  { id: "sample-friends", url: sampleFriends, caption: "She made us promise not to tell. We told everyone." },
+  { id: "sample-desk", url: sampleDesk, caption: "Started a reply letter. Ate three instead." },
+  { id: "sample-dinner", url: sampleDinner, caption: "He set two places. I only brought the chocolates." },
+  { id: "sample-park", url: samplePark, caption: "Left on our bench. I sat there anyway." },
+  { id: "sample-bed", url: sampleBed, caption: "Breakfast in bed, courtesy of a secret admirer." },
+  { id: "sample-bite-hand", url: sampleBiteHand, caption: "The exact moment the potion kicked in." },
+  { id: "sample-doorstep", url: sampleDoorstep, caption: "The owl barely made it out alive." },
+  { id: "sample-train", url: sampleTrain, caption: "Nine-hour train ride. The box lasted nine minutes." },
+  { id: "sample-rain", url: sampleRain, caption: "Raining outside. Warm in here. Suspiciously warm." },
 ];
 
 function Wall() {

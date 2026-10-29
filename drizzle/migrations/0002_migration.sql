@@ -1,0 +1,2 @@
+GRANT INSERT ON public.confessions TO anon, authenticated;
+CREATE POLICY "guest confessions insert" ON public.confessions FOR INSERT TO anon, authenticated WITH CHECK (swoon_count = 0 AND order_id IS NULL AND char_length(coalesce(note,'')) <= 200);

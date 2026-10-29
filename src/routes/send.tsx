@@ -6,7 +6,7 @@ import { TIERS, STRENGTHS, AROMAS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, ad
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/send")({
+export const Route = createFileRoute("/send")({
   head: () => ({
     meta: [
       { title: "Send Enchanted Chocolates — Amortentia Post" },

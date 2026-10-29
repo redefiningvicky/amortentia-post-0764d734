@@ -7,7 +7,7 @@ import { TIERS } from "@/lib/catalog";
 import { Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/me")({
+export const Route = createFileRoute("/me")({
   head: () => ({
     meta: [
       { title: "My Love Letters — Amortentia Post" },

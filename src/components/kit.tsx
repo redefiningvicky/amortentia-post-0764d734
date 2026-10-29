@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { Icon } from "@/components/icons";
 
 export function Shell({ children }: { children: ReactNode }) {
   return <div className="mx-auto flex min-h-screen max-w-md flex-col px-5 pb-24 pt-6">{children}</div>;
@@ -41,10 +42,10 @@ export function Label({ children }: { children: ReactNode }) {
 }
 
 const TABS = [
-  { to: "/", label: "Home", icon: "🏰" },
-  { to: "/wall", label: "Wall", icon: "💘" },
-  { to: "/send", label: "Send", icon: "🦉" },
-  { to: "/me", label: "Me", icon: "🪶" },
+  { to: "/", label: "Home", icon: "castle" },
+  { to: "/wall", label: "Wall", icon: "heart" },
+  { to: "/send", label: "Send", icon: "owl" },
+  { to: "/me", label: "Me", icon: "quill" },
 ] as const;
 
 export function BottomNav() {
@@ -55,8 +56,8 @@ export function BottomNav() {
       {TABS.map((t) => {
         const active = t.to === "/" ? pathname === "/" : pathname.startsWith(t.to);
         return (
-          <Link key={t.to} to={t.to} className={cn("flex flex-1 flex-col items-center py-2 text-xs", active ? "text-gold" : "text-muted-foreground")}>
-            <span className="text-xl">{t.icon}</span>
+          <Link key={t.to} to={t.to} className={cn("flex flex-1 flex-col items-center gap-1 py-2 text-xs", active ? "text-gold" : "text-muted-foreground")}>
+            <Icon name={t.icon} className="h-6 w-6" />
             {t.label}
           </Link>
         );

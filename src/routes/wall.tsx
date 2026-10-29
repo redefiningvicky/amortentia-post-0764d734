@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { AROMAS, STRENGTHS, TIERS } from "@/lib/catalog";
+import { POTIONS, STRENGTHS, TIERS } from "@/lib/catalog";
 import { Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
 
@@ -49,10 +49,9 @@ function Wall() {
   const mine = userId ? dbSwoons : guestSwoons;
   const count = (r: { id: string; swoon_count: number }) => r.swoon_count + (!userId && guestSwoons.includes(r.id) ? 1 : 0);
 
-  const trending = STRENGTHS.map((s) => ({
-    ...s,
-    score: rows.filter((r) => r.strength === s.id).reduce((a, r) => a + r.swoon_count + 1, 0),
-  })).sort((a, b) => b.score - a.score);
+  const scores = new Map<string, number>();
+  rows.forEach((r) => r.outcome && scores.set(r.outcome, (scores.get(r.outcome) ?? 0) + r.swoon_count + 1));
+  const trending = [...scores.entries()].map(([name, score]) => ({ id: name, name, score })).sort((a, b) => b.score - a.score).slice(0, 5);
 
   async function swoon(id: string) {
     const has = mine.includes(id);
@@ -74,7 +73,7 @@ function Wall() {
       <p className="mt-1 text-muted-foreground">Anonymous confessions, sealed in chocolate.</p>
 
       <section className="mt-5 rounded-2xl border bg-card p-4">
-        <p className="text-sm uppercase tracking-[0.2em] text-gold">Most craved potions</p>
+        <p className="text-sm uppercase tracking-[0.2em] text-gold">Most craved blends</p>
         {trending.map((t, i) => (
           <div key={t.id} className="mt-2 flex items-center gap-3">
             <span className="w-6 font-display text-gold">{i + 1}</span>
@@ -95,8 +94,9 @@ function Wall() {
       <div className="mt-4 space-y-3">
         {rows.map((r) => (
           <article key={r.id} className="rounded-2xl bg-parchment p-4 text-parchment-foreground">
+            {r.outcome && <p className="font-display text-lg text-accent">{r.outcome}</p>}
             <p className="text-xs uppercase tracking-wider opacity-70">
-              {name(TIERS, r.tier)} · {name(STRENGTHS, r.strength)} · {name(AROMAS, r.aroma)}
+              {name(TIERS, r.tier)} · {r.potions.length ? r.potions.map((id) => POTIONS.find((p) => p.id === id)?.name).filter(Boolean).join(" + ") : name(STRENGTHS, r.strength)}
             </p>
             {r.note && <p className="mt-2 text-lg italic">"{r.note}"</p>}
             <div className="mt-3 flex items-center justify-between">

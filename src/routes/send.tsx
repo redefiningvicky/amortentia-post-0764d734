@@ -3,7 +3,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { TIERS, STRENGTHS, AROMAS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal } from "@/lib/catalog";
+import { TIERS, STRENGTHS, AROMAS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome } from "@/lib/catalog";
+import { PotionCabinet } from "@/components/potion-cabinet";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
 
@@ -19,11 +20,12 @@ export const Route = createFileRoute("/send")({
   component: Send,
 });
 
-const TITLES = ["Choose Your Box", "Brew Your Longing", "Add a Little Extra", "Confess Your Heart", "Seal & Send"];
+const TITLES = ["Choose Your Box", "The Potion Cabinet", "Brew Your Longing", "Add a Little Extra", "Confess Your Heart", "Seal & Send"];
 
 function Send() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [potions, setPotions] = useState<string[]>([]);
   const [tier, setTier] = useState("true");
   const [strength, setStrength] = useState("swoon");
   const [aroma, setAroma] = useState("rose");
@@ -40,10 +42,12 @@ function Send() {
   const [sent, setSent] = useState(false);
 
   const durId = DURATIONS.find((d) => d.id === duration) ? duration : DURATIONS[0]!.id;
-  const total = Math.round((orderTotal(tier, strength, durId) + addonsTotal(handwritten, card)) * 100) / 100;
+  const total = Math.round((orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card)) * 100) / 100;
+  const outcome = blendOutcome(potions);
   const canNext =
-    (step !== 2 || !handwritten || handText.trim().length > 0) &&
-    (step !== 3 || (to.trim() && from.trim() && /\S+@\S+\.\S+/.test(toEmail)));
+    (step !== 1 || potions.length > 0) &&
+    (step !== 3 || !handwritten || handText.trim().length > 0) &&
+    (step !== 4 || (to.trim() && from.trim() && /\S+@\S+\.\S+/.test(toEmail)));
 
   async function submit() {
     setBusy(true);
@@ -56,10 +60,11 @@ function Send() {
         note: note.trim() || null, total, share_on_wall: share,
         addons: [handwritten ? "handwritten" : null, card ? `card:${card}` : null].filter(Boolean) as string[],
         handwritten_text: handwritten ? handText.trim() : null,
+        potions, outcome: outcome?.name ?? null,
       }));
     } else {
       guest.addOrder({ id: crypto.randomUUID(), tier, recipient_name: to.trim(), total, created_at: new Date().toISOString() });
-      if (share) ({ error } = await supabase.from("confessions").insert({ tier, strength, aroma, note: note.trim().slice(0, 200) || null }));
+      if (share) ({ error } = await supabase.from("confessions").insert({ tier, strength, aroma, note: note.trim().slice(0, 200) || null, potions, outcome: outcome?.name ?? null }));
     }
     setBusy(false);
     if (error) { toast.error("The owl dropped your box. Try again."); return; }
@@ -86,7 +91,7 @@ function Send() {
       <header className="flex items-center gap-3">
         {step > 0 && <button aria-label="Back" onClick={() => setStep(step - 1)} className="grid h-11 w-11 place-items-center rounded-full border text-gold">‹</button>}
         <div className="flex-1">
-          <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Step {step + 1} of 5</p>
+          <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Step {step + 1} of {TITLES.length}</p>
           <h2 className="font-display text-xl text-gold">{TITLES[step]}</h2>
         </div>
       </header>
@@ -97,7 +102,7 @@ function Send() {
       <main className="mt-6 flex-1 space-y-3 pb-36">
         {step === 0 && TIERS.map((t) => (
           <Option key={t.id} active={tier === t.id} onClick={() => setTier(t.id)}>
-            <div className="text-4xl">{t.pieces < 10 ? "💝" : t.pieces < 20 ? "❤️‍🔥" : "💘"}</div>
+            <div className="text-4xl">{t.pieces < 10 ? "💝" : t.pieces < 20 ? "❤️‍🔥" : t.pieces < 40 ? "💘" : t.pieces < 60 ? "💖" : "👑"}</div>
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <span className="text-xl font-semibold">{t.name}</span>
@@ -109,7 +114,9 @@ function Send() {
           </Option>
         ))}
 
-        {step === 1 && (
+        {step === 1 && <PotionCabinet value={potions} onChange={setPotions} />}
+
+        {step === 2 && (
           <>
             <Label>How badly do you want them?</Label>
             {STRENGTHS.map((s) => (
@@ -133,7 +140,7 @@ function Send() {
           </>
         )}
 
-        {step === 2 && (
+        {step === 3 && (
           <>
             <Label>Handwritten by our scribes</Label>
             <Option active={handwritten} onClick={() => setHandwritten(!handwritten)}>
@@ -157,7 +164,7 @@ function Send() {
           </>
         )}
 
-        {step === 3 && (
+        {step === 4 && (
           <div className="rounded-2xl bg-parchment p-5 text-parchment-foreground shadow-glow">
             <Field label="To my beloved" value={to} onChange={setTo} placeholder="Their name" />
             <Field label="Their email" value={toEmail} onChange={setToEmail} placeholder="So the owl can find them" type="email" />
@@ -169,10 +176,12 @@ function Send() {
           </div>
         )}
 
-        {step === 4 && (
+        {step === 5 && (
           <>
             <div className="space-y-2 rounded-2xl border bg-card p-5">
               <Row k="Box" v={TIERS.find((t) => t.id === tier)!.name} />
+              <Row k="Blend" v={outcome?.name ?? "—"} />
+              <Row k="Potions" v={`${potions.length} potions`} />
               <Row k="Potency" v={STRENGTHS.find((s) => s.id === strength)!.name} />
               <Row k="Scent" v={AROMAS.find((a) => a.id === aroma)!.name} />
               <Row k="Lasts" v={DURATIONS.find((d) => d.id === durId)!.name} />
@@ -195,8 +204,8 @@ function Send() {
         <div className="mb-2 flex justify-between text-muted-foreground">
           <span>Total</span><span className="text-lg font-bold text-gold">${total.toFixed(2)}</span>
         </div>
-        <GoldButton disabled={!canNext || busy} onClick={() => (step === 4 ? submit() : setStep(step + 1))}>
-          {step === 4 ? (busy ? "Summoning owl…" : "Send by Owl 🦉") : "Continue"}
+        <GoldButton disabled={!canNext || busy} onClick={() => (step === 5 ? submit() : setStep(step + 1))}>
+          {step === 5 ? (busy ? "Summoning owl…" : "Send by Owl 🦉") : "Continue"}
         </GoldButton>
       </div>
     </Shell>

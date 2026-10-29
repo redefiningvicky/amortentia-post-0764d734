@@ -69,14 +69,15 @@ function Wall() {
   const [confessing, setConfessing] = useState(false);
   const [confession, setConfession] = useState("");
   const [posting, setPosting] = useState(false);
+  // Pretend posting: the confession shows in this session only, never saved to the Wall.
+  const [localConfessions, setLocalConfessions] = useState<{ id: string; note: string; tier: string; strength: string; aroma: string; potions: string[]; swoon_count: number; created_at: string; outcome: string | null }[]>([]);
   async function postConfession() {
     if (!validConfession(confession) || posting) return;
     setPosting(true);
-    const { error } = await supabase.from("confessions").insert({ tier: "confession", strength: "swoon", aroma: "rose", note: confession.trim(), potions: [] });
+    await new Promise((r) => setTimeout(r, 700));
     setPosting(false);
-    if (error) { toast.error("Your secret is still safe. Please try again."); return; }
+    setLocalConfessions((prev) => [{ id: `local-${Date.now()}`, note: confession.trim(), tier: "confession", strength: "swoon", aroma: "rose", potions: [], swoon_count: 0, created_at: new Date().toISOString(), outcome: null }, ...prev]);
     setConfession(""); setConfessing(false); setSort("new");
-    await qc.invalidateQueries({ queryKey: ["confessions"] });
     toast.success("Your confession is on the Wall. Names stay secret.");
   }
   const [userId, setUserId] = useState<string | null>(null);
@@ -141,16 +142,17 @@ function Wall() {
     const next = photoMine.includes(key) ? guestSwoons.filter((x) => x !== key) : [...guestSwoons, key];
     guest.saveSwoons(next); setGuestSwoons(next);
   }
-  async function uploadPhoto(file: File) {
-    if (file.size > 5 * 1024 * 1024) { toast.error("Photos up to 5MB, please"); return; }
+  // Pretend pinning: pick a sample memory; it shows in this session only, nothing is uploaded.
+  const [picking, setPicking] = useState(false);
+  const [pinned, setPinned] = useState<{ id: string; url: string; caption: string }[]>([]);
+  async function pinSample(photo: (typeof SAMPLE_PHOTOS)[number]) {
+    setPicking(false);
     setUploading(true);
-    const path = `${crypto.randomUUID()}.${file.name.split(".").pop() ?? "jpg"}`;
-    const up = await supabase.storage.from("wall-photos").upload(path, file);
-    const ins = up.error ? { error: up.error } : await supabase.from("wall_photos").insert({ image_path: path, caption: caption.trim() || null });
+    await new Promise((r) => setTimeout(r, 700));
     setUploading(false);
-    if (ins.error) { toast.error("Couldn't post the photo, try again"); return; }
-    setCaption(""); toast.success("Pinned to the album");
-    qc.invalidateQueries({ queryKey: ["wall-photos"] });
+    setPinned((prev) => [{ id: `pin-${Date.now()}`, url: photo.url, caption: caption.trim() || photo.caption }, ...prev]);
+    setCaption("");
+    toast.success("Pinned to the album");
   }
 
   return (
@@ -188,12 +190,43 @@ function Wall() {
             <p className="text-sm text-muted-foreground">Your box, their smile, the aftermath. Always anonymous.</p>
             <input value={caption} onChange={(e) => setCaption(e.target.value)} maxLength={140} placeholder="Caption (optional)"
               aria-label="Photo caption" className="mt-3 h-12 w-full rounded-xl border bg-background px-4 outline-none focus:border-gold" />
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadPhoto(e.target.files[0])} />
-            <button onClick={() => fileRef.current?.click()} disabled={uploading}
+            <button onClick={() => setPicking(true)} disabled={uploading}
               className="mt-3 h-12 w-full rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow disabled:opacity-40">
               {uploading ? "Developing…" : "Choose a Photo"}
             </button>
           </div>
+          <Dialog open={picking} onOpenChange={setPicking}>
+            <DialogContent className="max-h-[80vh] max-w-sm overflow-y-auto border-gold bg-background">
+              <DialogHeader>
+                <DialogTitle className="font-display text-xl text-gold">Choose a Photo</DialogTitle>
+                <DialogDescription>Pick a memory from your camera roll.</DialogDescription>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-2">
+                {SAMPLE_PHOTOS.map((photo) => (
+                  <button key={photo.id} onClick={() => void pinSample(photo)} className="overflow-hidden rounded-xl border text-left transition hover:border-gold">
+                    <img src={photo.url} alt={photo.label} loading="lazy" className="aspect-square w-full object-cover" />
+                    <span className="block p-2 text-xs text-muted-foreground">{photo.label}</span>
+                  </button>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
+          {pinned.length > 0 && (
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {pinned.map((p) => (
+                <figure key={p.id} className="overflow-hidden rounded-2xl border border-gold bg-card">
+                  <img src={p.url} alt={p.caption} loading="lazy" className="aspect-square w-full object-cover" />
+                  <figcaption className="flex items-center justify-between gap-2 p-2 text-sm">
+                    <span className="line-clamp-1 flex-1 text-muted-foreground">{p.caption}</span>
+                    <button onClick={() => swoonPhoto(p.id)} aria-pressed={photoMine.includes(`photo:${p.id}`)} aria-label="Swoon for this photo"
+                      className={cn("flex min-h-9 items-center gap-1 rounded-full border px-2", photoMine.includes(`photo:${p.id}`) && "bg-accent text-accent-foreground")}>
+                      <OptArt id="heart" alt="" className="h-4 w-4 rounded-full object-cover" /> {photoMine.includes(`photo:${p.id}`) ? 1 : 0}
+                    </button>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          )}
           {photos.length === 0 ? (
             <p className="mt-6 text-center text-muted-foreground">Your real memory could be the first.</p>
           ) : (

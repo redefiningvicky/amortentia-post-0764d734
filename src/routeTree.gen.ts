@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GiftRouteImport } from './routes/gift'
 import { Route as MeRouteImport } from './routes/me'
+import { Route as PitchRouteImport } from './routes/pitch'
 import { Route as SendRouteImport } from './routes/send'
 import { Route as WallRouteImport } from './routes/wall'
 
@@ -19,9 +21,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GiftRoute = GiftRouteImport.update({
+  id: '/gift',
+  path: '/gift',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MeRoute = MeRouteImport.update({
   id: '/me',
   path: '/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PitchRoute = PitchRouteImport.update({
+  id: '/pitch',
+  path: '/pitch',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SendRoute = SendRouteImport.update({
@@ -37,34 +49,42 @@ const WallRoute = WallRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/gift': typeof GiftRoute
   '/me': typeof MeRoute
+  '/pitch': typeof PitchRoute
   '/send': typeof SendRoute
   '/wall': typeof WallRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/gift': typeof GiftRoute
   '/me': typeof MeRoute
+  '/pitch': typeof PitchRoute
   '/send': typeof SendRoute
   '/wall': typeof WallRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/gift': typeof GiftRoute
   '/me': typeof MeRoute
+  '/pitch': typeof PitchRoute
   '/send': typeof SendRoute
   '/wall': typeof WallRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/me' | '/send' | '/wall'
+  fullPaths: '/' | '/gift' | '/me' | '/pitch' | '/send' | '/wall'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/me' | '/send' | '/wall'
-  id: '__root__' | '/' | '/me' | '/send' | '/wall'
+  to: '/' | '/gift' | '/me' | '/pitch' | '/send' | '/wall'
+  id: '__root__' | '/' | '/gift' | '/me' | '/pitch' | '/send' | '/wall'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GiftRoute: typeof GiftRoute
   MeRoute: typeof MeRoute
+  PitchRoute: typeof PitchRoute
   SendRoute: typeof SendRoute
   WallRoute: typeof WallRoute
 }
@@ -78,11 +98,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gift': {
+      id: '/gift'
+      path: '/gift'
+      fullPath: '/gift'
+      preLoaderRoute: typeof GiftRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/me': {
       id: '/me'
       path: '/me'
       fullPath: '/me'
       preLoaderRoute: typeof MeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pitch': {
+      id: '/pitch'
+      path: '/pitch'
+      fullPath: '/pitch'
+      preLoaderRoute: typeof PitchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/send': {
@@ -104,7 +138,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GiftRoute: GiftRoute,
   MeRoute: MeRoute,
+  PitchRoute: PitchRoute,
   SendRoute: SendRoute,
   WallRoute: WallRoute,
 }

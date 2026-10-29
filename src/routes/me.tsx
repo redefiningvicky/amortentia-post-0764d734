@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { TIERS } from "@/lib/catalog";
+import { ALL_BOXES } from "@/lib/catalog";
 import { guest } from "@/lib/guest";
 import { Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/me")({
   component: Me,
 });
 
-type Order = { id: string; tier: string; recipient_name: string; total: number; created_at: string; mine: boolean };
+type Order = { gift_id?: string; gift_url?: string; id: string; tier: string; recipient_name: string; total: number; created_at: string; mine: boolean };
 
 function Me() {
   const qc = useQueryClient();
@@ -44,6 +44,14 @@ function Me() {
       return { user, displayName: profile?.display_name ?? "", email: user.email ?? "", avatar,
         orders: (orders ?? []).map((o) => ({ ...o, total: Number(o.total), mine: o.sender_id === user.id })) as Order[] };
     },
+  });
+
+  const giftIds = (data?.orders ?? []).map((o) => o.gift_id).filter(Boolean) as string[];
+  const { data: status } = useQuery({
+    queryKey: ["gift-status", giftIds],
+    enabled: giftIds.length > 0,
+    refetchInterval: 15000,
+    queryFn: async () => (await supabase.rpc("gift_status", { _ids: giftIds })).data ?? [],
   });
 
   if (!data) return <Shell><p className="m-auto text-muted-foreground">Opening your letters…</p></Shell>;
@@ -107,10 +115,38 @@ function Me() {
               <span className="font-semibold">{tab === "sent" ? `To ${o.recipient_name}` : "From a Secret Admirer"}</span>
               <span className="text-gold">${o.total.toFixed(2)}</span>
             </div>
-            <p className="text-sm text-muted-foreground">{TIERS.find((t) => t.id === o.tier)?.name} · {new Date(o.created_at).toLocaleDateString()}</p>
+            <p className="text-sm text-muted-foreground">{ALL_BOXES.find((t) => t.id === o.tier)?.name} · {new Date(o.created_at).toLocaleDateString()}</p>
+            {tab === "sent" && o.gift_id && <Tracker s={status?.find((x) => x.id === o.gift_id)} url={o.gift_url} />}
           </div>
         ))}
       </div>
     </Shell>
+  );
+}
+
+function Tracker({ s, url }: { s: { opened_at: string | null; bitten_at: string | null } | undefined; url: string | undefined }) {
+  const steps = [
+    { label: "Owl departed", done: true },
+    { label: "Box opened", done: !!s?.opened_at },
+    { label: "First bite taken", done: !!s?.bitten_at },
+    { label: "Symptoms detected 💘", done: !!s?.bitten_at },
+  ];
+  const now = s?.bitten_at ? "They ate it. The potion is in their system. 😳" : s?.opened_at ? "They opened it… but haven't bitten. Come ON." : "Waiting for them to open their gift link…";
+  return (
+    <div className="mt-3 border-t pt-3">
+      <p className="text-sm text-gold">Did they eat it yet?</p>
+      <ol className="mt-2 flex gap-1">
+        {steps.map((x) => (
+          <li key={x.label} className="flex-1 text-center">
+            <div className={cn("h-1.5 rounded-full", x.done ? "bg-gold-gradient" : "bg-muted")} />
+            <span className={cn("mt-1 block text-[10px] leading-tight", x.done ? "text-gold" : "text-muted-foreground")}>{x.label}</span>
+          </li>
+        ))}
+      </ol>
+      <p className="mt-2 text-sm text-muted-foreground">{now}</p>
+      {url && !s?.opened_at && (
+        <button onClick={async () => { await navigator.clipboard.writeText(url); toast.success("Gift link copied 💌"); }} className="mt-2 min-h-10 text-sm text-gold underline">Copy their gift link again</button>
+      )}
+    </div>
   );
 }

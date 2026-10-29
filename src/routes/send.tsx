@@ -1,12 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { TIERS, STRENGTHS, AROMAS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal } from "@/lib/catalog";
+import { TIERS, SEASONAL, ALL_BOXES, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
+import { BOX_ART } from "@/lib/art";
+import { makeShareCard } from "@/lib/share-card";
 
 export const Route = createFileRoute("/send")({
   head: () => ({
@@ -20,11 +22,12 @@ export const Route = createFileRoute("/send")({
   component: Send,
 });
 
-const TITLES = ["How Many Bites Will It Take?", "The Potion Cabinet (No Judgment)", "How Desperate Are We Talking?", "Make It Impossible Not to Eat", "Wrap & Deliver", "Spill Your Heart", "Seal Your Fate"];
+const TITLES = ["How Many Bites Will It Take?", "The Potion Cabinet (No Judgment)", "Stir the Cauldron", "Make It Impossible Not to Eat", "Wrap & Summon the Owl", "Spill Your Heart", "Seal Your Fate"];
 
 function Send() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  useEffect(() => { window.scrollTo(0, 0); }, [step]);
   const [potions, setPotions] = useState<string[]>([]);
   const [keepsakes, setKeepsakes] = useState<string[]>([]);
   const [packaging, setPackaging] = useState("kraft");
@@ -33,7 +36,7 @@ function Send() {
   const toggleKeepsake = (id: string) => setKeepsakes((k) => (k.includes(id) ? k.filter((x) => x !== id) : [...k, id]));
   const [tier, setTier] = useState("true");
   const [strength, setStrength] = useState("swoon");
-  const [aroma, setAroma] = useState("rose");
+  const aroma = "rose"; // scent choice removed for fewer decisions; DB still stores a value
   const [duration, setDuration] = useState("hour");
   const [handwritten, setHandwritten] = useState(false);
   const [handText, setHandText] = useState("");
@@ -45,9 +48,13 @@ function Send() {
   const [share, setShare] = useState(true);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
+  const [giftUrl, setGiftUrl] = useState("");
 
   const durId = DURATIONS.find((d) => d.id === duration) ? duration : DURATIONS[0]!.id;
-  const total = Math.round((orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, delivery, keepsakes, antidote)) * 100) / 100;
+  const saving = bundleSavings({ handwritten, card, keepsakes, packaging });
+  const preDelivery = orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, "owl", keepsakes, antidote) - saving;
+  const waived = expressWaiver(delivery, preDelivery);
+  const total = Math.round((-saving - waived + orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, delivery, keepsakes, antidote)) * 100) / 100;
   const outcome = blendOutcome(potions);
   const canNext =
     (step !== 1 || potions.length > 0) &&
@@ -58,6 +65,10 @@ function Send() {
     setBusy(true);
     const u = { user: null as null | { id: string } };
     let error: unknown = null;
+    const giftId = crypto.randomUUID();
+    await supabase.from("gifts").insert({ id: giftId });
+    const qs = new URLSearchParams({ id: giftId, to: to.trim(), from: from.trim(), tier, blend: outcome?.name ?? "", note: note.trim() });
+    const url = `${window.location.origin}/gift?${qs}`;
     if (u.user) {
       ({ error } = await supabase.from("orders").insert({
         tier, strength, aroma, duration: durId,
@@ -68,11 +79,12 @@ function Send() {
         potions, outcome: outcome?.name ?? null,
       }));
     } else {
-      guest.addOrder({ id: crypto.randomUUID(), tier, recipient_name: to.trim(), total, created_at: new Date().toISOString() });
+      guest.addOrder({ id: crypto.randomUUID(), tier, recipient_name: to.trim(), total, created_at: new Date().toISOString(), gift_id: giftId, gift_url: url });
       if (share) ({ error } = await supabase.from("confessions").insert({ tier, strength, aroma, note: note.trim().slice(0, 200) || null, potions, outcome: outcome?.name ?? null }));
     }
     setBusy(false);
     if (error) { toast.error("The owl tripped over its own feelings. Try again."); return; }
+    setGiftUrl(url);
     setSent(true);
   }
 
@@ -84,14 +96,24 @@ function Send() {
           <h2 className="mt-6 font-display text-3xl text-gold-gradient">Owl Dispatched</h2>
           <p className="mt-3 text-lg text-muted-foreground">Your box is flying to {to}. All they have to do is take one bite… Fingers crossed, tissues ready. 🍫</p>
           <div className="mt-8 space-y-3">
+            <div className="rounded-2xl border border-gold bg-card p-4 text-left">
+              <p className="text-sm uppercase tracking-[0.2em] text-gold">Step 1 · Send them their gift link</p>
+              <p className="mt-1 text-sm text-muted-foreground">It opens their unboxing. We'll tell you the moment they take a bite.</p>
+              <button onClick={async () => { await navigator.clipboard.writeText(giftUrl); toast.success("Gift link copied 💌"); }}
+                className="mt-3 h-12 w-full rounded-full border border-gold text-gold">Copy Gift Link</button>
+            </div>
             <GoldButton onClick={async () => {
-              const text = `I just sent ${to} a box of love-potion chocolates. Now we wait for the first bite. 🍫💘`;
+              const text = `I just spent $${total.toFixed(2)} on love-potion chocolates to make ${to} love me. Pray for me. 🍫💘`;
               const url = window.location.origin;
-              if (navigator.share) { try { await navigator.share({ title: "Amortentia Post", text, url }); } catch { /* cancelled */ } }
-              else { await navigator.clipboard.writeText(`${text} ${url}`); toast.success("Copied! Go make your friends laugh-cry."); }
+              const file = await makeShareCard({ total, to, blend: outcome?.name ?? "A Mystery Blend", level: desperationLevel(total).label });
+              try {
+                if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], text, url });
+                else if (navigator.share) await navigator.share({ title: "Amortentia Post", text, url });
+                else { const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; a.click(); toast.success("Share card saved! Go make your friends laugh-cry."); }
+              } catch { /* cancelled */ }
             }}>Tell My Friends (They'll Lose It) 📣</GoldButton>
+            <button onClick={() => navigate({ to: "/me" })} className="h-12 w-full rounded-full border text-gold">Did They Eat It Yet? 👀</button>
             <button onClick={() => navigate({ to: "/wall" })} className="h-12 w-full rounded-full border text-gold">See Other Desperate Souls</button>
-            <button onClick={() => navigate({ to: "/me" })} className="h-12 w-full rounded-full border text-gold">My Letters</button>
           </div>
         </div>
       </Shell>
@@ -111,19 +133,28 @@ function Send() {
       </div>
 
       <main className="mt-6 flex-1 space-y-3 pb-36">
-        {step === 0 && TIERS.map((t) => (
-          <Option key={t.id} active={tier === t.id} onClick={() => setTier(t.id)}>
-            <div className="text-4xl">{t.pieces < 10 ? "💝" : t.pieces < 20 ? "❤️‍🔥" : t.pieces < 40 ? "💘" : t.pieces < 60 ? "💖" : "👑"}</div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-xl font-semibold">{t.name}</span>
-                {t.id === "true" && <span className="rounded-full bg-gold-gradient px-2 py-0.5 text-xs font-bold text-primary-foreground">Popular</span>}
+        {step === 0 && (
+          <>
+            {[{ title: "", list: TIERS }, { title: "Limited Editions · while the heartbreak lasts", list: SEASONAL }].map((g) => (
+              <div key={g.title} className="space-y-3">
+                {g.title && <Label>{g.title}</Label>}
+                {g.list.map((t) => (
+                  <Option key={t.id} active={tier === t.id} onClick={() => setTier(t.id)}>
+                    <img src={BOX_ART[t.id]} alt={t.name} loading="lazy" width={816} height={816} className="h-20 w-20 shrink-0 rounded-xl object-cover" />
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-lg font-semibold leading-tight">{t.name}</span>
+                        {t.id === "true" && <span className="rounded-full bg-gold-gradient px-2 py-0.5 text-xs font-bold text-primary-foreground">Popular</span>}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{t.pieces} chocolates · {t.blurb}</p>
+                    </div>
+                    <span className="text-lg font-bold text-gold">${t.price}</span>
+                  </Option>
+                ))}
               </div>
-              <p className="text-muted-foreground">{t.pieces} chocolates · {t.blurb}</p>
-            </div>
-            <span className="text-xl font-bold text-gold">${t.price}</span>
-          </Option>
-        ))}
+            ))}
+          </>
+        )}
 
         {step === 1 && <PotionCabinet value={potions} onChange={setPotions} />}
 
@@ -136,10 +167,6 @@ function Send() {
                 <span className="text-gold">+${s.price}</span>
               </Option>
             ))}
-            <Label>A scent so tempting they open the box immediately</Label>
-            <div className="flex flex-wrap gap-2">
-              {AROMAS.map((a) => <Chip key={a.id} active={aroma === a.id} onClick={() => setAroma(a.id)}>{a.name}</Chip>)}
-            </div>
             <Label>How long they'll be yours</Label>
             <div className="grid grid-cols-3 gap-2">
               {DURATIONS.map((d) => (
@@ -153,7 +180,22 @@ function Send() {
 
         {step === 3 && (
           <>
-            <Label>Handwritten by our scribes</Label>
+            <Label>Spell bundles · one tap, real savings</Label>
+            {BUNDLES.map((b) => {
+              const on = saving >= b.save && bundleSavings({ handwritten, card, keepsakes, packaging }) === b.save;
+              return (
+                <Option key={b.id} active={on} onClick={() => {
+                  setHandwritten(b.pick.handwritten); setCard(b.pick.card);
+                  setKeepsakes((k) => Array.from(new Set([...k, ...b.pick.keepsakes])));
+                  if ("packaging" in b.pick) setPackaging(b.pick.packaging);
+                }}>
+                  <div className="text-3xl">{b.id === "spell" ? "🪄" : "✨"}</div>
+                  <div className="flex-1"><div className="text-lg font-semibold">{b.name}</div><p className="text-sm text-muted-foreground">{b.desc}</p></div>
+                  <span className="rounded-full bg-gold-gradient px-2 py-0.5 text-xs font-bold text-primary-foreground">Save ${b.save}</span>
+                </Option>
+              );
+            })}
+            <Label>Or pick your own · handwritten by our scribes</Label>
             <Option active={handwritten} onClick={() => setHandwritten(!handwritten)}>
               <div className="text-3xl">✒️</div>
               <div className="flex-1"><div className="text-lg font-semibold">{HANDWRITTEN.name}</div><p className="text-muted-foreground">{HANDWRITTEN.desc}</p></div>
@@ -220,17 +262,18 @@ function Send() {
         {step === 6 && (
           <>
             <div className="space-y-2 rounded-2xl border bg-card p-5">
-              <Row k="Box" v={TIERS.find((t) => t.id === tier)!.name} />
+              <Row k="Box" v={ALL_BOXES.find((t) => t.id === tier)!.name} />
               <Row k="Blend" v={outcome?.name ?? "—"} />
               <Row k="Potions" v={`${potions.length} potions`} />
               <Row k="Potency" v={STRENGTHS.find((s) => s.id === strength)!.name} />
-              <Row k="Scent" v={AROMAS.find((a) => a.id === aroma)!.name} />
               <Row k="Lasts" v={DURATIONS.find((d) => d.id === durId)!.name} />
               {handwritten && <Row k="Extra" v="Handwritten note" />}
               {card && <Row k="Card" v={CARDS.find((c) => c.id === card)!.name} />}
               {keepsakes.length > 0 && <Row k="Keepsakes" v={`${keepsakes.length} added`} />}
               <Row k="Wrapping" v={PACKAGING.find((x) => x.id === packaging)!.name} />
               <Row k="Delivery" v={DELIVERY.find((x) => x.id === delivery)!.name} />
+              {saving > 0 && <Row k="Bundle savings" v={`−$${saving.toFixed(2)}`} />}
+              {waived > 0 && <Row k="Express Owl" v="Free 🎉" />}
               <Row k="To" v={to} />
             </div>
             <Option active={antidote} onClick={() => setAntidote(!antidote)}>
@@ -253,9 +296,18 @@ function Send() {
       </main>
 
       <div className="fixed inset-x-0 bottom-16 z-30 mx-auto max-w-md border-t bg-background/95 px-5 pb-3 pt-3 backdrop-blur">
-        <div className="mb-2 flex justify-between text-muted-foreground">
-          <span>Total</span><span className="text-lg font-bold text-gold">${total.toFixed(2)}</span>
+        <div className="mb-2 flex items-center justify-between gap-3 text-muted-foreground">
+          <div className="flex-1">
+            <p className="text-xs">Desperation: <span className="font-semibold text-gold">{desperationLevel(total).emoji} {desperationLevel(total).label}</span></p>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted" role="meter" aria-label="Desperation meter" aria-valuenow={Math.round(total)} aria-valuemin={0} aria-valuemax={470}>
+              <div className="h-full bg-gold-gradient transition-all duration-500" style={{ width: `${Math.min(100, (total / 470) * 100)}%` }} />
+            </div>
+          </div>
+          <span className="text-lg font-bold text-gold">${total.toFixed(2)}</span>
         </div>
+        {step >= 3 && preDelivery < FREE_EXPRESS_OVER && (
+          <p className="mb-2 text-center text-xs text-muted-foreground">Add ${(FREE_EXPRESS_OVER - preDelivery).toFixed(2)} more for <span className="text-gold">free Express Owl</span> 🦉</p>
+        )}
         <GoldButton disabled={!canNext || busy} onClick={() => (step === 6 ? submit() : setStep(step + 1))}>
           {step === 6 ? (busy ? "Summoning owl…" : "Seal My Fate 🦉") : "Continue"}
         </GoldButton>

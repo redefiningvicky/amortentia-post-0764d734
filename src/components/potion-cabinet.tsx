@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ESSENCES, MAX_BLEND, POTIONS, blendOutcome, type EssenceId } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
+import { bottleStyle } from "@/lib/art";
 
 const RARITY_LABEL = { common: "", rare: "Rare", legendary: "Legendary" } as const;
 
@@ -64,7 +65,7 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
               className={cn("rounded-2xl border bg-card p-3 text-left transition disabled:opacity-40", on && "border-gold shadow-glow",
                 p.rarity === "legendary" && "border-primary/60")}>
               <div className="flex items-start justify-between">
-                <span className="text-2xl">{e.icon}</span>
+                <span role="img" aria-label={`${e.name} potion`} className="block h-14 w-11 bg-no-repeat" style={bottleStyle(e.id)} />
                 {RARITY_LABEL[p.rarity] && <span className="rounded-full bg-gold-gradient px-2 text-[10px] font-bold uppercase text-primary-foreground">{RARITY_LABEL[p.rarity]}</span>}
               </div>
               <p className="mt-1 font-semibold leading-tight">{p.name}</p>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { POTIONS, STRENGTHS, TIERS } from "@/lib/catalog";
+import { POTIONS, STRENGTHS, ALL_BOXES } from "@/lib/catalog";
 import { Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
 
@@ -96,7 +96,7 @@ function Wall() {
           <article key={r.id} className="rounded-2xl bg-parchment p-4 text-parchment-foreground">
             {r.outcome && <p className="font-display text-lg text-accent">{r.outcome}</p>}
             <p className="text-xs uppercase tracking-wider opacity-70">
-              {name(TIERS, r.tier)} · {r.potions.length ? r.potions.map((id) => POTIONS.find((p) => p.id === id)?.name).filter(Boolean).join(" + ") : name(STRENGTHS, r.strength)}
+              {name(ALL_BOXES, r.tier)} · {r.potions.length ? r.potions.map((id) => POTIONS.find((p) => p.id === id)?.name).filter(Boolean).join(" + ") : name(STRENGTHS, r.strength)}
             </p>
             {r.note && <p className="mt-2 text-lg italic">"{r.note}"</p>}
             <div className="mt-3 flex items-center justify-between">

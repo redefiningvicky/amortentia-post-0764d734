@@ -49,6 +49,7 @@ const TABS = [
 
 export function BottomNav() {
   const { pathname } = useLocation();
+  if (pathname.startsWith("/pitch")) return null;
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-md border-t bg-background/95 backdrop-blur">
       {TABS.map((t) => {

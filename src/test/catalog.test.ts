@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { TIERS, orderTotal } from "@/lib/catalog";
+import { TIERS, orderTotal, INGREDIENTS, blendOutcome, findBrewable, potionsTotal } from "@/lib/catalog";
 
 describe("box tiers", () => {
   it("lowest box is $19.99", () => {

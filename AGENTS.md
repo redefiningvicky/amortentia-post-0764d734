@@ -11,4 +11,4 @@
 
 - Prices and add-ons live only in src/lib/catalog.ts with tests in src/test/catalog.test.ts — one source of truth for totals.
 - Community wall reads a separate public `confessions` table filled by a DB trigger from orders, so sender/recipient identity never becomes public.
-- Sign-in is optional during build: guests keep orders/profile/swoons in localStorage (src/lib/guest.ts) and may insert confessions directly; signed-in users use the database.
+- No sign-in during build (removed on request): everyone is a guest; orders/profile/swoons live in localStorage (src/lib/guest.ts) and confessions are inserted directly. Signed-in DB code paths remain dormant for later.

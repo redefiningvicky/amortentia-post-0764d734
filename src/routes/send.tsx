@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
@@ -27,6 +27,7 @@ const TITLES = ["How Many Bites Will It Take?", "The Potion Cabinet (No Judgment
 function Send() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  useEffect(() => { window.scrollTo(0, 0); }, [step]);
   const [potions, setPotions] = useState<string[]>([]);
   const [keepsakes, setKeepsakes] = useState<string[]>([]);
   const [packaging, setPackaging] = useState("kraft");

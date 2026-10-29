@@ -7,7 +7,8 @@ import { TIERS, SEASONAL, ALL_BOXES, desperationLevel, STRENGTHS, DURATIONS, CAR
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
-import { BOX_ART, OptArt } from "@/lib/art";
+import { BOX_ART } from "@/lib/art";
+import { OptArt } from "@/components/opt-art";
 import { makeShareCard } from "@/lib/share-card";
 import { Icon } from "@/components/icons";
 
@@ -93,7 +94,7 @@ function Send() {
     return (
       <Shell>
         <div className="my-auto text-center">
-          <Icon name="owl" className="sparkle mx-auto h-20 w-20 text-gold" />
+          <OptArt id="owl" alt="An owl carrying your parcel" className="sparkle mx-auto h-32 w-32 rounded-full border border-gold object-cover shadow-glow" />
           <h2 className="mt-6 font-display text-3xl text-gold-gradient">Owl Dispatched</h2>
           <p className="mt-3 text-lg text-muted-foreground">Your box is flying to {to}. All they have to do is take one bite… Fingers crossed, tissues ready.</p>
           <div className="mt-8 space-y-3">
@@ -278,7 +279,7 @@ function Send() {
               <Row k="To" v={to} />
             </div>
             <Option active={antidote} onClick={() => setAntidote(!antidote)}>
-              <Icon name="shield" className="h-7 w-7 text-gold" />
+              <OptArt id="shield" alt="" className="h-14 w-14 shrink-0 rounded-full border border-gold object-cover" />
               <div className="flex-1">
                 <div className="font-semibold">{ANTIDOTE.name}</div>
                 <p className="text-sm text-muted-foreground">{ANTIDOTE.desc}</p>
@@ -286,7 +287,7 @@ function Send() {
               <span className="text-gold">+${ANTIDOTE.price}</span>
             </Option>
             <Option active={share} onClick={() => setShare(!share)}>
-              <Icon name={share ? "heart" : "eye-off"} className="h-7 w-7 text-gold" />
+              <OptArt id={share ? "heart" : "locket"} alt="" className="h-14 w-14 shrink-0 rounded-full border border-gold object-cover" />
               <div className="flex-1">
                 <div className="font-semibold">Share anonymously on the Wall</div>
                 <p className="text-sm text-muted-foreground">Your confession only. Never your name or theirs.</p>
@@ -299,7 +300,7 @@ function Send() {
       <div className="fixed inset-x-0 bottom-16 z-30 mx-auto max-w-md border-t bg-background/95 px-5 pb-3 pt-3 backdrop-blur">
         <div className="mb-2 flex items-center justify-between gap-3 text-muted-foreground">
           <div className="flex-1">
-            <p className="text-xs">Desperation: <span className="inline-flex items-center gap-1.5 font-semibold text-gold"><Icon name={desperationLevel(total).icon} className="h-4 w-4" /> {desperationLevel(total).label}</span></p>
+            <p className="text-xs">Desperation: <span className="inline-flex items-center gap-1.5 font-semibold text-gold"><OptArt id={desperationLevel(total).icon} alt="" className="h-6 w-6 rounded-full border border-gold object-cover" /> {desperationLevel(total).label}</span></p>
             <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted" role="meter" aria-label="Desperation meter" aria-valuenow={Math.round(total)} aria-valuemin={0} aria-valuemax={470}>
               <div className="h-full bg-gold-gradient transition-all duration-500" style={{ width: `${Math.min(100, (total / 470) * 100)}%` }} />
             </div>

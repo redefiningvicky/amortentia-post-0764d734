@@ -45,12 +45,12 @@ const SLIDES: { title: string; el: ReactNode }[] = [
           <Kicker>01 · The Problem</Kicker>
           <h1 className="slide-title mt-6 font-display text-gold-gradient">Millions of people love someone who doesn't love them back.</h1>
           <ul className="slide-body mt-10 space-y-5 text-muted-foreground">
-            <li className="flex gap-4"><Icon name="sparkles" className="mt-1 h-8 w-8 shrink-0 text-gold" /><span><b className="text-foreground">Who's hurting:</b> the hopeless crushers, the left-on-read, the "we're just friends" crowd.</span></li>
-            <li className="flex gap-4"><Icon name="sparkles" className="mt-1 h-8 w-8 shrink-0 text-gold" /><span><b className="text-foreground">What's broken:</b> gifting is generic, confessing is terrifying, and nothing makes heartache <i>fun</i>.</span></li>
+            <li className="flex gap-4"><OptArt id="wand" alt="" className="mt-1 h-14 w-14 shrink-0 rounded-full border border-gold object-cover" /><span><b className="text-foreground">Who's hurting:</b> the hopeless crushers, the left-on-read, the "we're just friends" crowd.</span></li>
+            <li className="flex gap-4"><OptArt id="broken" alt="" className="mt-1 h-14 w-14 shrink-0 rounded-full border border-gold object-cover" /><span><b className="text-foreground">What's broken:</b> gifting is generic, confessing is terrifying, and nothing makes heartache <i>fun</i>.</span></li>
           </ul>
         </div>
         <div className="text-center">
-          <Icon name="broken-heart" className="mx-auto h-[260px] w-[260px] text-gold" />
+          <OptArt id="broken" alt="A broken heart mended with gold" className="mx-auto h-[340px] w-[340px] rounded-[48px] border border-gold object-cover shadow-glow" />
           <p className="slide-subtitle mt-6 font-serif italic text-gold">"Why won't they notice me?"</p>
         </div>
       </div>
@@ -74,12 +74,12 @@ const SLIDES: { title: string; el: ReactNode }[] = [
         <h1 className="slide-title mt-6 font-display text-gold-gradient">Everyone with a crush is a customer.</h1>
         <div className="mt-14 grid grid-cols-3 gap-10">
           {[
-            ["Who pays", "Senders aged 18–40 buying for a crush, partner, ex… or bestie", "card"],
+            ["Who pays", "Senders aged 18–40 buying for a crush, partner, ex… or bestie", "coins"],
             ["How many", <>Valentine's spend: <Ph>[US $ figure — add source]</Ph></>, "chart"],
             ["Why now", "Gifting went social: people buy what makes a great share, not just a great present", "clock"],
           ].map(([h, b, e]) => (
             <div key={String(h)} className="min-h-[300px] rounded-[32px] border border-gold/40 bg-card p-10">
-              <Icon name={String(e)} className="h-20 w-20 text-gold" />
+              <OptArt id={String(e)} alt="" className="h-28 w-28 rounded-3xl border border-gold object-cover" />
               <p className="slide-subtitle mt-4 font-display text-gold">{h}</p>
               <p className="slide-body mt-4 text-muted-foreground">{b}</p>
             </div>
@@ -115,7 +115,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
   { title: "Smile", el: (
     <Slide>
       <div className="absolute inset-0 flex flex-col items-center justify-center px-[200px] text-center">
-        <Icon name="emblem" className="mx-auto h-[180px] w-[180px] text-gold" />
+        <OptArt id="spell" alt="A bubbling cauldron of golden love potion" className="sparkle mx-auto h-[240px] w-[240px] rounded-full border border-gold object-cover shadow-glow" />
         <h1 className="slide-title mt-10 font-display text-gold-gradient">We can't make them love you…</h1>
         <p className="slide-subtitle mt-6 font-serif italic">…but we can make them eat the chocolate.</p>
       </div>

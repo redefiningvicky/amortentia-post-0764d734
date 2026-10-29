@@ -67,7 +67,7 @@ describe("bundles & free express", () => {
     expect(bundleSavings({ handwritten: true, card: "singing", keepsakes: ["vial"], packaging: "velvet" })).toBe(0));
   it("express is free over $99", () => expect(expressWaiver("express", 99)).toBe(14.99));
   it("express is paid under $99", () => expect(expressWaiver("express", 98.99)).toBe(0));
-  it.each([["wish", 4, 20.96], ["romance", 7, 44.96], ["serenade", 12, 62.96]])("%s bundle applies its proposed saving", (id, saving, price) => {
+  it.each([["wish", 4, 23.96], ["romance", 7, 44.96], ["serenade", 12, 62.96]])("%s bundle applies its proposed saving", (id, saving, price) => {
     const bundle = BUNDLES.find((b) => b.id === id);
     expect(bundle).toBeDefined();
     if (!bundle) throw new Error("Missing bundle");

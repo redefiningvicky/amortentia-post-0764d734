@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Offer navigation button suggestions; wait for user choice before adding
 - [ ] Generated, labeled sample album memories; working standalone confession form
 - [ ] Full-line results disclaimer; cauldron art; wrapped potion filters
 - [ ] Christmas, New Year, Thanksgiving and birthday boxes; more spell bundles

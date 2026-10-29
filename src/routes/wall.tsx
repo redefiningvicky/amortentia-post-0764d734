@@ -79,7 +79,7 @@ function Wall() {
           <div key={t.id} className="mt-2 flex items-center gap-3">
             <span className="w-6 font-display text-gold">{i + 1}</span>
             <span className="flex-1 text-lg">{t.name}</span>
-            <span className="flex items-center gap-1.5 text-muted-foreground"><Icon name="heart" className="h-4 w-4 text-gold" /> {t.score}</span>
+            <span className="flex items-center gap-1.5 text-muted-foreground"><OptArt id="heart" alt="swoons" className="h-5 w-5 rounded-full object-cover" /> {t.score}</span>
           </div>
         ))}
       </section>
@@ -104,7 +104,7 @@ function Wall() {
               <span className="text-sm opacity-70">— A Secret Admirer</span>
               <button onClick={() => swoon(r.id)} aria-pressed={mine.includes(r.id)}
                 className={cn("flex min-h-11 items-center gap-2 rounded-full border border-parchment-foreground/30 px-4", mine.includes(r.id) && "bg-accent text-accent-foreground")}>
-                <Icon name="heart" className="h-4 w-4" /> {count(r)}
+                <OptArt id="heart" alt="swoon" className="h-5 w-5 rounded-full object-cover" /> {count(r)}
               </button>
             </div>
           </article>

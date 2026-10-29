@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
-import { Icon } from "@/components/icons";
+import { OptArt } from "@/components/opt-art";
 
 export function Shell({ children }: { children: ReactNode }) {
   return <div className="mx-auto flex min-h-screen max-w-md flex-col px-5 pb-24 pt-6">{children}</div>;
@@ -57,7 +57,7 @@ export function BottomNav() {
         const active = t.to === "/" ? pathname === "/" : pathname.startsWith(t.to);
         return (
           <Link key={t.to} to={t.to} className={cn("flex flex-1 flex-col items-center gap-1 py-2 text-xs", active ? "text-gold" : "text-muted-foreground")}>
-            <Icon name={t.icon} className="h-6 w-6" />
+            <OptArt id={t.icon} alt="" className={cn("h-9 w-9 rounded-full border object-cover", active ? "border-gold shadow-glow" : "border-transparent opacity-70")} />
             {t.label}
           </Link>
         );

@@ -7,7 +7,7 @@ import potions from "@/assets/shot-potions.jpg";
 import extras from "@/assets/shot-extras.jpg";
 import bite from "@/assets/shot-bite.jpg";
 import grand from "@/assets/box-grand.jpg";
-import { Icon } from "@/components/icons";
+import { OptArt } from "@/components/opt-art";
 
 export const Route = createFileRoute("/pitch")({
   validateSearch: (s: Record<string, unknown>) => ({ slide: Math.max(1, Math.min(6, Number(s["slide"]) || 1)) }),

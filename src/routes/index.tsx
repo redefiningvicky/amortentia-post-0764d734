@@ -2,12 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import hero from "@/assets/hero.jpg";
 import { useEffect, useState } from "react";
 import { GoldButton, Shell } from "@/components/kit";
-import { Icon } from "@/components/icons";
+import { OptArt } from "@/components/opt-art";
 
 const TOUR = [
   { icon: "heart", title: "You love them.", body: "Like, a lot. Embarrassingly a lot." },
-  { icon: "eye-off", title: "They don't notice you.", body: "Rude. Truly unacceptable." },
-  { icon: "choco", title: "Make them eat a chocolate.", body: "We brew love potions into every bite. One bite and they finally see you.*" },
+  { icon: "locket", title: "They don't notice you.", body: "Rude. Truly unacceptable." },
+  { icon: "sweet", title: "Make them eat a chocolate.", body: "We brew love potions into every bite. One bite and they finally see you.*" },
 ];
 
 export const Route = createFileRoute("/")({
@@ -32,7 +32,7 @@ function Home() {
       <Shell>
         <button onClick={done} className="ml-auto min-h-11 px-2 text-sm text-muted-foreground">Skip</button>
         <div key={tour} className="reveal my-auto text-center">
-          <Icon name={t.icon} className="mx-auto h-28 w-28 text-gold" />
+          <OptArt id={t.icon} alt="" className="sparkle mx-auto h-32 w-32 rounded-3xl border border-gold object-cover shadow-glow" />
           <h1 className="mt-6 font-display text-3xl text-gold-gradient">{t.title}</h1>
           <p className="mx-auto mt-3 max-w-xs text-lg text-muted-foreground">{t.body}</p>
         </div>

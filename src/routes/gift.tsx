@@ -48,7 +48,7 @@ function Gift() {
             <button onClick={() => setStage("open")} aria-label="Open the box" className="mx-auto mt-8 block w-64 animate-bounce">
               <img src={BOX_ART[box.id]} alt={box.name} width={816} height={816} className="rounded-3xl shadow-glow" />
             </button>
-            <p className="mt-4 flex items-center justify-center gap-2 text-muted-foreground">Tap the box to open it <Icon name="tap" className="h-5 w-5 text-gold" /></p>
+            <p className="mt-4 flex items-center justify-center gap-2 text-muted-foreground">Tap the box to open it <OptArt id="wand" alt="" className="h-8 w-8 rounded-full object-cover" /></p>
           </>
         )}
         {stage === "open" && (
@@ -66,7 +66,7 @@ function Gift() {
             <div className="relative h-40">
               {Array.from({ length: 14 }).map((_, i) => (
                 <span key={i} className="absolute sparkle" style={{ left: `${(i * 37) % 95}%`, top: `${(i * 53) % 90}%`, animationDelay: `${i * 0.15}s` }}>
-                  <Icon name="heart" className="h-7 w-7 text-gold" />
+                  <OptArt id="heart" alt="" className="h-8 w-8 rounded-full object-cover" />
                 </span>
               ))}
             </div>

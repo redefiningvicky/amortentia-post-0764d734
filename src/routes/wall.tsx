@@ -149,9 +149,6 @@ function Wall() {
       {tab === "confessions" && (<>
       <section className="mt-5 rounded-2xl border bg-card p-4">
         <p className="text-sm uppercase tracking-[0.2em] text-gold">Most craved blends</p>
-
-      <section className="mt-5 rounded-2xl border bg-card p-4">
-        <p className="text-sm uppercase tracking-[0.2em] text-gold">Most craved blends</p>
         {trending.map((t, i) => (
           <div key={t.id} className="mt-2 flex items-center gap-3">
             <span className="w-6 font-display text-gold">{i + 1}</span>

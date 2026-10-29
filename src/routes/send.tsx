@@ -102,7 +102,7 @@ function Send() {
       <main className="mt-6 flex-1 space-y-3 pb-36">
         {step === 0 && TIERS.map((t) => (
           <Option key={t.id} active={tier === t.id} onClick={() => setTier(t.id)}>
-            <div className="text-4xl">{t.pieces < 10 ? "💝" : t.pieces < 20 ? "❤️‍🔥" : "💘"}</div>
+            <div className="text-4xl">{t.pieces < 10 ? "💝" : t.pieces < 20 ? "❤️‍🔥" : t.pieces < 40 ? "💘" : t.pieces < 60 ? "💖" : "👑"}</div>
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <span className="text-xl font-semibold">{t.name}</span>

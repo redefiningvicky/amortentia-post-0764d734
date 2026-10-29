@@ -4,6 +4,8 @@ export const TIERS: Tier[] = [
   { id: "sweet", name: "The Sweet Whisper", pieces: 9, price: 19.99, blurb: "A gentle crush" },
   { id: "true", name: "The True Devotion", pieces: 18, price: 34.99, blurb: "Most chosen" },
   { id: "eternal", name: "The Eternal Enchantment", pieces: 32, price: 54.99, blurb: "Hopelessly smitten" },
+  { id: "vault", name: "The Obsession Vault", pieces: 48, price: 79.99, blurb: "No one else will do" },
+  { id: "grand", name: "The Grand Amortentia", pieces: 72, price: 119.99, blurb: "Love beyond reason" },
 ];
 
 export const STRENGTHS = [

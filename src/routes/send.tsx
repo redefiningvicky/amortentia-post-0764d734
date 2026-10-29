@@ -2,11 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { guest } from "@/lib/guest";
 import { TIERS, STRENGTHS, AROMAS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal } from "@/lib/catalog";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/send")({
+export const Route = createFileRoute("/send")({
   head: () => ({
     meta: [
       { title: "Send Enchanted Chocolates — Amortentia Post" },
@@ -46,13 +47,20 @@ function Send() {
 
   async function submit() {
     setBusy(true);
-    const { error } = await supabase.from("orders").insert({
-      tier, strength, aroma, duration: durId,
-      sender_name: from.trim(), recipient_name: to.trim(), recipient_email: toEmail.trim(),
-      note: note.trim() || null, total, share_on_wall: share,
-      addons: [handwritten ? "handwritten" : null, card ? `card:${card}` : null].filter(Boolean) as string[],
-      handwritten_text: handwritten ? handText.trim() : null,
-    });
+    const { data: u } = await supabase.auth.getUser();
+    let error: unknown = null;
+    if (u.user) {
+      ({ error } = await supabase.from("orders").insert({
+        tier, strength, aroma, duration: durId,
+        sender_name: from.trim(), recipient_name: to.trim(), recipient_email: toEmail.trim(),
+        note: note.trim() || null, total, share_on_wall: share,
+        addons: [handwritten ? "handwritten" : null, card ? `card:${card}` : null].filter(Boolean) as string[],
+        handwritten_text: handwritten ? handText.trim() : null,
+      }));
+    } else {
+      guest.addOrder({ id: crypto.randomUUID(), tier, recipient_name: to.trim(), total, created_at: new Date().toISOString() });
+      if (share) ({ error } = await supabase.from("confessions").insert({ tier, strength, aroma, note: note.trim().slice(0, 200) || null }));
+    }
     setBusy(false);
     if (error) { toast.error("The owl dropped your box. Try again."); return; }
     setSent(true);

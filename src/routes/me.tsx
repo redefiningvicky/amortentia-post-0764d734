@@ -1,13 +1,15 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { TIERS } from "@/lib/catalog";
+import { guest } from "@/lib/guest";
 import { Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/me")({
+export const Route = createFileRoute("/me")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "My Love Letters — Amortentia Post" },
@@ -19,32 +21,45 @@ export const Route = createFileRoute("/_authenticated/me")({
   component: Me,
 });
 
+type Order = { id: string; tier: string; recipient_name: string; total: number; created_at: string; mine: boolean };
+
 function Me() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [tab, setTab] = useState<"sent" | "received">("sent");
+  const [name, setName] = useState<string | null>(null);
   const { data } = useQuery({
     queryKey: ["me"],
     queryFn: async () => {
       const { data: u } = await supabase.auth.getUser();
-      const user = u.user!;
+      const user = u.user;
+      if (!user) {
+        const p = guest.profile();
+        return { user: null, displayName: p.display_name, email: "Guest — saved on this device", avatar: p.avatar,
+          orders: guest.orders().map((o) => ({ ...o, mine: true })) as Order[] };
+      }
       const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
-      let avatar: string | null = null;
-      if (profile?.avatar_url && !profile.avatar_url.startsWith("http")) {
-        avatar = (await supabase.storage.from("avatars").createSignedUrl(profile.avatar_url, 3600)).data?.signedUrl ?? null;
-      } else avatar = profile?.avatar_url ?? null;
+      let avatar = profile?.avatar_url ?? null;
+      if (avatar && !avatar.startsWith("http"))
+        avatar = (await supabase.storage.from("avatars").createSignedUrl(avatar, 3600)).data?.signedUrl ?? null;
       const { data: orders } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
-      return { user, profile, avatar, orders: orders ?? [] };
+      return { user, displayName: profile?.display_name ?? "", email: user.email ?? "", avatar,
+        orders: (orders ?? []).map((o) => ({ ...o, total: Number(o.total), mine: o.sender_id === user.id })) as Order[] };
     },
   });
-  const [name, setName] = useState<string | null>(null);
 
   if (!data) return <Shell><p className="m-auto text-muted-foreground">Opening your letters…</p></Shell>;
-  const sent = data.orders.filter((o) => o.sender_id === data.user.id);
-  const received = data.orders.filter((o) => o.sender_id !== data.user.id);
+  const sent = data.orders.filter((o) => o.mine);
+  const received = data.orders.filter((o) => !o.mine);
   const list = tab === "sent" ? sent : received;
 
   async function upload(f: File) {
+    if (!data!.user) {
+      const r = new FileReader();
+      r.onload = () => { guest.saveProfile({ ...guest.profile(), avatar: String(r.result) }); qc.invalidateQueries({ queryKey: ["me"] }); };
+      r.readAsDataURL(f);
+      return;
+    }
     const path = `${data!.user.id}/avatar-${Date.now()}`;
     const { error } = await supabase.storage.from("avatars").upload(path, f, { upsert: true });
     if (error) { toast.error("Upload failed"); return; }
@@ -53,7 +68,8 @@ function Me() {
   }
   async function saveName() {
     if (name === null) return;
-    await supabase.from("profiles").update({ display_name: name }).eq("id", data!.user.id);
+    if (data!.user) await supabase.from("profiles").update({ display_name: name }).eq("id", data!.user.id);
+    else guest.saveProfile({ ...guest.profile(), display_name: name });
     setName(null);
     qc.invalidateQueries({ queryKey: ["me"] });
     toast.success("Name saved");
@@ -62,7 +78,7 @@ function Me() {
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
-    navigate({ to: "/auth", search: { redirect: "/send" }, replace: true });
+    navigate({ to: "/", replace: true });
   }
 
   return (
@@ -73,9 +89,9 @@ function Me() {
           <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
         </label>
         <div className="flex-1">
-          <input value={name ?? data.profile?.display_name ?? ""} onChange={(e) => setName(e.target.value)} onBlur={saveName}
+          <input value={name ?? data.displayName} onChange={(e) => setName(e.target.value)} onBlur={saveName}
             aria-label="Display name" className="w-full bg-transparent font-display text-2xl text-gold outline-none" />
-          <p className="text-sm text-muted-foreground">{data.user.email}</p>
+          <p className="text-sm text-muted-foreground">{data.email}</p>
         </div>
       </div>
 
@@ -97,13 +113,15 @@ function Me() {
           <div key={o.id} className="rounded-2xl border bg-card p-4">
             <div className="flex justify-between">
               <span className="font-semibold">{tab === "sent" ? `To ${o.recipient_name}` : "From a Secret Admirer"}</span>
-              <span className="text-gold">${Number(o.total).toFixed(2)}</span>
+              <span className="text-gold">${o.total.toFixed(2)}</span>
             </div>
             <p className="text-sm text-muted-foreground">{TIERS.find((t) => t.id === o.tier)?.name} · {new Date(o.created_at).toLocaleDateString()}</p>
           </div>
         ))}
       </div>
-      <button onClick={signOut} className="mt-8 text-muted-foreground underline">Sign out</button>
+      {data.user
+        ? <button onClick={signOut} className="mt-8 text-muted-foreground underline">Sign out</button>
+        : <Link to="/auth" search={{ redirect: "/me" }} className="mt-8 text-center text-gold underline">Optional: sign in to save across devices</Link>}
     </Shell>
   );
 }

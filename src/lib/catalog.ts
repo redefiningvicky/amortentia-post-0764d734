@@ -19,11 +19,11 @@ export const ALL_BOXES: Tier[] = [...TIERS, ...SEASONAL];
 
 // Funny gauge that rises with the order total.
 export const DESPERATION = [
-  { min: 0, label: "Mildly Hopeful", emoji: "🙂" },
-  { min: 60, label: "Lovesick", emoji: "🥺" },
-  { min: 120, label: "Hopelessly Devoted", emoji: "😩" },
-  { min: 220, label: "Writing Their Name in Notebooks", emoji: "📓" },
-  { min: 350, label: "Unhinged Romantic", emoji: "🫠" },
+  { min: 0, label: "Mildly Hopeful", icon: "fleur" },
+  { min: 60, label: "Lovesick", icon: "heart" },
+  { min: 120, label: "Hopelessly Devoted", icon: "flame" },
+  { min: 220, label: "Writing Their Name in Notebooks", icon: "quill" },
+  { min: 350, label: "Unhinged Romantic", icon: "sparkles" },
 ];
 export function desperationLevel(total: number) {
   return [...DESPERATION].reverse().find((d) => total >= d.min)!;
@@ -59,8 +59,8 @@ export function orderTotal(tierId: string, strengthId: string, durationId: strin
 export const HANDWRITTEN = { id: "handwritten", name: "Handwritten Love Note", desc: "Your words, penned in gold ink by our scribes", price: 6.99 };
 
 export const CARDS = [
-  { id: "vintage", name: "Vintage Valentine", desc: "Lace-edged, 1940s post style", price: 4.99, emoji: "💌" },
-  { id: "singing", name: "Singing Envelope", desc: "Sings your confession when opened", price: 8.99, emoji: "🎶" },
+  { id: "vintage", name: "Vintage Valentine", desc: "Lace-edged, 1940s post style", price: 4.99, icon: "envelope" },
+  { id: "singing", name: "Singing Envelope", desc: "Sings your confession when opened", price: 8.99, icon: "music" },
 ];
 
 export function addonsTotal(handwritten: boolean, cardId: string | null) {
@@ -74,16 +74,16 @@ export const RARITY_PRICE: Record<Rarity, number> = { common: 3.99, rare: 6.99, 
 export const MAX_BLEND = 5;
 
 export const ESSENCES = [
-  { id: "ember", name: "Passion", icon: "🔥", adj: "Smoldering", noun: "Desire", effect: "their pulse races when you walk in" },
-  { id: "rose", name: "Tenderness", icon: "🌹", adj: "Tender", noun: "Affection", effect: "they long to hold your hand" },
-  { id: "moon", name: "Longing", icon: "🌙", adj: "Aching", noun: "Yearning", effect: "they miss you the moment you leave" },
-  { id: "star", name: "Destiny", icon: "⭐", adj: "Fated", noun: "Destiny", effect: "they swear you were meant to meet" },
-  { id: "thorn", name: "Obsession", icon: "🥀", adj: "Consuming", noun: "Obsession", effect: "you are all they can think about" },
-  { id: "honey", name: "Devotion", icon: "🍯", adj: "Devoted", noun: "Devotion", effect: "they'd cross oceans for you" },
-  { id: "mist", name: "Mystery", icon: "🌫️", adj: "Enchanted", noun: "Intrigue", effect: "they can't stop wondering about you" },
-  { id: "storm", name: "Courage", icon: "⚡", adj: "Fearless", noun: "Confession", effect: "they find the nerve to say it first" },
-  { id: "bloom", name: "Euphoria", icon: "🌸", adj: "Giddy", noun: "Bliss", effect: "they smile like a fool around you" },
-  { id: "frost", name: "Rekindling", icon: "❄️", adj: "Rekindled", noun: "Second Chance", effect: "old feelings thaw and return" },
+  { id: "ember", name: "Passion", icon: "flame", adj: "Smoldering", noun: "Desire", effect: "their pulse races when you walk in" },
+  { id: "rose", name: "Tenderness", icon: "rose", adj: "Tender", noun: "Affection", effect: "they long to hold your hand" },
+  { id: "moon", name: "Longing", icon: "moon", adj: "Aching", noun: "Yearning", effect: "they miss you the moment you leave" },
+  { id: "star", name: "Destiny", icon: "star", adj: "Fated", noun: "Destiny", effect: "they swear you were meant to meet" },
+  { id: "thorn", name: "Obsession", icon: "thorn", adj: "Consuming", noun: "Obsession", effect: "you are all they can think about" },
+  { id: "honey", name: "Devotion", icon: "honey", adj: "Devoted", noun: "Devotion", effect: "they'd cross oceans for you" },
+  { id: "mist", name: "Mystery", icon: "mist", adj: "Enchanted", noun: "Intrigue", effect: "they can't stop wondering about you" },
+  { id: "storm", name: "Courage", icon: "bolt", adj: "Fearless", noun: "Confession", effect: "they find the nerve to say it first" },
+  { id: "bloom", name: "Euphoria", icon: "bloom", adj: "Giddy", noun: "Bliss", effect: "they smile like a fool around you" },
+  { id: "frost", name: "Rekindling", icon: "snowflake", adj: "Rekindled", noun: "Second Chance", effect: "old feelings thaw and return" },
 ] as const;
 export type EssenceId = (typeof ESSENCES)[number]["id"];
 
@@ -157,22 +157,22 @@ function cap(s: string) {
 
 // ---------- Upgrades: packaging, delivery, keepsakes ----------
 export const PACKAGING = [
-  { id: "kraft", name: "Vintage Kraft Parcel", desc: "Twine and a red wax seal", price: 0, emoji: "📦" },
-  { id: "velvet", name: "Crimson Velvet Heart", desc: "Soft velvet they'll keep forever", price: 9.99, emoji: "❤️" },
-  { id: "music", name: "Enchanted Music Box Heart", desc: "Plays a waltz the moment they lift the lid", price: 39.99, emoji: "🎼" },
+  { id: "kraft", name: "Vintage Kraft Parcel", desc: "Twine and a red wax seal", price: 0, icon: "box" },
+  { id: "velvet", name: "Crimson Velvet Heart", desc: "Soft velvet they'll keep forever", price: 9.99, icon: "velvet" },
+  { id: "music", name: "Enchanted Music Box Heart", desc: "Plays a waltz the moment they lift the lid", price: 39.99, icon: "music" },
 ];
 
 export const DELIVERY = [
-  { id: "owl", name: "Standard Owl", desc: "Arrives in 3–5 days", price: 0, emoji: "🦉" },
-  { id: "express", name: "Express Owl", desc: "Tomorrow. Free on orders over $99", price: 14.99, emoji: "💨" },
-  { id: "courier", name: "Hand-Delivered by Courier", desc: "Handed over in person, with a bow", price: 49.99, emoji: "🎩" },
+  { id: "owl", name: "Standard Owl", desc: "Arrives in 3–5 days", price: 0, icon: "owl" },
+  { id: "express", name: "Express Owl", desc: "Tomorrow. Free on orders over $99", price: 14.99, icon: "wind" },
+  { id: "courier", name: "Hand-Delivered by Courier", desc: "Handed over in person, with a bow", price: 49.99, icon: "hat" },
 ];
 
 export const KEEPSAKES = [
-  { id: "seal", name: "Monogram Wax Seal", desc: "Your initial, pressed in gold wax", price: 2.99, emoji: "🔴" },
-  { id: "vial", name: "Keepsake Potion Vial", desc: "A glowing vial of your blend to keep", price: 12.99, emoji: "🧪" },
-  { id: "plush", name: "Messenger Owl Plush", desc: "Something to hold when you're not there", price: 18.99, emoji: "🧸" },
-  { id: "bouquet", name: "Dozen Red Roses", desc: "Delivered alongside the box", price: 29.99, emoji: "💐" },
+  { id: "seal", name: "Monogram Wax Seal", desc: "Your initial, pressed in gold wax", price: 2.99, icon: "seal" },
+  { id: "vial", name: "Keepsake Potion Vial", desc: "A glowing vial of your blend to keep", price: 12.99, icon: "vial" },
+  { id: "plush", name: "Messenger Owl Plush", desc: "Something to hold when you're not there", price: 18.99, icon: "plush" },
+  { id: "bouquet", name: "Dozen Red Roses", desc: "Delivered alongside the box", price: 29.99, icon: "bouquet" },
 ];
 
 export const ANTIDOTE = { id: "antidote", name: "Antidote Guarantee", desc: "If they don't swoon, we re-brew a fresh box free", price: 7.99 };

@@ -21,7 +21,7 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
 
   return (
     <div className="space-y-3">
-      <div className="sticky top-0 z-10 -mx-5 bg-background/95 px-5 pb-3 pt-1 backdrop-blur">
+      <div className="pb-3 pt-1">
         <div className="rounded-2xl border border-gold bg-card p-4 shadow-glow">
           <p className="text-xs uppercase tracking-[0.2em] text-gold">Your blend · {value.length}/{MAX_BLEND}</p>
           {outcome ? (

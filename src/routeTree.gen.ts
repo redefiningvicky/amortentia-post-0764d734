@@ -10,15 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as GiftRouteImport } from './routes/gift'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as PitchRouteImport } from './routes/pitch'
 import { Route as SendRouteImport } from './routes/send'
+import { Route as SpellbookRouteImport } from './routes/spellbook'
 import { Route as WallRouteImport } from './routes/wall'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GiftRoute = GiftRouteImport.update({
@@ -41,6 +48,11 @@ const SendRoute = SendRouteImport.update({
   path: '/send',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SpellbookRoute = SpellbookRouteImport.update({
+  id: '/spellbook',
+  path: '/spellbook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WallRoute = WallRouteImport.update({
   id: '/wall',
   path: '/wall',
@@ -49,43 +61,76 @@ const WallRoute = WallRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/discover': typeof DiscoverRoute
   '/gift': typeof GiftRoute
   '/me': typeof MeRoute
   '/pitch': typeof PitchRoute
   '/send': typeof SendRoute
+  '/spellbook': typeof SpellbookRoute
   '/wall': typeof WallRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/discover': typeof DiscoverRoute
   '/gift': typeof GiftRoute
   '/me': typeof MeRoute
   '/pitch': typeof PitchRoute
   '/send': typeof SendRoute
+  '/spellbook': typeof SpellbookRoute
   '/wall': typeof WallRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/discover': typeof DiscoverRoute
   '/gift': typeof GiftRoute
   '/me': typeof MeRoute
   '/pitch': typeof PitchRoute
   '/send': typeof SendRoute
+  '/spellbook': typeof SpellbookRoute
   '/wall': typeof WallRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/gift' | '/me' | '/pitch' | '/send' | '/wall'
+  fullPaths:
+    | '/'
+    | '/discover'
+    | '/gift'
+    | '/me'
+    | '/pitch'
+    | '/send'
+    | '/spellbook'
+    | '/wall'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/gift' | '/me' | '/pitch' | '/send' | '/wall'
-  id: '__root__' | '/' | '/gift' | '/me' | '/pitch' | '/send' | '/wall'
+  to:
+    | '/'
+    | '/discover'
+    | '/gift'
+    | '/me'
+    | '/pitch'
+    | '/send'
+    | '/spellbook'
+    | '/wall'
+  id:
+    | '__root__'
+    | '/'
+    | '/discover'
+    | '/gift'
+    | '/me'
+    | '/pitch'
+    | '/send'
+    | '/spellbook'
+    | '/wall'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DiscoverRoute: typeof DiscoverRoute
   GiftRoute: typeof GiftRoute
   MeRoute: typeof MeRoute
   PitchRoute: typeof PitchRoute
   SendRoute: typeof SendRoute
+  SpellbookRoute: typeof SpellbookRoute
   WallRoute: typeof WallRoute
 }
 
@@ -96,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gift': {
@@ -126,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SendRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/spellbook': {
+      id: '/spellbook'
+      path: '/spellbook'
+      fullPath: '/spellbook'
+      preLoaderRoute: typeof SpellbookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/wall': {
       id: '/wall'
       path: '/wall'
@@ -138,10 +197,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DiscoverRoute: DiscoverRoute,
   GiftRoute: GiftRoute,
   MeRoute: MeRoute,
   PitchRoute: PitchRoute,
   SendRoute: SendRoute,
+  SpellbookRoute: SpellbookRoute,
   WallRoute: WallRoute,
 }
 export const routeTree = rootRouteImport

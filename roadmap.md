@@ -1,9 +1,10 @@
 # Roadmap
-- [ ] Offer navigation button suggestions; wait for user choice before adding
-- [ ] Generated, labeled sample album memories; working standalone confession form
-- [ ] Full-line results disclaimer; cauldron art; wrapped potion filters
-- [ ] Christmas, New Year, Thanksgiving and birthday boxes; more spell bundles
-- [ ] Verify new choices and refresh pitch screenshots; retain seven sending steps
+- [x] Must-have interactive cauldron class: choose paid ingredients, stir and bottle custom blend, carry into Send
+- [x] Add chosen Discover and Spellbook pages and navigation; carry choices into Send
+- [x] Generated, labeled sample album memories; working standalone confession form
+- [x] Full-line results disclaimer; cauldron art; wrapped potion filters
+- [x] Christmas, New Year, Thanksgiving and birthday boxes; more spell bundles
+- [x] Verify new choices and refresh pitch screenshots; retain seven sending steps
 - [ ] Accounts — removed for now at user request; re-add before launch
 - [x] Anonymous "Secret Admirer Wall" with swoons + trending potions
 - [x] Save orders to backend

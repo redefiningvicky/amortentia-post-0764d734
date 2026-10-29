@@ -58,6 +58,8 @@ export function Label({ children }: { children: ReactNode }) {
 
 const TABS = [
   { to: "/", label: "Home", icon: "castle" },
+  { to: "/discover", label: "Discover", icon: "sweet" },
+  { to: "/spellbook", label: "Spellbook", icon: "spell" },
   { to: "/wall", label: "Wall", icon: "heart" },
   { to: "/send", label: "Send", icon: "owl" },
   { to: "/me", label: "Me", icon: "quill" },
@@ -71,7 +73,7 @@ export function BottomNav() {
       {TABS.map((t) => {
         const active = t.to === "/" ? pathname === "/" : pathname.startsWith(t.to);
         return (
-          <Link key={t.to} to={t.to} className={cn("flex flex-1 flex-col items-center gap-1 py-2 text-xs", active ? "text-gold" : "text-muted-foreground")}>
+          <Link key={t.to} to={t.to} className={cn("flex min-w-0 flex-1 flex-col items-center gap-1 py-2 text-[10px]", active ? "text-gold" : "text-muted-foreground")}>
             <OptArt id={t.icon} alt="" className={cn("h-9 w-9 rounded-full border object-cover", active ? "border-gold shadow-glow" : "border-transparent opacity-70")} />
             {t.label}
           </Link>

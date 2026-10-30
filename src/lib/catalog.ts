@@ -34,9 +34,9 @@ export function desperationLevel(total: number) {
 }
 
 export const STRENGTHS = [
-  { id: "flutter", name: "Flutter", desc: "They can't stop thinking of you", price: 7 },
-  { id: "swoon", name: "Swoon", desc: "They ache when you leave the room", price: 12 },
-  { id: "besotted", name: "Utterly Besotted", desc: "Hopelessly, desperately yours", price: 19 },
+  { id: "flutter", name: "Flutter", desc: "They can't stop thinking of you", price: 6.99 },
+  { id: "swoon", name: "Swoon", desc: "They ache when you leave the room", price: 11.99 },
+  { id: "besotted", name: "Utterly Besotted", desc: "Hopelessly, desperately yours", price: 18.99 },
 ];
 
 export const AROMAS = [
@@ -48,16 +48,16 @@ export const AROMAS = [
 ];
 
 export const DURATIONS = [
-  { id: "hour", name: "One Night", price: 4 },
-  { id: "day", name: "A Full Moon", price: 9 },
-  { id: "week", name: "Forever-ish", price: 15 },
+  { id: "hour", name: "One Night", price: 3.99 },
+  { id: "day", name: "A Full Moon", price: 8.99 },
+  { id: "week", name: "Forever-ish", price: 14.99 },
 ];
 
 export function orderTotal(tierId: string, strengthId: string, durationId: string) {
   const t = ALL_BOXES.find((x) => x.id === tierId)?.price ?? 0;
   const s = STRENGTHS.find((x) => x.id === strengthId)?.price ?? 0;
   const d = DURATIONS.find((x) => x.id === durationId)?.price ?? 0;
-  return Math.round((t + s + d) * 100) / 100;
+  return to99(t + s + d);
 }
 
 export const HANDWRITTEN = { id: "handwritten", name: "Handwritten Love Note", desc: "Your words, penned in gold ink by our scribes", price: 6.99 };
@@ -69,7 +69,7 @@ export const CARDS = [
 
 export function addonsTotal(handwritten: boolean, cardId: string | null) {
   const c = CARDS.find((x) => x.id === cardId)?.price ?? 0;
-  return Math.round(((handwritten ? HANDWRITTEN.price : 0) + c) * 100) / 100;
+  return to99((handwritten ? HANDWRITTEN.price : 0) + c);
 }
 
 // ---------- The Potion Cabinet: 110 potions, 11 essences, blend synergies ----------
@@ -341,7 +341,7 @@ export function blendOutcome(potionIds: string[]): Outcome | null {
 }
 
 export function potionsTotal(potionIds: string[]) {
-  return Math.round(potionIds.reduce((s, id) => s + (findBrewable(id)?.price ?? 0), 0) * 100) / 100;
+  return to99(potionIds.reduce((s, id) => s + (findBrewable(id)?.price ?? 0), 0));
 }
 
 function cap(s: string) {
@@ -377,7 +377,7 @@ export function upgradesTotal(packagingId: string, deliveryId: string, keepsakeI
   const p = PACKAGING.find((x) => x.id === packagingId)?.price ?? 0;
   const d = DELIVERY.find((x) => x.id === deliveryId)?.price ?? 0;
   const k = keepsakeIds.reduce((s, id) => s + (KEEPSAKES.find((x) => x.id === id)?.price ?? 0), 0);
-  return Math.round((p + d + k + (antidote ? ANTIDOTE.price : 0)) * 100) / 100;
+  return to99(p + d + k + (antidote ? ANTIDOTE.price : 0));
 }
 
 // Spell bundles: one tap picks several extras; when every item in a bundle is chosen, the saving applies.
@@ -402,7 +402,7 @@ export function bundleMatches(b: SpellBundle, x: Extras) {
 }
 
 export function bundlePrice(b: SpellBundle) {
-  return Math.round((addonsTotal(b.pick.handwritten, b.pick.card) + upgradesTotal(b.pick.packaging ?? "kraft", "owl", [...b.pick.keepsakes], false) - b.save) * 100) / 100;
+  return to99(addonsTotal(b.pick.handwritten, b.pick.card) + upgradesTotal(b.pick.packaging ?? "kraft", "owl", [...b.pick.keepsakes], false) - b.save);
 }
 
 export function bundleSavings(x: Extras) {

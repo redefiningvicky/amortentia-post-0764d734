@@ -1,0 +1,1 @@
+ALTER TABLE public.orders ALTER COLUMN recipient_email DROP NOT NULL;

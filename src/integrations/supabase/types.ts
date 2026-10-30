@@ -85,7 +85,7 @@ export type Database = {
           note: string | null
           outcome: string | null
           potions: string[]
-          recipient_email: string
+          recipient_email: string | null
           recipient_name: string
           sender_id: string
           sender_name: string
@@ -104,7 +104,7 @@ export type Database = {
           note?: string | null
           outcome?: string | null
           potions?: string[]
-          recipient_email: string
+          recipient_email?: string | null
           recipient_name: string
           sender_id?: string
           sender_name: string
@@ -123,7 +123,7 @@ export type Database = {
           note?: string | null
           outcome?: string | null
           potions?: string[]
-          recipient_email?: string
+          recipient_email?: string | null
           recipient_name?: string
           sender_id?: string
           sender_name?: string

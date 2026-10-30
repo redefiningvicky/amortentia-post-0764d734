@@ -40,6 +40,13 @@ export function to99(n: number): number {
   return Math.round((k + 0.99) * 100) / 100;
 }
 
+// For "spend X more" tips: the next .99 amount at or above n, so the tip never under-promises.
+export function to99Up(n: number): number {
+  if (n <= 0) return 0;
+  const k = Math.ceil(n - 0.99);
+  return Math.round((k + 0.99) * 100) / 100;
+}
+
 export const STRENGTHS = [
   { id: "flutter", name: "Flutter", desc: "They can't stop thinking of you", price: 6.99 },
   { id: "swoon", name: "Swoon", desc: "They ache when you leave the room", price: 11.99 },

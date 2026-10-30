@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { TIERS, SEASONAL, ALL_BOXES, MAX_BLEND, findBrewable, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER, to99 } from "@/lib/catalog";
+import { TIERS, SEASONAL, ALL_BOXES, MAX_BLEND, findBrewable, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER, to99, to99Up } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { BrewClass } from "@/components/brew-class";
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,6 @@ function Send() {
   const [handText, setHandText] = useState("");
   const [card, setCard] = useState<string | null>(initialBundle?.pick.card ?? null);
   const [to, setTo] = useState("");
-  const [toEmail, setToEmail] = useState("");
   const [from, setFrom] = useState("");
   const [note, setNote] = useState("");
   const [share, setShare] = useState(true);
@@ -328,7 +327,7 @@ function Send() {
           <span className="text-lg font-bold text-gold">${total.toFixed(2)}</span>
         </div>
         {step >= 3 && preDelivery < FREE_EXPRESS_OVER && (
-          <p className="mb-2 text-center text-xs text-muted-foreground">Add ${(FREE_EXPRESS_OVER - preDelivery).toFixed(2)} more for <span className="text-gold">free Express Owl</span></p>
+          <p className="mb-2 text-center text-xs text-muted-foreground">Add ${to99Up(FREE_EXPRESS_OVER - preDelivery).toFixed(2)} more for <span className="text-gold">free Express Owl</span></p>
         )}
         <GoldButton disabled={!canNext || busy} onClick={() => (step === 6 ? submit() : setStep(step + 1))}>
           {step === 6 ? (busy ? "Summoning owl…" : "Seal My Fate") : "Continue"}

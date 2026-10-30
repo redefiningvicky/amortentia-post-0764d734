@@ -43,6 +43,13 @@
       "when": 1793244551340,
       "tag": "0005_wall_photo_album",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793319161081,
+      "tag": "0006_orders_recipient_email_optional",
+      "breakpoints": true
     }
   ]
 }

@@ -16,7 +16,7 @@ describe("box tiers", () => {
 import { addonsTotal } from "@/lib/catalog";
 describe("add-ons", () => {
   it("handwritten note costs $6.99", () => expect(addonsTotal(true, null)).toBe(6.99));
-  it("note plus singing card", () => expect(addonsTotal(true, "singing")).toBe(15.98));
+  it("note plus singing card", () => expect(addonsTotal(true, "singing")).toBe(15.99));
   it("no add-ons is $0", () => expect(addonsTotal(false, null)).toBe(0));
 });
 
@@ -36,14 +36,14 @@ describe("potion cabinet", () => {
   it("a legendary potion upgrades the outcome", () => {
     expect(blendOutcome(["ember-10", "thorn-1"])?.name).toBe("Legendary Wildfire Obsession");
   });
-  it("potion prices add up", () => expect(potionsTotal(["ember-1", "ember-7", "ember-10"])).toBe(22.97));
+  it("potion prices add up", () => expect(potionsTotal(["ember-1", "ember-7", "ember-10"])).toBe(22.99));
 });
 
 import { upgradesTotal, MAX_BLEND } from "@/lib/catalog";
 describe("upgrades", () => {
   it("blend allows up to 5 potions", () => expect(MAX_BLEND).toBe(5));
   it("default kraft + standard owl is free", () => expect(upgradesTotal("kraft", "owl", [], false)).toBe(0));
-  it("music box + courier + plush + antidote", () => expect(upgradesTotal("music", "courier", ["plush"], true)).toBe(116.96));
+  it("music box + courier + plush + antidote", () => expect(upgradesTotal("music", "courier", ["plush"], true)).toBe(116.99));
 });
 
 import { SEASONAL, desperationLevel } from "@/lib/catalog";
@@ -67,7 +67,7 @@ describe("bundles & free express", () => {
     expect(bundleSavings({ handwritten: true, card: "singing", keepsakes: ["vial"], packaging: "velvet" })).toBe(0));
   it("express is free over $99", () => expect(expressWaiver("express", 99)).toBe(14.99));
   it("express is paid under $99", () => expect(expressWaiver("express", 98.99)).toBe(0));
-  it.each([["wish", 4, 23.96], ["romance", 7, 44.96], ["serenade", 12, 62.96]])("%s bundle applies its proposed saving", (id, saving, price) => {
+  it.each([["wish", 4, 23.99], ["romance", 7, 44.99], ["serenade", 12, 62.99]])("%s bundle applies its proposed saving", (id, saving, price) => {
     const bundle = BUNDLES.find((b) => b.id === id);
     expect(bundle).toBeDefined();
     if (!bundle) throw new Error("Missing bundle");
@@ -102,13 +102,31 @@ describe("raw brewing ingredients", () => {
     expect(new Set(INGREDIENTS.map((i) => INGREDIENT_KIND[i.essence])).size).toBe(11);
   });
   it("prices raw blends through the same totals as potions", () => {
-    expect(potionsTotal(["raw-ember-1", "raw-rose-1"])).toBe(3.98);
+    expect(potionsTotal(["raw-ember-1", "raw-rose-1"])).toBe(3.99);
     expect(potionsTotal(["raw-ember-10"])).toBe(4.99);
-    expect(potionsTotal(["ember-1", "raw-thorn-1"])).toBe(5.98);
+    expect(potionsTotal(["ember-1", "raw-thorn-1"])).toBe(5.99);
   });
   it("raw ingredients blend into the same essence outcomes", () => {
     expect(findBrewable("raw-ember-1")?.name).toBe("Crushed Dragon Pepper");
     expect(blendOutcome(["raw-ember-1", "raw-thorn-1"])?.name).toBe("Wildfire Obsession");
     expect(blendOutcome(["raw-moon-1", "raw-star-1"])?.name).toBe("Written in the Stars");
+  });
+});
+
+import { STRENGTHS, DURATIONS, HANDWRITTEN, ANTIDOTE } from "@/lib/catalog";
+describe("every price ends in .99", () => {
+  const ends99 = (n: number) => Math.round((n % 1) * 100) === 99;
+  it("every option price ends in .99", () => {
+    for (const p of [...TIERS, ...SEASONAL, ...STRENGTHS, ...DURATIONS, ...CARDS, ...POTIONS, ...INGREDIENTS]) expect(ends99(p.price)).toBe(true);
+    for (const p of [...PACKAGING, ...DELIVERY]) expect(p.price === 0 || ends99(p.price)).toBe(true);
+    expect(ends99(HANDWRITTEN.price)).toBe(true);
+    expect(ends99(ANTIDOTE.price)).toBe(true);
+  });
+  it("every computed total ends in .99", () => {
+    expect(ends99(orderTotal("grand", "besotted", "week"))).toBe(true);
+    expect(ends99(addonsTotal(true, "singing"))).toBe(true);
+    expect(ends99(potionsTotal(["raw-ember-1", "raw-rose-1", "ember-1", "ember-7", "ember-10"]))).toBe(true);
+    expect(ends99(upgradesTotal("music", "courier", ["seal", "vial", "plush", "bouquet"], true))).toBe(true);
+    for (const b of BUNDLES) expect(ends99(bundlePrice(b))).toBe(true);
   });
 });

@@ -112,3 +112,21 @@ describe("raw brewing ingredients", () => {
     expect(blendOutcome(["raw-moon-1", "raw-star-1"])?.name).toBe("Written in the Stars");
   });
 });
+
+import { STRENGTHS, DURATIONS, HANDWRITTEN, ANTIDOTE } from "@/lib/catalog";
+describe("every price ends in .99", () => {
+  const ends99 = (n: number) => Math.round((n % 1) * 100) === 99;
+  it("every option price ends in .99", () => {
+    for (const p of [...TIERS, ...SEASONAL, ...STRENGTHS, ...DURATIONS, ...CARDS, ...POTIONS, ...INGREDIENTS]) expect(ends99(p.price)).toBe(true);
+    for (const p of [...PACKAGING, ...DELIVERY]) expect(p.price === 0 || ends99(p.price)).toBe(true);
+    expect(ends99(HANDWRITTEN.price)).toBe(true);
+    expect(ends99(ANTIDOTE.price)).toBe(true);
+  });
+  it("every computed total ends in .99", () => {
+    expect(ends99(orderTotal("grand", "besotted", "week"))).toBe(true);
+    expect(ends99(addonsTotal(true, "singing"))).toBe(true);
+    expect(ends99(potionsTotal(["raw-ember-1", "raw-rose-1", "ember-1", "ember-7", "ember-10"]))).toBe(true);
+    expect(ends99(upgradesTotal("music", "courier", ["seal", "vial", "plush", "bouquet"], true))).toBe(true);
+    for (const b of BUNDLES) expect(ends99(bundlePrice(b))).toBe(true);
+  });
+});

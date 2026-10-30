@@ -281,7 +281,7 @@ function Wall() {
       <div className="mt-4 space-y-3">
         {[...localConfessions, ...rows].map((r) => (
           <article key={r.id} className="rounded-2xl bg-parchment p-4 text-parchment-foreground">
-            {r.outcome && <p className="font-display text-lg text-accent">{r.outcome}</p>}
+            <p className="font-display text-lg text-accent">{r.outcome ?? "No Potion Needed"}</p>
             <p className="text-xs uppercase tracking-wider opacity-70">
               {r.tier === "confession" ? "A secret, straight from the heart" : <>{name(ALL_BOXES, r.tier)} · {r.potions.length ? r.potions.map((id) => findBrewable(id)?.name).filter(Boolean).join(" + ") : name(STRENGTHS, r.strength)}</>}
             </p>

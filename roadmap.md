@@ -36,3 +36,7 @@
 - [x] Fix stray "preview test" confession to match other post format
 - [x] Confess Your Own: pretend-post only, do not save to DB
 - [x] Match Enchantment bottle art (proportions, lighting, background) to original ten essences
+- [ ] Every price ends in .99 — option tags and computed totals, never .95/.96/.97/.98
+- [ ] Label the standard boxes "Original Editions · a spell for every everyday" above The Sweet Whisper
+- [ ] Spill Your Heart step: remove the recipient email option
+- [ ] Give the "A secret, straight from the heart" confession post a title like every other post

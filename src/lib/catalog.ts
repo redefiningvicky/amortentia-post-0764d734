@@ -33,6 +33,13 @@ export function desperationLevel(total: number) {
   return [...DESPERATION].reverse().find((d) => total >= d.min)!;
 }
 
+// Every price the app shows ends in .99: computed totals snap to the nearest .99 (never more than 50¢ off the raw sum).
+export function to99(n: number): number {
+  if (n <= 0) return 0;
+  const k = Math.round(n - 0.99);
+  return Math.round((k + 0.99) * 100) / 100;
+}
+
 export const STRENGTHS = [
   { id: "flutter", name: "Flutter", desc: "They can't stop thinking of you", price: 6.99 },
   { id: "swoon", name: "Swoon", desc: "They ache when you leave the room", price: 11.99 },

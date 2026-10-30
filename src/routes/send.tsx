@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
-import { TIERS, SEASONAL, ALL_BOXES, MAX_BLEND, findBrewable, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER } from "@/lib/catalog";
+import { TIERS, SEASONAL, ALL_BOXES, MAX_BLEND, findBrewable, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER, to99 } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { BrewClass } from "@/components/brew-class";
 import { Button } from "@/components/ui/button";
@@ -68,12 +68,12 @@ function Send() {
   const saving = bundleSavings({ handwritten, card, keepsakes, packaging });
   const preDelivery = orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, "owl", keepsakes, antidote) - saving;
   const waived = expressWaiver(delivery, preDelivery);
-  const total = Math.round((-saving - waived + orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, delivery, keepsakes, antidote)) * 100) / 100;
+  const total = to99(-saving - waived + orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, delivery, keepsakes, antidote));
   const outcome = blendOutcome(potions);
   const canNext =
     (step !== 1 || (potions.length > 0 && (potionMode === "cabinet" || brewReady))) &&
     (step !== 3 || !handwritten || handText.trim().length > 0) &&
-    (step !== 5 || (to.trim() && from.trim() && /\S+@\S+\.\S+/.test(toEmail)));
+    (step !== 5 || (to.trim() && from.trim()));
 
   async function submit() {
     setBusy(true);
@@ -86,7 +86,7 @@ function Send() {
     if (u.user) {
       ({ error } = await supabase.from("orders").insert({
         tier, strength, aroma, duration: durId,
-        sender_name: from.trim(), recipient_name: to.trim(), recipient_email: toEmail.trim(),
+        sender_name: from.trim(), recipient_name: to.trim(),
         note: note.trim() || null, total, share_on_wall: share,
         addons: [handwritten ? "handwritten" : null, card ? `card:${card}` : null, `pack:${packaging}`, `ship:${delivery}`, antidote ? "antidote" : null, ...keepsakes.map((k) => `keep:${k}`)].filter(Boolean) as string[],
         handwritten_text: handwritten ? handText.trim() : null,
@@ -149,7 +149,7 @@ function Send() {
       <main className="mt-6 flex-1 space-y-3 pb-36">
         {step === 0 && (
           <>
-            {[{ title: "", list: TIERS }, { title: "Occasion Editions · a spell for every celebration", list: SEASONAL }].map((g) => (
+            {[{ title: "Original Editions · a spell for every everyday", list: TIERS }, { title: "Occasion Editions · a spell for every celebration", list: SEASONAL }].map((g) => (
               <div key={g.title} className="space-y-3">
                 {g.title && <Label>{g.title}</Label>}
                 {g.list.map((t) => (
@@ -273,7 +273,6 @@ function Send() {
         {step === 5 && (
           <div className="rounded-2xl bg-parchment p-5 text-parchment-foreground shadow-glow">
             <Field label="To my beloved" value={to} onChange={setTo} placeholder="Their name" />
-            <Field label="Their email" value={toEmail} onChange={setToEmail} placeholder="So the owl can find them" type="email" />
             <Field label="From your admirer" value={from} onChange={setFrom} placeholder="Your name" />
             <label className="mt-2 block text-sm font-semibold uppercase tracking-wider">Your confession</label>
             <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} rows={4} placeholder="I've liked you since… (please eat the chocolates)"

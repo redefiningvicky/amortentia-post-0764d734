@@ -327,7 +327,7 @@ function Send() {
           <span className="text-lg font-bold text-gold">${total.toFixed(2)}</span>
         </div>
         {step >= 3 && preDelivery < FREE_EXPRESS_OVER && (
-          <p className="mb-2 text-center text-xs text-muted-foreground">Add ${(FREE_EXPRESS_OVER - preDelivery).toFixed(2)} more for <span className="text-gold">free Express Owl</span></p>
+          <p className="mb-2 text-center text-xs text-muted-foreground">Add ${to99Up(FREE_EXPRESS_OVER - preDelivery).toFixed(2)} more for <span className="text-gold">free Express Owl</span></p>
         )}
         <GoldButton disabled={!canNext || busy} onClick={() => (step === 6 ? submit() : setStep(step + 1))}>
           {step === 6 ? (busy ? "Summoning owl…" : "Seal My Fate") : "Continue"}

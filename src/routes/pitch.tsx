@@ -85,7 +85,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
             </div>
           ))}
         </div>
-        <p className="slide-caption mt-10 text-muted-foreground">Average order today: from $19.99 up to $469 with potions, keepsakes and delivery.</p>
+        <p className="slide-caption mt-10 text-muted-foreground">Average order today: from $19.99 up to $380.99 with potions, keepsakes and delivery.</p>
       </div>
     </Slide>) },
   { title: "Product", el: (

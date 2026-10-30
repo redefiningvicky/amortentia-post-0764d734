@@ -40,3 +40,4 @@
 - [ ] Label the standard boxes "Original Editions · a spell for every everyday" above The Sweet Whisper
 - [ ] Spill Your Heart step: remove the recipient email option
 - [ ] Give the "A secret, straight from the heart" confession post a title like every other post
+- [ ] Verify the "Into the Cauldron" pop-up at the 5th raw ingredient works in the live app

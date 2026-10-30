@@ -56,7 +56,6 @@ function Send() {
   const [handText, setHandText] = useState("");
   const [card, setCard] = useState<string | null>(initialBundle?.pick.card ?? null);
   const [to, setTo] = useState("");
-  const [toEmail, setToEmail] = useState("");
   const [from, setFrom] = useState("");
   const [note, setNote] = useState("");
   const [share, setShare] = useState(true);

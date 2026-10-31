@@ -4,7 +4,7 @@ import { livePotionResult, MAX_BLEND, type PotionResult, findBrewable } from "@/
 import { cn } from "@/lib/utils";
 
 export function PotionResultCard({ ids, result: savedResult, heading = "Your blend", emptyText = "Pick up to 5 potions. A little longing needs a recipe.", showRecipe = false, embedded = false, children }: {
-  ids: string[]; result?: PotionResult | null; heading?: string; emptyText?: string;
+  ids: string[]; result?: PotionResult | null | undefined; heading?: string; emptyText?: string;
   showRecipe?: boolean; embedded?: boolean; children?: ReactNode;
 }) {
   const result = savedResult ?? livePotionResult(ids);

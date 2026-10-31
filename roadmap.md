@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Wall “Brew This Blend”: exact recipe handoff, correct Spellbook mode, replacement confirmation, unavailable recipe state, preserve edits into Send
 - [x] Live potion result in Cabinet and Brew My Own across Spellbook and Send; carry stable recipe IDs and result into summary and saved orders without changing old data
 - [x] Must-have interactive cauldron class: choose paid ingredients, stir and bottle custom blend, carry into Send
 - [x] Add chosen Discover and Spellbook pages and navigation; carry choices into Send

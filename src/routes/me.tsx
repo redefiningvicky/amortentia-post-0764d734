@@ -8,6 +8,8 @@ import { guest } from "@/lib/guest";
 import { Shell } from "@/components/kit";
 import { OptArt } from "@/components/opt-art";
 import { cn } from "@/lib/utils";
+import { PotionResultCard } from "@/components/potion-result-card";
+import type { PotionResult } from "@/lib/catalog";
 
 export const Route = createFileRoute("/me")({
   ssr: false,
@@ -24,7 +26,7 @@ export const Route = createFileRoute("/me")({
   component: Me,
 });
 
-type Order = { gift_id?: string; gift_url?: string; id: string; tier: string; recipient_name: string; total: number; created_at: string; mine: boolean };
+type Order = { gift_id?: string; gift_url?: string; id: string; tier: string; recipient_name: string; total: number; created_at: string; mine: boolean; potions?: string[]; potion_result?: PotionResult | null };
 
 function Me() {
   const qc = useQueryClient();
@@ -119,6 +121,7 @@ function Me() {
               <span className="text-gold">${o.total.toFixed(2)}</span>
             </div>
             <p className="text-sm text-muted-foreground">{ALL_BOXES.find((t) => t.id === o.tier)?.name} · {new Date(o.created_at).toLocaleDateString()}</p>
+            {o.potions && o.potions.length > 0 && <PotionResultCard ids={o.potions} result={o.potion_result} heading="Saved potion result" showRecipe embedded />}
             {tab === "sent" && o.gift_id && <Tracker s={status?.find((x) => x.id === o.gift_id)} url={o.gift_url} />}
           </div>
         ))}

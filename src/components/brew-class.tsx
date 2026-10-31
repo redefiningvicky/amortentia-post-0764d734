@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { OptArt } from "@/components/opt-art";
 import { MAX_BLEND, blendOutcome, potionsTotal } from "@/lib/catalog";
+import { PotionResultCard } from "@/components/potion-result-card";
 
 export function BrewClass({ value, onChange, onReady }: { value: string[]; onChange: (ids: string[]) => void; onReady?: (ready: boolean) => void }) {
   const [stage, setStage] = useState<"ingredients" | "stir" | "bottled">("ingredients");
@@ -20,10 +21,7 @@ export function BrewClass({ value, onChange, onReady }: { value: string[]; onCha
 
   return <section className="space-y-4" aria-label="Cauldron class">
     <div className="pb-3 pt-1">
-      <div className="rounded-2xl border border-gold bg-card p-4 shadow-glow">
-        <p className="text-xs uppercase tracking-[0.2em] text-gold">Cauldron Class · {stage === "ingredients" ? `${value.length}/${MAX_BLEND}` : stage === "stir" ? "2 · Stir" : "3 · Bottle"}</p>
-        {stage === "ingredients" && <p className="mt-1 text-muted-foreground">Start from scratch: pick raw ingredients and brew a potion no one has ever tasted.</p>}
-      </div>
+      <PotionResultCard ids={value} heading="Cauldron Class" emptyText="Start from scratch: pick up to 5 raw ingredients and brew a potion no one has ever tasted." />
     </div>
     {stage === "ingredients" ? <>
       <IngredientShelf value={value} onChange={chooseIngredients} />
@@ -35,7 +33,7 @@ export function BrewClass({ value, onChange, onReady }: { value: string[]; onCha
           className="absolute bottom-4 left-1/2 h-12 -translate-x-1/2 rounded-full border-gold bg-background/95 px-6 text-gold">{stirs >= 3 ? "Your blend is ready" : `Stir · ${stirs}/3`}</Button>}
       </div>
       {stage === "stir" && <div className="flex gap-2" aria-label={`${stirs} of 3 stirs complete`}>{[1, 2, 3].map((n) => <div key={n} className={`h-2 flex-1 rounded-full ${stirs >= n ? "bg-gold-gradient" : "bg-muted"}`} />)}</div>}
-      <div aria-live="polite"><h2 className="font-display text-2xl text-gold-gradient">{stage === "bottled" ? "Bottled: " : "Brewing: "}{outcome?.name}</h2><p className="mt-2 text-lg text-muted-foreground">{outcome?.desc}</p><p className="mt-2 text-gold">{value.length} potions · +${potionsTotal(value).toFixed(2)}</p></div>
+      <div><h2 className="font-display text-2xl text-gold-gradient">{stage === "bottled" ? "Bottled: " : "Brewing: "}{outcome?.name}</h2><p className="mt-2 text-gold">{value.length} ingredients · +${potionsTotal(value).toFixed(2)}</p></div>
       {stage === "stir" && <GoldButton disabled={stirs < 3} onClick={() => { setStage("bottled"); onReady?.(true); }}>Bottle My Love Potion</GoldButton>}
       <Button variant="outline" className="h-11 w-full" onClick={editIngredients}>Change Ingredients</Button>
       <p className="text-xs italic text-muted-foreground">A playful chocolate spell. Real feelings stay delightfully beyond our control.</p>

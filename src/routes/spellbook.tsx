@@ -20,8 +20,11 @@ export const Route = createFileRoute("/spellbook")({
 });
 
 function Spellbook() {
-  const [potions, setPotions] = useState<string[]>([]);
+  const [cabinetPotions, setCabinetPotions] = useState<string[]>([]);
+  const [rawIngredients, setRawIngredients] = useState<string[]>([]);
   const [mode, setMode] = useState<"class" | "cabinet">("class");
+  const potions = mode === "class" ? rawIngredients : cabinetPotions;
+  const setPotions = mode === "class" ? setRawIngredients : setCabinetPotions;
   const [ready, setReady] = useState(false);
   return <Shell>
     <div className="mb-5 flex items-center gap-3"><OptArt id="spell" alt="An antique book of love spells" /><div><h1 className="font-display text-3xl text-gold-gradient">Spellbook</h1><p className="mt-1 text-muted-foreground">What does your heart have in mind?</p></div></div>

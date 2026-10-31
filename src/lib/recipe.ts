@@ -25,12 +25,12 @@ export function readSpellbookDraft(): SpellbookDraft {
     const value: unknown = JSON.parse(sessionStorage.getItem(DRAFT_KEY) ?? "null");
     if (!value || typeof value !== "object") return empty;
     const draft = value as Record<string, unknown>;
-    const cabinet = restoreRecipe(draft.cabinet);
-    const ingredients = restoreRecipe(draft.ingredients);
+    const cabinet = restoreRecipe(draft['cabinet']);
+    const ingredients = restoreRecipe(draft['ingredients']);
     return {
       cabinet: cabinet?.mode === "cabinet" ? cabinet.ids : [],
       ingredients: ingredients?.mode === "class" ? ingredients.ids : [],
-      mode: draft.mode === "cabinet" ? "cabinet" : "class",
+      mode: draft['mode'] === "cabinet" ? "cabinet" : "class",
     };
   } catch { return empty; }
 }

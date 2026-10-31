@@ -64,6 +64,17 @@
   --gradient-night: radial-gradient(ellipse at top, oklch(0.32 0.11 22), oklch(0.16 0.05 20) 70%);
   --shadow-glow: 0 10px 40px -10px oklch(0.78 0.13 80 / 55%);
   --shadow-frame: 0 0 110px 26px oklch(0.06 0.02 20 / 82%);
+  --potion-ember: oklch(0.5 0.2 24);
+  --potion-rose: oklch(0.75 0.14 355);
+  --potion-moon: oklch(0.85 0.02 270);
+  --potion-star: oklch(0.5 0.15 265);
+  --potion-thorn: oklch(0.35 0.12 315);
+  --potion-honey: oklch(0.78 0.15 80);
+  --potion-mist: oklch(0.77 0.03 290);
+  --potion-storm: oklch(0.55 0.1 195);
+  --potion-bloom: oklch(0.65 0.2 5);
+  --potion-frost: oklch(0.8 0.1 225);
+  --potion-charm: oklch(0.6 0.18 305);
 }
 
 @layer base {

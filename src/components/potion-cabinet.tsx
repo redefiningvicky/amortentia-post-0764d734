@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { ESSENCES, MAX_BLEND, POTIONS, blendOutcome, type EssenceId } from "@/lib/catalog";
+import { ESSENCES, MAX_BLEND, POTIONS, type EssenceId } from "@/lib/catalog";
+import { PotionResultCard } from "@/components/potion-result-card";
 import { cn } from "@/lib/utils";
 import { bottleStyle } from "@/lib/art";
 import { Icon } from "@/components/icons";
@@ -15,23 +16,13 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
     () => POTIONS.filter((p) => (essence === "all" || p.essence === essence) && p.name.toLowerCase().includes(q.toLowerCase())),
     [essence, q],
   );
-  const outcome = blendOutcome(value);
   const toggle = (id: string) =>
     value.includes(id) ? onChange(value.filter((x) => x !== id)) : value.length < MAX_BLEND && onChange([...value, id]);
 
   return (
     <div className="space-y-3">
       <div className="pb-3 pt-1">
-        <div className="rounded-2xl border border-gold bg-card p-4 shadow-glow">
-          <p className="text-xs uppercase tracking-[0.2em] text-gold">Your blend · {value.length}/{MAX_BLEND}</p>
-          {outcome ? (
-            <>
-              <p className="mt-1 font-display text-xl text-gold-gradient">{outcome.name}</p>
-              <p className="text-muted-foreground">{outcome.desc}</p>
-            </>
-          ) : (
-            <p className="mt-1 text-muted-foreground">Pick up to 5 potions. Mixing them changes how they fall for you.</p>
-          )}
+        <PotionResultCard ids={value} emptyText="Pick up to 5 potions. Mixing them changes how they fall for you.">
           {value.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {value.map((id) => {
@@ -47,7 +38,7 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
               })}
             </div>
           )}
-        </div>
+        </PotionResultCard>
       </div>
 
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search 110 potions…" aria-label="Search potions"

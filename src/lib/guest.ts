@@ -1,5 +1,7 @@
-// Guest mode: while sign-in is optional, guests keep orders, profile and swoons on this device.
-export type GuestOrder = { id: string; tier: string; recipient_name: string; total: number; created_at: string; gift_id?: string; gift_url?: string };
+import type { PotionResult } from "@/lib/catalog";
+
+// Optional recipe fields preserve orders saved before live potion results existed.
+export type GuestOrder = { id: string; tier: string; recipient_name: string; total: number; created_at: string; gift_id?: string; gift_url?: string; potions?: string[]; potion_result?: PotionResult | null };
 export type GuestProfile = { display_name: string; avatar: string | null };
 
 const read = <T,>(k: string, d: T): T => {

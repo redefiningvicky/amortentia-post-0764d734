@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { guest } from "@/lib/guest";
 import { TIERS, SEASONAL, ALL_BOXES, MAX_BLEND, findBrewable, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER, to99, to99Up } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
+import { PotionResultCard } from "@/components/potion-result-card";
+import { livePotionResult } from "@/lib/catalog";
 import { BrewClass } from "@/components/brew-class";
 import { Button } from "@/components/ui/button";
 import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
@@ -39,10 +41,13 @@ function Send() {
   const search = Route.useSearch();
   const initialBundle = BUNDLES.find((b) => b.id === search.bundle);
   const [step, setStep] = useState(0);
-  const [potionMode, setPotionMode] = useState<"cabinet" | "class">("cabinet");
+  const [potionMode, setPotionMode] = useState<"cabinet" | "class">(search.blend?.split(",").some((id) => id.startsWith("raw-")) ? "class" : "cabinet");
   const [brewReady, setBrewReady] = useState(false);
   useEffect(() => { window.scrollTo(0, 0); }, [step]);
-  const [potions, setPotions] = useState<string[]>(search.blend ? search.blend.split(",") : []);
+  const [cabinetPotions, setCabinetPotions] = useState<string[]>(search.blend?.split(",").filter((id) => !id.startsWith("raw-")) ?? []);
+  const [rawIngredients, setRawIngredients] = useState<string[]>(search.blend?.split(",").filter((id) => id.startsWith("raw-")) ?? []);
+  const potions = potionMode === "class" ? rawIngredients : cabinetPotions;
+  const setPotions = potionMode === "class" ? setRawIngredients : setCabinetPotions;
   const [keepsakes, setKeepsakes] = useState<string[]>(initialBundle ? [...initialBundle.pick.keepsakes] : []);
   const [packaging, setPackaging] = useState(initialBundle?.pick.packaging ?? "kraft");
   const [delivery, setDelivery] = useState("owl");
@@ -69,6 +74,7 @@ function Send() {
   const waived = expressWaiver(delivery, preDelivery);
   const total = to99(-saving - waived + orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, delivery, keepsakes, antidote));
   const outcome = blendOutcome(potions);
+  const potionResult = livePotionResult(potions);
   const canNext =
     (step !== 1 || (potions.length > 0 && (potionMode === "cabinet" || brewReady))) &&
     (step !== 3 || !handwritten || handText.trim().length > 0) &&
@@ -89,10 +95,10 @@ function Send() {
         note: note.trim() || null, total, share_on_wall: share,
         addons: [handwritten ? "handwritten" : null, card ? `card:${card}` : null, `pack:${packaging}`, `ship:${delivery}`, antidote ? "antidote" : null, ...keepsakes.map((k) => `keep:${k}`)].filter(Boolean) as string[],
         handwritten_text: handwritten ? handText.trim() : null,
-        potions, outcome: outcome?.name ?? null,
+        potions: potionResult?.recipeIds ?? potions, outcome: outcome?.name ?? null,
       }));
     } else {
-      guest.addOrder({ id: crypto.randomUUID(), tier, recipient_name: to.trim(), total, created_at: new Date().toISOString(), gift_id: giftId, gift_url: url });
+      guest.addOrder({ id: crypto.randomUUID(), tier, recipient_name: to.trim(), total, created_at: new Date().toISOString(), gift_id: giftId, gift_url: url, potions: potionResult?.recipeIds ?? potions, potion_result: potionResult });
       if (share) ({ error } = await supabase.from("confessions").insert({ tier, strength, aroma, note: note.trim().slice(0, 200) || null, potions, outcome: outcome?.name ?? null }));
     }
     setBusy(false);
@@ -284,8 +290,6 @@ function Send() {
           <>
             <div className="space-y-2 rounded-2xl border bg-card p-5">
               <Row k="Box" v={ALL_BOXES.find((t) => t.id === tier)!.name} />
-              <Row k="Blend" v={outcome?.name ?? "—"} />
-              <Row k="Potions" v={`${potions.length} potions`} />
               <Row k="Potency" v={STRENGTHS.find((s) => s.id === strength)!.name} />
               <Row k="Lasts" v={DURATIONS.find((d) => d.id === durId)!.name} />
               {handwritten && <Row k="Extra" v="Handwritten note" />}
@@ -297,6 +301,7 @@ function Send() {
               {waived > 0 && <Row k="Express Owl" v="Free" />}
               <Row k="To" v={to} />
             </div>
+            <PotionResultCard ids={potions} result={potionResult} heading="Your potion result" showRecipe />
             <Option active={antidote} onClick={() => setAntidote(!antidote)}>
               <OptArt id="shield" alt="" className="h-14 w-14 shrink-0 rounded-full border border-gold object-cover" />
               <div className="flex-1">

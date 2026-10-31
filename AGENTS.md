@@ -15,6 +15,7 @@
 - Spell bundle matching, prices and best non-stacking discounts are derived in the catalog, so displayed offers and order totals agree.
 - Discover and Spellbook are public browsing routes; validated Send search parameters carry catalog selections into the seven-step order flow without duplicating product data.
 - Brew My Own (cauldron class) brews from raw INGREDIENTS (raw-* IDs, priced, never free); the Potion Cabinet uses bottled POTIONS. Both resolve through findBrewable in catalog.ts, so blendOutcome and potionsTotal accept either ID type in Spellbook, Send, and Wall.
+- Live potion results derive from canonical catalogue IDs through livePotionResult in catalog.ts and one shared PotionResultCard; keep cabinet and raw selections separate, and save optional versioned result snapshots alongside recipe IDs without migrating existing guest orders.
 - No sign-in during build (removed on request): everyone is a guest; orders/profile/swoons live in localStorage (src/lib/guest.ts) and confessions are inserted directly. Signed-in DB code paths remain dormant for later.
 - Pitch deck lives at /pitch as an in-app slide route (1920x1080 scaled, ?slide=N); product slide uses real app screenshots in src/assets/shot-* (bundled images or CDN asset pointers) — retake them when screens change.
 - Gift tracking: public `gifts` table holds only open/bite timestamps (no names); recipient names travel in the private gift link URL; read/write only via mark_gift/gift_status RPCs.

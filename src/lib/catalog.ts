@@ -358,6 +358,64 @@ export function potionsTotal(potionIds: string[]) {
   return to99(potionIds.reduce((s, id) => s + (findBrewable(id)?.price ?? 0), 0));
 }
 
+export type PotionResult = {
+  version: 1;
+  recipeIds: string[];
+  name: string;
+  colour: string;
+  colourEssences: EssenceId[];
+  flavour: string;
+  effect: string;
+};
+
+export const POTION_COLOURS: Record<EssenceId, string> = {
+  ember: "Ruby", rose: "Rose pink", moon: "Moonlit silver", star: "Starlight blue",
+  thorn: "Blackberry", honey: "Honey gold", mist: "Pearl grey", storm: "Storm teal",
+  bloom: "Strawberry pink", frost: "Glacial blue", charm: "Enchanted violet",
+};
+const PREDICTED_EFFECTS: Record<EssenceId, string> = {
+  ember: "May cause suspiciously long eye contact.",
+  rose: "May cause hand-holding disguised as checking your pulse.",
+  moon: "May cause a very casual text at 2:03 a.m.",
+  star: "May cause them to call an ordinary Tuesday destiny.",
+  thorn: "May cause repeated visits to your profile. For research.",
+  honey: "May cause them to save you the last chocolate. Allegedly.",
+  mist: "May cause dramatic window-gazing with you as the plot.",
+  storm: "May cause a rehearsed hello to escape at full volume.",
+  bloom: "May cause giggling at jokes that were not that funny.",
+  frost: "May cause an old flame to ask if you are still cold.",
+  charm: "May cause them to forget why they entered the room. You entered it.",
+};
+const FLAVOUR_WORDS = /dark chocolate|white chocolate|dark cocoa|smoked cocoa|cocoa|chocolate|black cherry|cherry|rosewater|rose|cinnamon|vanilla|lavender|chamomile|jasmine|violet|caramel|almond|mint|honey|cardamom|plum|blackberry|espresso|licorice|butterscotch|marshmallow|maple|pear|fig|blackcurrant|saffron|ginger|citrus|pepper|strawberry|peach|orange|raspberry|melon|coconut|treacle|clove|turmeric|grapefruit|gooseberry|juniper/gi;
+
+/** Canonical catalogue IDs keep every result independent of click order. */
+export function livePotionResult(ids: string[]): PotionResult | null {
+  const recipeIds = [...new Set(ids)].filter((id) => findBrewable(id)).sort();
+  const recipe = recipeIds.map(findBrewable).filter((p): p is Potion | Ingredient => Boolean(p));
+  const outcome = blendOutcome(recipeIds);
+  const dominant = outcome?.essences[0];
+  if (!outcome || !dominant) return null;
+  const flavours = [...new Set(recipe.flatMap((p) => {
+    const matches = `${p.name}. ${p.note}`.match(FLAVOUR_WORDS);
+    return matches ? matches.map((word) => word.toLowerCase()) : [p.name.toLowerCase()];
+  }))];
+  // One flavour from each selection comes first, so no selected ingredient disappears.
+  const firstFlavours = [...new Set(recipe.map((p) => {
+    const matches = `${p.name}. ${p.note}`.match(FLAVOUR_WORDS);
+    return matches?.[0]?.toLowerCase() ?? p.name.toLowerCase();
+  }))];
+  const description = [...new Set([...firstFlavours, ...flavours])].slice(0, Math.max(3, firstFlavours.length));
+  const flavour = description.length > 1
+    ? `${description.slice(0, -1).join(", ")} and ${description.at(-1)}.`
+    : `${description[0] ?? "A little chocolate mystery"}.`;
+  return {
+    version: 1, recipeIds, name: outcome.name,
+    colour: outcome.essences.map((e) => POTION_COLOURS[e]).join(" / "),
+    colourEssences: recipe.map((p) => p.essence),
+    flavour: cap(flavour), effect: PREDICTED_EFFECTS[dominant],
+  };
+}
+
 function cap(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }

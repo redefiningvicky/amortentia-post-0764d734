@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { TIERS, orderTotal, INGREDIENTS, INGREDIENT_KIND, blendOutcome, findBrewable, potionsTotal } from "@/lib/catalog";
+import { TIERS, orderTotal, INGREDIENTS, INGREDIENT_KIND, blendOutcome, findBrewable, potionsTotal, livePotionResult } from "@/lib/catalog";
 
 describe("box tiers", () => {
   it("lowest box is $19.99", () => {
@@ -10,6 +10,24 @@ describe("box tiers", () => {
   });
   it("adds potion add-ons to total", () => {
     expect(orderTotal("sweet", "besotted", "week")).toBe(53.99);
+  });
+});
+
+describe("live potion recipes", () => {
+  it("the same combination produces the same complete result in any selection order", () => {
+    expect(livePotionResult(["rose-1", "ember-1", "moon-4"])).toEqual(livePotionResult(["moon-4", "rose-1", "ember-1"]));
+  });
+  it("retains stable raw catalogue IDs for saved recipes", () => {
+    expect(livePotionResult(["raw-rose-1", "raw-bloom-6", "raw-storm-1"])?.recipeIds).toEqual(["raw-bloom-6", "raw-rose-1", "raw-storm-1"]);
+  });
+  it("derives the flavour from the actual rose, cherry and cocoa selections", () => {
+    const result = livePotionResult(["raw-rose-1", "raw-bloom-6", "raw-storm-1"]);
+    expect(result?.flavour).toBe("Cherry, rose and cocoa.");
+    expect(result?.name).toBe(blendOutcome(["raw-rose-1", "raw-bloom-6", "raw-storm-1"])?.name);
+  });
+  it("has no invented result before selection", () => {
+    expect(livePotionResult([])).toBeNull();
+    expect(livePotionResult(["unknown-id"])).toBeNull();
   });
 });
 

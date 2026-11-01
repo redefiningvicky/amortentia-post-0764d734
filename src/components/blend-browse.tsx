@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 
 export const PAGE_SIZE = 10;
 
-/** Shows matching products 10 at a time; resets whenever the filter key changes. */
-export function useShowMore<T>(list: T[], resetKey: string) {
-  const [count, setCount] = useState(PAGE_SIZE);
-  useEffect(() => { setCount(PAGE_SIZE); }, [resetKey]);
-  return { visible: list.slice(0, count), shown: Math.min(count, list.length), total: list.length, more: () => setCount((c) => c + PAGE_SIZE) };
+/** Shows matching items a page at a time (10 by default); resets whenever the filter key changes. */
+export function useShowMore<T>(list: T[], resetKey: string, pageSize = PAGE_SIZE) {
+  const [count, setCount] = useState(pageSize);
+  useEffect(() => { setCount(pageSize); }, [resetKey, pageSize]);
+  return { visible: list.slice(0, count), shown: Math.min(count, list.length), total: list.length, more: () => setCount((c) => c + pageSize) };
 }
 
 export function ShowMore({ shown, total, noun, onMore }: { shown: number; total: number; noun: string; onMore: () => void }) {

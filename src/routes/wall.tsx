@@ -261,6 +261,7 @@ function Wall() {
               </figure>
             ))}
           </div>
+          <ShowMore shown={sampleShown} total={sampleTotal} noun="photos" onMore={moreSamples} />
         </section>
       )}
 

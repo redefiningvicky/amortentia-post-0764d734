@@ -1,13 +1,22 @@
 import type { ComponentType, ReactNode } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+const queryState = vi.hoisted(() => ({ error: null as Error | null, retry: vi.fn() }));
 vi.mock("@tanstack/react-router", () => ({
   createFileRoute: () => (options: unknown) => ({ options }),
   Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }));
 vi.mock("@tanstack/react-query", () => ({
   useQueryClient: () => ({ invalidateQueries: vi.fn() }),
-  useQuery: () => ({ data: [] }),
+  useQuery: ({ queryKey }: { queryKey: string[] }) =>
+    queryKey[0] === "confessions"
+      ? {
+          data: queryState.error ? undefined : [],
+          error: queryState.error,
+          refetch: queryState.retry,
+          isFetching: false,
+        }
+      : { data: [] },
 }));
 vi.mock("@/components/kit", () => ({
   Shell: ({ children }: { children: ReactNode }) => <main>{children}</main>,
@@ -16,8 +25,20 @@ vi.mock("@/components/kit", () => ({
 vi.mock("@/integrations/supabase/client", () => ({ supabase: {} }));
 import { Route } from "@/routes/wall";
 const Wall = Route.options.component as ComponentType;
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  queryState.error = null;
+  queryState.retry.mockClear();
+});
 describe("Completed Wall", () => {
+  it("explains a database outage instead of silently hiding confessions", () => {
+    localStorage.clear();
+    queryState.error = new Error("Database unavailable");
+    render(<Wall />);
+    expect(screen.getByRole("alert")).toHaveTextContent("database is temporarily unavailable");
+    fireEvent.click(screen.getByRole("button", { name: "Retry Confessions" }));
+    expect(queryState.retry).toHaveBeenCalledOnce();
+  });
   it("opens the album without undefined paging state and reveals six more photos", () => {
     const { container } = render(<Wall />);
     fireEvent.click(screen.getByRole("button", { name: "Photo Album" }));

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { restoreRecipe } from "@/lib/recipe";
 import { guest } from "@/lib/guest";
+import type { Database } from "@/integrations/supabase/types";
 import { findBrewable, STRENGTHS, ALL_BOXES } from "@/lib/catalog";
 import { GoldButton, Shell } from "@/components/kit";
 import { Button } from "@/components/ui/button";
@@ -218,7 +219,26 @@ function Wall() {
     setUserId(null);
   }, []);
 
-  const { data: rows = [] } = useQuery({
+  const [cachedConfessions, setCachedConfessions] = useState<
+    Database["public"]["Tables"]["confessions"]["Row"][]
+  >([]);
+  useEffect(() => {
+    try {
+      const saved: unknown = JSON.parse(localStorage.getItem("ap-wall-cache-v1") ?? "null");
+      if (Array.isArray(saved))
+        setCachedConfessions(
+          saved.filter((row) => row && typeof row.id === "string" && Array.isArray(row.potions)),
+        );
+    } catch {
+      /* A damaged cache must not block the Wall. */
+    }
+  }, []);
+  const {
+    data: liveRows,
+    error: confessionsError,
+    refetch: retryConfessions,
+    isFetching: confessionsLoading,
+  } = useQuery({
     queryKey: ["confessions", sort],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -230,6 +250,16 @@ function Wall() {
       return data;
     },
   });
+  useEffect(() => {
+    if (!liveRows?.length) return;
+    setCachedConfessions(liveRows);
+    try {
+      localStorage.setItem("ap-wall-cache-v1", JSON.stringify(liveRows));
+    } catch {
+      /* Continue browsing if storage is full. */
+    }
+  }, [liveRows]);
+  const rows = liveRows ?? cachedConfessions;
   const [guestSwoons, setGuestSwoons] = useState<string[]>([]);
   useEffect(() => setGuestSwoons(guest.swoons()), []);
   const { data: dbSwoons = [] } = useQuery({
@@ -535,6 +565,26 @@ function Wall() {
 
       {tab === "confessions" && (
         <>
+          {confessionsError && (
+            <div role="alert" className="mt-4 rounded-xl border border-gold bg-card p-4">
+              <p className="text-gold">The owl can’t reach the confession archive.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                The Wall’s database is temporarily unavailable.
+                {cachedConfessions.length > 0
+                  ? " Showing the last saved confessions on this device."
+                  : " Confessions will return when the connection is restored."}
+              </p>
+              <Button
+                variant="outline"
+                className="mt-3 min-h-11"
+                disabled={confessionsLoading}
+                onClick={() => void retryConfessions()}
+              >
+                {confessionsLoading ? "Trying again…" : "Retry Confessions"}
+              </Button>
+            </div>
+          )}
+
           <GoldButton className="mt-5" onClick={() => setConfessing(true)}>
             Confess Your Own
           </GoldButton>

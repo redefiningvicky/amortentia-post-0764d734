@@ -38,7 +38,7 @@ export function BlendAnchor({ count, children }: { count: number; children: Reac
   useEffect(() => {
     const el = ref.current;
     if (!el || typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(([e]) => setAway(!e.isIntersecting && e.boundingClientRect.top < 0));
+    const io = new IntersectionObserver(([e]) => { if (e) setAway(!e.isIntersecting && e.boundingClientRect.top < 0); });
     io.observe(el);
     return () => io.disconnect();
   }, []);

@@ -279,9 +279,7 @@ function Wall() {
         <DialogContent className="max-w-sm border-gold bg-background">
           <DialogHeader>
             <DialogTitle className="font-display text-xl text-gold">Confess Your Own</DialogTitle>
-            <DialogDescription>
-              You’ve rehearsed it in the shower. Let’s hear it.
-            </DialogDescription>
+            <DialogDescription>You’ve rehearsed it in the shower. Let’s hear it.</DialogDescription>
           </DialogHeader>
           <form
             onSubmit={(event) => {
@@ -305,7 +303,8 @@ function Wall() {
               {confession.length}/{CONFESSION_LIMIT}
             </p>
             <p className="my-3 text-sm text-muted-foreground">
-              Signed “A Secret Admirer” for this visit. No names or numbers—we’re desperate, not detectives.
+              Signed “A Secret Admirer” for this visit. No names or numbers—we’re desperate, not
+              detectives.
             </p>
             <GoldButton type="submit" disabled={!validConfession(confession) || posting}>
               {posting ? "Sealing your secret…" : "Post My Confession"}
@@ -335,91 +334,86 @@ function Wall() {
       </div>
 
       {tab === "album" && (
-        <section className="mt-4">
-          <div className="rounded-2xl border border-gold bg-card p-4">
-            <p className="font-display text-lg text-gold-gradient">Pin a memory</p>
-            <p className="text-sm text-muted-foreground">
-              Your box, their smile, the aftermath. Your name is not displayed.
-            </p>
-            <input
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              maxLength={140}
-              placeholder="Caption (optional)"
-              aria-label="Photo caption"
-              className="mt-3 h-12 w-full rounded-xl border bg-background px-4 outline-none focus:border-gold"
-            />
-            <button
-              onClick={() => setPicking(true)}
-              disabled={uploading}
-              className="mt-3 h-12 w-full rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow disabled:opacity-40"
-            >
-              {uploading ? "Developing…" : "Choose a Photo"}
-            </button>
-          </div>
-          <Dialog open={picking} onOpenChange={setPicking}>
-            <DialogContent className="max-h-[80vh] max-w-sm overflow-y-auto border-gold bg-background">
+        <section className="mt-5">
+          <GoldButton
+            disabled={uploading}
+            onClick={() => {
+              setPhotoPreview(null);
+              setCaption("");
+              setPicking(true);
+            }}
+          >
+            {uploading ? "Developing…" : "Pin a Memory"}
+          </GoldButton>
+          <Dialog
+            open={picking}
+            onOpenChange={(open) => {
+              setPicking(open);
+              if (!open) {
+                setPhotoPreview(null);
+                setCaption("");
+              }
+            }}
+          >
+            <DialogContent className="max-h-[90dvh] max-w-sm overflow-y-auto border-gold bg-background">
               <DialogHeader>
-                <DialogTitle className="font-display text-xl text-gold">Choose a Photo</DialogTitle>
-                <DialogDescription>Choose a memory from the shop’s collection.</DialogDescription>
+                <DialogTitle className="font-display text-xl text-gold">Pin a Memory</DialogTitle>
+                <DialogDescription>
+                  Choose a scene. Add a caption. Let the group chat speculate.
+                </DialogDescription>
               </DialogHeader>
-              <div className="grid grid-cols-2 gap-2">
+              <div
+                className="grid max-h-[35dvh] grid-cols-2 gap-2 overflow-y-auto"
+                role="group"
+                aria-label="Choose your memory"
+              >
                 {SAMPLE_PHOTOS.map((photo) => (
                   <button
                     key={photo.id}
-                    onClick={() => {
-                      setPicking(false);
-                      setPhotoPreview(photo);
-                    }}
-                    className="overflow-hidden rounded-xl border text-left transition hover:border-gold"
+                    aria-label={photo.label}
+                    aria-pressed={photoPreview?.id === photo.id}
+                    onClick={() => setPhotoPreview(photo)}
+                    className={cn(
+                      "overflow-hidden rounded-xl border text-left transition hover:border-gold",
+                      photoPreview?.id === photo.id && "border-gold ring-2 ring-gold",
+                    )}
                   >
                     <img
                       src={photo.url}
-                      alt={photo.label}
+                      alt=""
                       loading="lazy"
-                      className="aspect-square w-full object-cover"
+                      className="aspect-[4/3] w-full object-cover"
                     />
                     <span className="block p-2 text-xs text-muted-foreground">{photo.label}</span>
                   </button>
                 ))}
               </div>
-            </DialogContent>
-          </Dialog>
-          <Dialog
-            open={!!photoPreview}
-            onOpenChange={(open) => {
-              if (!open) setPhotoPreview(null);
-            }}
-          >
-            <DialogContent className="max-h-[85dvh] max-w-sm overflow-y-auto border-gold bg-background">
-              <DialogHeader>
-                <DialogTitle>Pin This Memory?</DialogTitle>
-                <DialogDescription>
-                  Your chosen memory appears in this visit’s album.
-                </DialogDescription>
-              </DialogHeader>
-              {photoPreview && (
-                <img
-                  src={photoPreview.url}
-                  alt={photoPreview.label}
-                  className="aspect-square w-full rounded-lg object-cover"
+              <p className="text-sm text-gold" aria-live="polite">
+                {photoPreview ? `Selected: ${photoPreview.label}` : "Choose one photo to pin."}
+              </p>
+              <div>
+                <label htmlFor="memory-caption" className="block text-sm text-gold">
+                  Your caption
+                </label>
+                <input
+                  id="memory-caption"
+                  value={caption}
+                  onChange={(event) => setCaption(event.target.value)}
+                  maxLength={140}
+                  placeholder={photoPreview?.caption ?? "What happened after the first bite?"}
+                  className="mt-2 h-12 w-full rounded-xl border bg-card px-3 outline-none focus:border-gold"
                 />
-              )}
-              <input
-                aria-label="Preview photo caption"
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                maxLength={140}
-                placeholder="Caption (optional)"
-                className="h-12 rounded-lg border bg-card px-3"
-              />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Leave it blank to keep the scene’s caption.
+                </p>
+              </div>
               <GoldButton
-                disabled={uploading}
+                disabled={uploading || !photoPreview}
                 onClick={() => photoPreview && void pinSample(photoPreview)}
               >
                 Pin My Memory
               </GoldButton>
-              <Button variant="outline" onClick={() => setPhotoPreview(null)}>
+              <Button variant="outline" className="min-h-11" onClick={() => setPicking(false)}>
                 Cancel
               </Button>
             </DialogContent>
@@ -574,8 +568,6 @@ function Wall() {
             noun="confessions"
             onMore={showMoreConfessions}
           />
-
-
         </>
       )}
     </Shell>

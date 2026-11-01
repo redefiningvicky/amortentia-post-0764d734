@@ -18,6 +18,32 @@ afterEach(() => {
   sessionStorage.clear();
 });
 describe("Completed Wall", () => {
+  it("uses one action per tab and pins a sample photo from one popup", async () => {
+    const { container } = render(<Wall />);
+    expect(screen.getAllByRole("button", { name: "Confess Your Own" })).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Photo Album" }));
+    expect(screen.getAllByRole("button", { name: "Pin a Memory" })).toHaveLength(1);
+    expect(screen.queryByRole("textbox")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Pin a Memory" }));
+    const popup = screen.getByRole("dialog");
+    expect(screen.getByRole("button", { name: "Pin My Memory" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "The First Bite" }));
+    expect(screen.getAllByRole("dialog")).toHaveLength(1);
+    expect(screen.getByRole("dialog")).toBe(popup);
+    expect(screen.getByRole("button", { name: "The First Bite" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    fireEvent.change(screen.getByLabelText("Your caption"), {
+      target: { value: "An entirely sensible decision." },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Pin My Memory" }));
+    await screen.findByText("An entirely sensible decision.", {}, { timeout: 2000 });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(container.querySelectorAll("figure")).toHaveLength(6);
+    expect(screen.getByText("Showing 6 of 17 photos")).toBeInTheDocument();
+    expect(container.querySelector('input[type="file"]')).toBeNull();
+  });
   it("uses fictional samples and ignores saved customer data without making network requests", () => {
     localStorage.clear();
     sessionStorage.clear();

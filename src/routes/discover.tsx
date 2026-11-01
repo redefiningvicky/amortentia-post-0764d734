@@ -76,7 +76,7 @@ function Discover() {
         ))}
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
-        Box and potions priced separately. Best matching bundle saving applies; savings don’t stack.
+        Choose your box, then add your potions. We’ll apply the best bundle saving automatically.
       </p>
     </Shell>
   );

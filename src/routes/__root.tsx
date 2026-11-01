@@ -118,9 +118,6 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       {import.meta.env.VITE_STATIC_DEMO === "true" && <HeadContent />}
       <Outlet />
-      <p className="mx-auto max-w-md px-5 pb-24 text-center text-xs text-muted-foreground">
-        A fictional chocolate shop. No payment or delivery. Your activity stays in this browser.
-      </p>
       <BottomNav />
       <Toaster />
     </QueryClientProvider>

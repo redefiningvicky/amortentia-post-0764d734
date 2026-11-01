@@ -74,6 +74,11 @@ describe("Send step arrangement", () => {
     fireEvent.click(screen.getByRole("button", { name: "Finish brewing" }));
     next();
     next();
+    fireEvent.click(screen.getByRole("button", { name: /Crimson Velvet Heart/ }));
+    expect(screen.getByRole("button", { name: /Crimson Velvet Heart/ })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
     next();
     expect(screen.getByText("Step 5 of 8")).toBeInTheDocument();
     expect(
@@ -100,6 +105,10 @@ describe("Send step arrangement", () => {
     }
     expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
     next();
+    expect(screen.getByRole("button", { name: /Crimson Velvet Heart/ })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
     next();
     fireEvent.change(screen.getByLabelText("To my beloved"), { target: { value: "Beloved" } });
     fireEvent.change(screen.getByLabelText("From your admirer"), { target: { value: "Admirer" } });
@@ -112,6 +121,7 @@ describe("Send step arrangement", () => {
       note: "",
       handwritten: "",
       card: "sealed-card",
+      wrapping: "velvet",
     });
     expect(guest.orders()[0]?.gift?.cardMessage).toBeUndefined();
   });

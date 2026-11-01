@@ -88,6 +88,8 @@ export const Route = createFileRoute("/send")({
   component: Send,
 });
 
+const VELVET_HEART = PACKAGING.find((option) => option.id === "velvet")!;
+
 const TITLES = [
   "How Many Bites Will It Take?",
   "Brew a Little Trouble",
@@ -614,6 +616,24 @@ function Send() {
             <p className="text-sm text-muted-foreground">
               Every bite counts. Make the box too beautiful to ignore.
             </p>
+            <Option
+              active={packaging === VELVET_HEART.id}
+              onClick={() =>
+                setPackaging(
+                  packaging === VELVET_HEART.id ? "kraft" : VELVET_HEART.id,
+                )
+              }
+            >
+              <OptArt id={VELVET_HEART.id} alt={VELVET_HEART.name} />
+              <div className="flex-1">
+                <div className="text-lg font-semibold">{VELVET_HEART.name}</div>
+                <p className="text-muted-foreground">{VELVET_HEART.desc}</p>
+                <p className="mt-1 text-sm text-gold">
+                  Upgrades your wrapping to a velvet heart-shaped box.
+                </p>
+              </div>
+              <span className="text-gold">+${VELVET_HEART.price}</span>
+            </Option>
             {KEEPSAKES.map((k) => (
               <Option
                 key={k.id}

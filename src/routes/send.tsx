@@ -40,6 +40,7 @@ import { Chip, GoldButton, Label, Option, Shell } from "@/components/kit";
 import { cn } from "@/lib/utils";
 import { BOX_ART } from "@/lib/art";
 import { OptArt } from "@/components/opt-art";
+import { addWallConfession } from "@/lib/wall-demo";
 import { makeShareCard } from "@/lib/share-card";
 
 export const Route = createFileRoute("/send")({
@@ -210,7 +211,7 @@ function Send() {
         recipient_name: to.trim(),
         note: note.trim() || null,
         total,
-        share_on_wall: share,
+        share_on_wall: false,
         addons: [
           handwritten ? "handwritten" : null,
           card ? `card:${card}` : null,
@@ -245,18 +246,16 @@ function Send() {
         return;
       }
       if (share)
-        ({ error } = await supabase.from("confessions").insert({
+        addWallConfession({
           tier,
           strength,
           aroma,
-          note: note.trim().slice(0, 200) || null,
+          note: note.trim().slice(0, 200),
           potions,
           outcome: outcome?.name ?? null,
-        }));
+        });
     }
     setBusy(false);
-    if (error)
-      toast.error("Your gift is saved, but its confession could not be posted to the Wall.");
     setSavedGift(details);
     setGiftUrl(url);
     setSent(true);
@@ -746,7 +745,7 @@ function Send() {
               <div className="flex-1">
                 <div className="font-semibold">Share anonymously on the Wall</div>
                 <p className="text-sm text-muted-foreground">
-                  Your confession only. Never your name or theirs.
+                  Try it on the pretend Wall for this visit only.
                 </p>
               </div>
             </Option>

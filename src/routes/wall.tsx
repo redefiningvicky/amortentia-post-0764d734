@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  WALL_CONFESSIONS,
+  readWallConfessions,
+  addWallConfession,
+  type WallConfession,
+} from "@/lib/wall-demo";
 import { restoreRecipe } from "@/lib/recipe";
 import { guest } from "@/lib/guest";
-import type { Database } from "@/integrations/supabase/types";
 import { findBrewable, STRENGTHS, ALL_BOXES } from "@/lib/catalog";
 import { GoldButton, Shell } from "@/components/kit";
 import { Button } from "@/components/ui/button";
@@ -161,7 +164,6 @@ const SAMPLE_PHOTOS = [
 ];
 
 function Wall() {
-  const qc = useQueryClient();
   const [rankingsOpen, setRankingsOpen] = useState(true);
   useEffect(() => {
     try {
@@ -176,102 +178,31 @@ function Wall() {
   const [confessing, setConfessing] = useState(false);
   const [confession, setConfession] = useState("");
   const [posting, setPosting] = useState(false);
-  // Pretend posting: the confession shows in this session only, never saved to the Wall.
-  const [localConfessions, setLocalConfessions] = useState<
-    {
-      id: string;
-      note: string;
-      tier: string;
-      strength: string;
-      aroma: string;
-      potions: string[];
-      swoon_count: number;
-      created_at: string;
-      outcome: string | null;
-    }[]
-  >([]);
+  const [rows, setRows] = useState<WallConfession[]>(WALL_CONFESSIONS);
+  useEffect(() => setRows(readWallConfessions()), []);
   async function postConfession() {
     if (!validConfession(confession) || posting) return;
     setPosting(true);
-    await new Promise((r) => setTimeout(r, 700));
+    const row = addWallConfession({
+      note: confession.trim(),
+      tier: "confession",
+      strength: "swoon",
+      aroma: "rose",
+      potions: [],
+      outcome: null,
+    });
+    setRows((previous) => [row, ...previous]);
     setPosting(false);
-    setLocalConfessions((prev) => [
-      {
-        id: `local-${Date.now()}`,
-        note: confession.trim(),
-        tier: "confession",
-        strength: "swoon",
-        aroma: "rose",
-        potions: [],
-        swoon_count: 0,
-        created_at: new Date().toISOString(),
-        outcome: null,
-      },
-      ...prev,
-    ]);
     setConfession("");
     setConfessing(false);
     setSort("new");
     toast.success("Your confession is on the Wall for this visit. Names stay secret.");
   }
-  const [userId, setUserId] = useState<string | null>(null);
-  useEffect(() => {
-    setUserId(null);
-  }, []);
-
-  const [cachedConfessions, setCachedConfessions] = useState<
-    Database["public"]["Tables"]["confessions"]["Row"][]
-  >([]);
-  useEffect(() => {
-    try {
-      const saved: unknown = JSON.parse(localStorage.getItem("ap-wall-cache-v1") ?? "null");
-      if (Array.isArray(saved))
-        setCachedConfessions(
-          saved.filter((row) => row && typeof row.id === "string" && Array.isArray(row.potions)),
-        );
-    } catch {
-      /* A damaged cache must not block the Wall. */
-    }
-  }, []);
-  const {
-    data: liveRows,
-    error: confessionsError,
-    refetch: retryConfessions,
-    isFetching: confessionsLoading,
-  } = useQuery({
-    queryKey: ["confessions", sort],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("confessions")
-        .select("*")
-        .order(sort === "hot" ? "swoon_count" : "created_at", { ascending: false })
-        .limit(100);
-      if (error) throw error;
-      return data;
-    },
-  });
-  useEffect(() => {
-    if (!liveRows?.length) return;
-    setCachedConfessions(liveRows);
-    try {
-      localStorage.setItem("ap-wall-cache-v1", JSON.stringify(liveRows));
-    } catch {
-      /* Continue browsing if storage is full. */
-    }
-  }, [liveRows]);
-  const rows = liveRows ?? cachedConfessions;
   const [guestSwoons, setGuestSwoons] = useState<string[]>([]);
   useEffect(() => setGuestSwoons(guest.swoons()), []);
-  const { data: dbSwoons = [] } = useQuery({
-    queryKey: ["my-swoons", userId],
-    enabled: !!userId,
-    queryFn: async () =>
-      (await supabase.from("swoons").select("confession_id")).data?.map((s) => s.confession_id) ??
-      [],
-  });
-  const mine = userId ? dbSwoons : guestSwoons;
-  const count = (r: { id: string; swoon_count: number }) =>
-    r.swoon_count + (!userId && guestSwoons.includes(r.id) ? 1 : 0);
+  const mine = guestSwoons;
+  const count = (row: { id: string; swoon_count: number }) =>
+    row.swoon_count + (guestSwoons.includes(row.id) ? 1 : 0);
 
   const scores = new Map<string, number>();
   rows.forEach(
@@ -282,8 +213,8 @@ function Wall() {
     .sort((a, b) => b.score - a.score)
     .slice(0, 5);
 
-  // Confession feed: 10 at a time; changing the sort starts over at 10.
-  const feed = [...localConfessions, ...rows].sort((a, b) =>
+  // Show five fictional or session-only confessions at a time.
+  const feed = [...rows].sort((a, b) =>
     sort === "hot" ? count(b) - count(a) : Date.parse(b.created_at) - Date.parse(a.created_at),
   );
   const {
@@ -293,45 +224,16 @@ function Wall() {
     more: showMoreConfessions,
   } = useShowMore(feed, sort, 5);
 
-  async function swoon(id: string) {
-    const has = mine.includes(id);
-    if (!userId) {
-      const next = has ? guestSwoons.filter((x) => x !== id) : [...guestSwoons, id];
-      guest.saveSwoons(next);
-      setGuestSwoons(next);
-      return;
-    }
-    const { error } = has
-      ? await supabase.from("swoons").delete().eq("confession_id", id).eq("user_id", userId)
-      : await supabase.from("swoons").insert({ confession_id: id });
-    if (error) {
-      toast.error("Couldn't swoon, try again");
-      return;
-    }
-    qc.invalidateQueries({ queryKey: ["confessions"] });
-    qc.invalidateQueries({ queryKey: ["my-swoons"] });
+  function swoon(id: string) {
+    const next = mine.includes(id)
+      ? guestSwoons.filter((item) => item !== id)
+      : [...guestSwoons, id];
+    guest.saveSwoons(next);
+    setGuestSwoons(next);
   }
-
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState("");
-  const { data: photos = [] } = useQuery({
-    queryKey: ["wall-photos"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("wall_photos")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(60);
-      if (error) throw error;
-      if (!data.length) return [];
-      const { data: signed } = await supabase.storage.from("wall-photos").createSignedUrls(
-        data.map((p) => p.image_path),
-        3600,
-      );
-      const urls = new Map((signed ?? []).map((s) => [s.path, s.signedUrl]));
-      return data.map((p) => ({ ...p, url: urls.get(p.image_path) ?? "" }));
-    },
-  });
+
   const photoMine = guestSwoons.filter((s) => s.startsWith("photo:"));
   function swoonPhoto(id: string) {
     const key = `photo:${id}`;
@@ -361,12 +263,6 @@ function Wall() {
 
   const albumItems = [
     ...pinned.map((p) => ({ ...p, label: "Your Pinned Memory", swoon_count: 0 })),
-    ...photos.map((p) => ({
-      ...p,
-      label: "A Secret Admirer’s Memory",
-      caption: p.caption ?? "",
-      swoon_count: p.swoon_count ?? 0,
-    })),
     ...SAMPLE_PHOTOS.map((p) => ({ ...p, swoon_count: 0 })),
   ];
   const albumPage = useShowMore(albumItems, "album", 6);
@@ -565,26 +461,6 @@ function Wall() {
 
       {tab === "confessions" && (
         <>
-          {confessionsError && (
-            <div role="alert" className="mt-4 rounded-xl border border-gold bg-card p-4">
-              <p className="text-gold">The owl can’t reach the confession archive.</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                The Wall’s database is temporarily unavailable.
-                {cachedConfessions.length > 0
-                  ? " Showing the last saved confessions on this device."
-                  : " Confessions will return when the connection is restored."}
-              </p>
-              <Button
-                variant="outline"
-                className="mt-3 min-h-11"
-                disabled={confessionsLoading}
-                onClick={() => void retryConfessions()}
-              >
-                {confessionsLoading ? "Trying again…" : "Retry Confessions"}
-              </Button>
-            </div>
-          )}
-
           <GoldButton className="mt-5" onClick={() => setConfessing(true)}>
             Confess Your Own
           </GoldButton>

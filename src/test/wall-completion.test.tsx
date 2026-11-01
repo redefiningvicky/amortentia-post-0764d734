@@ -1,22 +1,9 @@
 import type { ComponentType, ReactNode } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-const queryState = vi.hoisted(() => ({ error: null as Error | null, retry: vi.fn() }));
 vi.mock("@tanstack/react-router", () => ({
   createFileRoute: () => (options: unknown) => ({ options }),
   Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
-}));
-vi.mock("@tanstack/react-query", () => ({
-  useQueryClient: () => ({ invalidateQueries: vi.fn() }),
-  useQuery: ({ queryKey }: { queryKey: string[] }) =>
-    queryKey[0] === "confessions"
-      ? {
-          data: queryState.error ? undefined : [],
-          error: queryState.error,
-          refetch: queryState.retry,
-          isFetching: false,
-        }
-      : { data: [] },
 }));
 vi.mock("@/components/kit", () => ({
   Shell: ({ children }: { children: ReactNode }) => <main>{children}</main>,
@@ -27,17 +14,41 @@ import { Route } from "@/routes/wall";
 const Wall = Route.options.component as ComponentType;
 afterEach(() => {
   cleanup();
-  queryState.error = null;
-  queryState.retry.mockClear();
+  localStorage.clear();
+  sessionStorage.clear();
 });
 describe("Completed Wall", () => {
-  it("explains a database outage instead of silently hiding confessions", () => {
+  it("uses fictional samples and ignores saved customer data without making network requests", () => {
     localStorage.clear();
-    queryState.error = new Error("Database unavailable");
+    sessionStorage.clear();
+    localStorage.setItem(
+      "ap-wall-cache-v1",
+      JSON.stringify([{ id: "customer-one", note: "Private customer confession", potions: [] }]),
+    );
+    const network = vi.spyOn(globalThis, "fetch");
+    const { container } = render(<Wall />);
+    expect(container.querySelectorAll("article")).toHaveLength(5);
+    expect(screen.getByText("Showing 5 of 13 confessions")).toBeInTheDocument();
+    expect(screen.queryByText(/Private customer confession/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Show More" }));
+    expect(container.querySelectorAll("article")).toHaveLength(10);
+    fireEvent.click(screen.getByRole("button", { name: "Photo Album" }));
+    expect(screen.getByText("Showing 6 of 16 photos")).toBeInTheDocument();
+    expect(container.querySelector('input[type="file"]')).toBeNull();
+    expect(network).not.toHaveBeenCalled();
+    network.mockRestore();
+  });
+  it("pretends to post for this browser session only", () => {
+    sessionStorage.clear();
     render(<Wall />);
-    expect(screen.getByRole("alert")).toHaveTextContent("database is temporarily unavailable");
-    fireEvent.click(screen.getByRole("button", { name: "Retry Confessions" }));
-    expect(queryState.retry).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getAllByRole("button", { name: "Confess Your Own" })[0]!);
+    fireEvent.change(screen.getByLabelText("Your secret confession"), {
+      target: { value: "I rehearsed hello again." },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Post My Confession" }));
+    expect(screen.getByText(/I rehearsed hello again/)).toBeInTheDocument();
+    expect(sessionStorage.getItem("ap-pretend-wall-v1")).toContain("I rehearsed hello again.");
+    expect(localStorage.getItem("ap-pretend-wall-v1")).toBeNull();
   });
   it("opens the album without undefined paging state and reveals six more photos", () => {
     const { container } = render(<Wall />);

@@ -20,3 +20,7 @@
 - Pitch deck lives at /pitch as an in-app slide route (1920x1080 scaled, ?slide=N); product slide uses real app screenshots in src/assets/shot-* (bundled images or CDN asset pointers) — retake them when screens change.
 - Gift tracking: public `gifts` table holds only open/bite timestamps (no names); recipient names travel in the private gift link URL; read/write only via mark_gift/gift_status RPCs.
 - All imagery is realistic vintage storybook oil-painting art (burgundy/gold on aged parchment) generated into src/assets/opt-*.jpg and mapped in src/lib/art.ts (OPT_ART), rendered via src/components/opt-art.tsx — never emoji, pictographs, or flat line-art icons, in the app or the deck. src/components/icons.tsx survives only for pure UI glyphs (check, x). Catalog entries still carry icon name strings asserted by src/test/catalog.test.ts.
+
+
+## Fictional Wall
+The Wall is a gag experience using only the 13 fictional confessions in src/lib/wall-demo.ts and 16 bundled sample photos. This supersedes earlier database-backed Wall instructions. Never read customer confessions, photo uploads, or old database caches into this UI. Posting and order sharing are pretend interactions kept only in sessionStorage; pinning uses built-in photos for the current visit, with no uploads. Send must set share_on_wall to false and must not insert confessions in the database. Preserve five-confession/six-photo paging and the shared ShowMore spacing.

@@ -666,12 +666,14 @@ function Wall() {
               </article>
             ))}
           </div>
-          <ShowMore
-            shown={feedShown}
-            total={feedTotal}
-            noun="confessions"
-            onMore={showMoreConfessions}
-          />
+          <div className="mt-5 pb-2 [&>div]:space-y-3">
+            <ShowMore
+              shown={feedShown}
+              total={feedTotal}
+              noun="confessions"
+              onMore={showMoreConfessions}
+            />
+          </div>
 
           <Button
             onClick={() => setConfessing(true)}

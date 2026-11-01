@@ -633,13 +633,10 @@ function Send() {
 
         {step === 4 && (
           <>
-            <p className="text-sm text-muted-foreground">
-              All messages can be left blank. This is a pretend gift—tap
-              Continue whenever you’re ready.
-            </p>
             <MessageField
               id="gift-confession"
               label="Your confession"
+              description="Printed on a message slip and tucked inside your chocolate box."
               value={note}
               onChange={setNote}
               maxLength={200}
@@ -679,11 +676,17 @@ function Send() {
                 placeholder="A few words they'll keep forever. No pressure."
               />
             )}
-            <Label>Add a handwritten note</Label>
-            <Option
-              active={handwritten}
-              onClick={() => setHandwritten(!handwritten)}
-            >
+            <Label>Handwritten note</Label>
+            <Option active={!handwritten} onClick={() => setHandwritten(false)}>
+              <div className="flex-1">
+                <div className="text-lg font-semibold">No handwritten note</div>
+                <p className="text-sm text-muted-foreground">
+                  The message slip or card is plenty.
+                </p>
+              </div>
+              <span className="text-gold">Included</span>
+            </Option>
+            <Option active={handwritten} onClick={() => setHandwritten(true)}>
               <OptArt id="quill" alt={HANDWRITTEN.name} />
               <div className="flex-1">
                 <div className="text-lg font-semibold">{HANDWRITTEN.name}</div>
@@ -966,8 +969,10 @@ function MessageField({
   onChange,
   maxLength,
   placeholder,
+  description,
 }: {
   id: string;
+  description?: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
@@ -982,6 +987,7 @@ function MessageField({
       >
         {label}
       </label>
+      {description && <p className="mt-1 text-sm opacity-70">{description}</p>}
       <textarea
         id={id}
         value={value}

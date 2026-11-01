@@ -162,6 +162,13 @@ export const CARDS = [
     price: 8.99,
     icon: "music",
   },
+  {
+    id: "sealed-card",
+    name: "Wax-Sealed Confession",
+    desc: "A parchment card sealed shut for dramatic effect",
+    price: 5.99,
+    icon: "envelope",
+  },
 ];
 
 export function addonsTotal(handwritten: boolean, cardId: string | null) {

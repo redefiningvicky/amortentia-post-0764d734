@@ -172,6 +172,7 @@ export const BOX_ART: Record<string, string> = {
 export const OPT_ART: Record<string, string> = {
   quill: optQuill,
   vintage: optCardVintage,
+  "sealed-card": optSeal,
   singing: optCardSinging,
   seal: optSeal,
   vial: optVial,

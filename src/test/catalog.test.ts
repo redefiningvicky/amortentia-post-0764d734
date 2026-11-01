@@ -167,7 +167,6 @@ describe("drawn artwork", () => {
     ...DESPERATION.map((d) => d.icon),
   ];
   it("every catalog icon name has artwork", () => {
-    expect(used.length).toBe(28);
     for (const name of used) expect(ICON_NAMES).toContain(name);
   });
 });

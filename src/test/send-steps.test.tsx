@@ -76,12 +76,23 @@ describe("Send step arrangement", () => {
     next();
     next();
     expect(screen.getByText("Step 5 of 8")).toBeInTheDocument();
+    expect(
+      screen.getByText("Printed on a message slip and tucked inside your chocolate box."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/All messages can be left blank/)).toBeNull();
+    expect(screen.getByRole("button", { name: /^No handwritten note/ })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
     expect(screen.getByRole("button", { name: /^No card/ })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
     expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
-    fireEvent.click(screen.getByRole("button", { name: /Vintage Valentine/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Wax-Sealed Confession/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Handwritten Love Note/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^No handwritten note/ }));
+    expect(screen.queryByLabelText("Your handwritten letter")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /Handwritten Love Note/ }));
     for (const label of ["Your confession", "Your card message", "Your handwritten letter"]) {
       expect(screen.getByLabelText(label)).toHaveValue("");
@@ -97,7 +108,11 @@ describe("Send step arrangement", () => {
     expect(screen.getByRole("button", { name: "Seal My Fate" })).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "Seal My Fate" }));
     await waitFor(() => expect(guest.orders()).toHaveLength(1));
-    expect(guest.orders()[0]?.gift).toMatchObject({ note: "", handwritten: "", card: "vintage" });
+    expect(guest.orders()[0]?.gift).toMatchObject({
+      note: "",
+      handwritten: "",
+      card: "sealed-card",
+    });
     expect(guest.orders()[0]?.gift?.cardMessage).toBeUndefined();
   });
 

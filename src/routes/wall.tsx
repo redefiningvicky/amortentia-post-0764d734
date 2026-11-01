@@ -554,14 +554,12 @@ function Wall() {
               </figure>
             ))}
           </div>
-          <div className="mt-5 pb-2 [&>div]:space-y-3">
-            <ShowMore
-              shown={albumPage.shown}
-              total={albumPage.total}
-              noun="photos"
-              onMore={albumPage.more}
-            />
-          </div>
+          <ShowMore
+            shown={albumPage.shown}
+            total={albumPage.total}
+            noun="photos"
+            onMore={albumPage.more}
+          />
         </section>
       )}
 
@@ -689,14 +687,12 @@ function Wall() {
               </article>
             ))}
           </div>
-          <div className="mt-5 pb-2 [&>div]:space-y-3">
-            <ShowMore
-              shown={feedShown}
-              total={feedTotal}
-              noun="confessions"
-              onMore={showMoreConfessions}
-            />
-          </div>
+          <ShowMore
+            shown={feedShown}
+            total={feedTotal}
+            noun="confessions"
+            onMore={showMoreConfessions}
+          />
 
           <Button
             onClick={() => setConfessing(true)}

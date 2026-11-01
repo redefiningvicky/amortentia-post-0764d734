@@ -32,7 +32,7 @@ export function ShowMore({
 }) {
   if (total === 0) return null;
   return (
-    <div className="space-y-2 text-center">
+    <div className="flex flex-col gap-3 pb-2 pt-5 text-center">
       <p className="text-xs text-muted-foreground" aria-live="polite">
         Showing {shown} of {total} {noun}
       </p>

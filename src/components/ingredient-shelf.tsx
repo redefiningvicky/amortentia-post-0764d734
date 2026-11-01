@@ -68,54 +68,56 @@ export function IngredientShelf({
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        {page.visible.map((p) => {
-          const on = value.includes(p.id);
-          const full = !on && value.length >= MAX_BLEND;
-          const e = ESSENCES.find((x) => x.id === p.essence)!;
-          return (
-            <button
-              key={p.id}
-              onClick={() => toggle(p.id)}
-              disabled={full}
-              aria-pressed={on}
-              className={cn(
-                "rounded-2xl border bg-card p-3 text-left transition disabled:opacity-40",
-                on && "border-gold shadow-glow",
-                p.rarity === "legendary" && "border-primary/60",
-              )}
-            >
-              <div className="relative">
-                <img
-                  src={ING_ART[p.id]}
-                  alt={p.name}
-                  loading="lazy"
-                  width={460}
-                  height={460}
-                  className="aspect-square w-full rounded-xl border border-gold/30 object-cover"
-                />
-                {RARITY_LABEL[p.rarity] && (
-                  <span className="absolute right-1.5 top-1.5 rounded-full bg-gold-gradient px-2 text-[10px] font-bold uppercase text-primary-foreground">
-                    {RARITY_LABEL[p.rarity]}
-                  </span>
+      <div>
+        <div className="grid grid-cols-2 gap-2">
+          {page.visible.map((p) => {
+            const on = value.includes(p.id);
+            const full = !on && value.length >= MAX_BLEND;
+            const e = ESSENCES.find((x) => x.id === p.essence)!;
+            return (
+              <button
+                key={p.id}
+                onClick={() => toggle(p.id)}
+                disabled={full}
+                aria-pressed={on}
+                className={cn(
+                  "rounded-2xl border bg-card p-3 text-left transition disabled:opacity-40",
+                  on && "border-gold shadow-glow",
+                  p.rarity === "legendary" && "border-primary/60",
                 )}
-              </div>
-              <p className="mt-2 font-semibold leading-tight">{p.name}</p>
-              <p className="mt-0.5 text-xs italic text-muted-foreground">{p.note}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {INGREDIENT_KIND[p.essence]} · {e.name} ·{" "}
-                <span className="text-gold">${p.price}</span>
-              </p>
-            </button>
-          );
-        })}
-        {list.length === 0 && (
-          <p className="col-span-2 py-6 text-center text-muted-foreground">
-            No ingredient by that name… yet.
-          </p>
-        )}
+              >
+                <div className="relative">
+                  <img
+                    src={ING_ART[p.id]}
+                    alt={p.name}
+                    loading="lazy"
+                    width={460}
+                    height={460}
+                    className="aspect-square w-full rounded-xl border border-gold/30 object-cover"
+                  />
+                  {RARITY_LABEL[p.rarity] && (
+                    <span className="absolute right-1.5 top-1.5 rounded-full bg-gold-gradient px-2 text-[10px] font-bold uppercase text-primary-foreground">
+                      {RARITY_LABEL[p.rarity]}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-2 font-semibold leading-tight">{p.name}</p>
+                <p className="mt-0.5 text-xs italic text-muted-foreground">{p.note}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {INGREDIENT_KIND[p.essence]} · {e.name} ·{" "}
+                  <span className="text-gold">${p.price}</span>
+                </p>
+              </button>
+            );
+          })}
+          {list.length === 0 && (
+            <p className="col-span-2 py-6 text-center text-muted-foreground">
+              No ingredient by that name… yet.
+            </p>
+          )}
+        </div>
+        <ShowMore shown={page.shown} total={page.total} noun="ingredients" onMore={page.more} />
       </div>
-      <ShowMore shown={page.shown} total={page.total} noun="ingredients" onMore={page.more} />
     </div>
   );
 }

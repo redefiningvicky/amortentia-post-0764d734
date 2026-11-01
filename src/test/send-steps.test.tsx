@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("@tanstack/react-router", () => ({
   createFileRoute: () => (options: unknown) => ({ options, useSearch: () => ({}) }),
@@ -7,7 +7,7 @@ vi.mock("@tanstack/react-router", () => ({
   Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }));
 vi.mock("@/integrations/supabase/client", () => ({
-  supabase: { from: () => ({ insert: vi.fn(() => Promise.resolve({ error: null })) }) },
+  supabase: { from: vi.fn(() => ({ insert: vi.fn(() => Promise.resolve({ error: null })) })) },
 }));
 vi.mock("@/components/brew-class", () => ({
   BrewClass: ({
@@ -60,6 +60,7 @@ vi.mock("@/components/kit", () => ({
 }));
 import { Route } from "@/routes/send";
 import { guest } from "@/lib/guest";
+import { supabase } from "@/integrations/supabase/client";
 const Send = Route.options.component as ComponentType;
 afterEach(cleanup);
 beforeEach(() => {
@@ -67,6 +68,36 @@ beforeEach(() => {
   sessionStorage.clear();
 });
 describe("Send step arrangement", () => {
+  it("selects all bundle items and replaces the previous bundle without duplicate selections", () => {
+    render(<Send />);
+    const next = () => fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    next();
+    fireEvent.click(screen.getByRole("button", { name: "Finish brewing" }));
+    next();
+    next();
+    const option = (name: string) =>
+      screen.getByRole("button", { name: (label) => label.startsWith(name) });
+    expect(screen.queryByRole("button", { name: /Crimson Velvet Heart/ })).toBeNull();
+    fireEvent.click(option("The Bottled Confession"));
+    expect(option("The Bottled Confession")).toHaveAttribute("aria-pressed", "true");
+    expect(option("The Little Charm")).toHaveAttribute("aria-pressed", "false");
+    expect(option("Monogram Wax Seal")).toHaveAttribute("aria-pressed", "true");
+    expect(option("Keepsake Potion Vial")).toHaveTextContent("Included");
+    fireEvent.click(option("The Full Love Spell"));
+    expect(option("The Full Love Spell")).toHaveAttribute("aria-pressed", "true");
+    expect(option("The Bottled Confession")).toHaveAttribute("aria-pressed", "false");
+    expect(option("Monogram Wax Seal")).toHaveAttribute("aria-pressed", "false");
+    expect(option("Keepsake Potion Vial")).toHaveAttribute("aria-pressed", "true");
+    expect(option("Messenger Owl Plush")).toHaveAttribute("aria-pressed", "true");
+    expect(option("Messenger Owl Plush")).toHaveTextContent("Included");
+    next();
+    expect(option("Singing Envelope")).toHaveAttribute("aria-pressed", "true");
+    expect(option("Vintage Valentine")).toHaveAttribute("aria-pressed", "false");
+    expect(option("Handwritten Love Note")).toHaveAttribute("aria-pressed", "true");
+    expect(option("Handwritten Love Note")).toHaveTextContent("Included");
+    next();
+    expect(option("Crimson Velvet Heart")).toHaveAttribute("aria-pressed", "true");
+  }, 15000);
   it("continues and sends a pretend gift with every message blank, including paid note and card", async () => {
     render(<Send />);
     const next = () => fireEvent.click(screen.getByRole("button", { name: "Continue" }));
@@ -74,11 +105,6 @@ describe("Send step arrangement", () => {
     fireEvent.click(screen.getByRole("button", { name: "Finish brewing" }));
     next();
     next();
-    fireEvent.click(screen.getByRole("button", { name: /Crimson Velvet Heart/ }));
-    expect(screen.getByRole("button", { name: /Crimson Velvet Heart/ })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
     next();
     expect(screen.getByText("Step 5 of 8")).toBeInTheDocument();
     expect(
@@ -100,28 +126,45 @@ describe("Send step arrangement", () => {
     expect(screen.queryByLabelText("Your handwritten letter")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /Handwritten Love Note/ }));
     for (const label of ["Your confession", "Your card message", "Your handwritten letter"]) {
-      expect(screen.getByLabelText(label)).toHaveValue("");
+      expect(screen.getByLabelText(label)).not.toHaveValue("");
+      fireEvent.change(screen.getByLabelText(label), { target: { value: "" } });
       expect(screen.getByLabelText(label)).not.toBeRequired();
     }
     expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
     next();
-    expect(screen.getByRole("button", { name: /Crimson Velvet Heart/ })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
     next();
-    fireEvent.change(screen.getByLabelText("To my beloved"), { target: { value: "Beloved" } });
-    fireEvent.change(screen.getByLabelText("From your admirer"), { target: { value: "Admirer" } });
+    expect(screen.getByLabelText("To my beloved")).toHaveValue("Henry");
+    expect(screen.getByLabelText("From your admirer")).toHaveValue("Ramona");
+    fireEvent.change(screen.getByLabelText("To my beloved"), { target: { value: "" } });
+    fireEvent.change(screen.getByLabelText("From your admirer"), { target: { value: "" } });
+    expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
     next();
     expect(screen.getByText("No message added")).toBeInTheDocument();
+    expect(screen.queryByText("Shop .99 adjustment")).toBeNull();
+    const receipt = screen.getByText("Price breakdown").parentElement!;
+    const cents = (label: string) => {
+      const value = within(receipt).getByText(label, { exact: true }).parentElement!
+        .lastElementChild!.textContent!;
+      return Math.round(Number(value.replace("−", "-").replace("$", "")) * 100);
+    };
+    const sum = [
+      "Box, potency & duration",
+      "Recipe",
+      "Note & card",
+      "Wrapping, delivery & extras",
+      "Savings",
+    ].reduce((sum, label) => sum + cents(label), 0);
+    expect(cents("Total")).toBe(sum);
     expect(screen.getByRole("button", { name: "Seal My Fate" })).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "Seal My Fate" }));
     await waitFor(() => expect(guest.orders()).toHaveLength(1));
     expect(guest.orders()[0]?.gift).toMatchObject({
+      to: "Henry",
+      from: "Ramona",
       note: "",
       handwritten: "",
       card: "sealed-card",
-      wrapping: "velvet",
+      wrapping: "kraft",
     });
     expect(guest.orders()[0]?.gift?.cardMessage).toBeUndefined();
   });
@@ -155,7 +198,7 @@ describe("Send step arrangement", () => {
     next();
     expect(screen.getByText("Step 7 of 8")).toBeInTheDocument();
     expect(screen.queryByLabelText("Your confession")).toBeNull();
-    expect(screen.getByRole("button", { name: "Continue" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
     fireEvent.change(screen.getByLabelText("To my beloved"), { target: { value: "Beloved" } });
     fireEvent.change(screen.getByLabelText("From your admirer"), { target: { value: "Admirer" } });
     next();
@@ -167,13 +210,17 @@ describe("Send step arrangement", () => {
     next();
     next();
     next();
+    fireEvent.click(screen.getByRole("button", { name: /Share anonymously on the Wall/ }));
     fireEvent.click(screen.getByRole("button", { name: "Seal My Fate" }));
     await waitFor(() => expect(guest.orders()).toHaveLength(1));
+    expect(sessionStorage.getItem("ap-pretend-wall-v1")).toContain("A confession for you");
+    expect(localStorage.getItem("ap-pretend-wall-v1")).toBeNull();
+    expect(supabase.from).not.toHaveBeenCalledWith("confessions");
     expect(guest.orders()[0]?.gift).toMatchObject({
       note: "A confession for you",
       handwritten: "A letter from me",
       card: "vintage",
       cardMessage: "A card to keep",
     });
-  });
+  }, 15000);
 });

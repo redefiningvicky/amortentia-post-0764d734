@@ -1,3 +1,4 @@
+import { DEMO_COPY } from "@/lib/demo-copy";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -177,7 +178,7 @@ function Wall() {
   const [tab, setTab] = useState<"confessions" | "album">("confessions");
   const [sort, setSort] = useState<"hot" | "new">("hot");
   const [confessing, setConfessing] = useState(false);
-  const [confession, setConfession] = useState("");
+  const [confession, setConfession] = useState(DEMO_COPY.wallConfession);
   const [posting, setPosting] = useState(false);
   const [rows, setRows] = useState<WallConfession[]>(WALL_CONFESSIONS);
   useEffect(() => setRows(readWallConfessions()), []);
@@ -194,7 +195,7 @@ function Wall() {
     });
     setRows((previous) => [row, ...previous]);
     setPosting(false);
-    setConfession("");
+    setConfession(DEMO_COPY.wallConfession);
     setConfessing(false);
     setSort("new");
     toast.success("Your confession is on the Wall for this visit. Names stay secret.");
@@ -233,7 +234,7 @@ function Wall() {
     setGuestSwoons(next);
   }
   const [uploading, setUploading] = useState(false);
-  const [caption, setCaption] = useState("");
+  const [caption, setCaption] = useState(DEMO_COPY.photoCaption);
 
   const photoMine = guestSwoons.filter((s) => s.startsWith("photo:"));
   function swoonPhoto(id: string) {
@@ -258,7 +259,7 @@ function Wall() {
       { id: `pin-${Date.now()}`, url: photo.url, caption: caption.trim() || photo.caption },
       ...prev,
     ]);
-    setCaption("");
+    setCaption(DEMO_COPY.photoCaption);
     toast.success("Pinned to the album");
   }
 
@@ -339,7 +340,7 @@ function Wall() {
             disabled={uploading}
             onClick={() => {
               setPhotoPreview(null);
-              setCaption("");
+              setCaption(DEMO_COPY.photoCaption);
               setPicking(true);
             }}
           >
@@ -351,7 +352,7 @@ function Wall() {
               setPicking(open);
               if (!open) {
                 setPhotoPreview(null);
-                setCaption("");
+                setCaption(DEMO_COPY.photoCaption);
               }
             }}
           >

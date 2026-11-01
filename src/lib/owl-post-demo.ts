@@ -1,12 +1,13 @@
-import { blendOutcome, livePotionResult, orderTotal, potionsTotal, to99 } from "@/lib/catalog";
+import { DEMO_COPY } from "@/lib/demo-copy";
+import { blendOutcome, livePotionResult, orderTotal, potionsTotal } from "@/lib/catalog";
 import type { GuestOrder, GiftDetails } from "@/lib/guest";
 
 export const SAMPLE_SENT_ID = "owl-post-rehearsal";
 const potions = ["honey-1", "rose-6"];
 const gift: GiftDetails = {
   id: SAMPLE_SENT_ID,
-  to: "Your Secret Crush",
-  from: "Their Secret Admirer",
+  to: DEMO_COPY.recipient,
+  from: DEMO_COPY.sender,
   tier: "true",
   blend: blendOutcome(potions)?.name ?? "A Very Unreasonable Affection",
   note: "I asked the owl to act casual. It wore a bow tie.",
@@ -20,7 +21,7 @@ export const SAMPLE_SENT_ORDER: GuestOrder & { mine: true; demo: true } = {
   gift_id: SAMPLE_SENT_ID,
   recipient_name: gift.to,
   tier: gift.tier,
-  total: to99(orderTotal(gift.tier, "swoon", "hour") + potionsTotal(potions)),
+  total: Math.round((orderTotal(gift.tier, "swoon", "hour") + potionsTotal(potions)) * 100) / 100,
   created_at: gift.createdAt!,
   gift,
   potions,

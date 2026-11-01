@@ -1149,7 +1149,7 @@ export function upgradesTotal(
 ) {
   const p = PACKAGING.find((x) => x.id === packagingId)?.price ?? 0;
   const d = DELIVERY.find((x) => x.id === deliveryId)?.price ?? 0;
-  const k = keepsakeIds.reduce((s, id) => s + (KEEPSAKES.find((x) => x.id === id)?.price ?? 0), 0);
+  const k = [...new Set(keepsakeIds)].reduce((s, id) => s + (KEEPSAKES.find((x) => x.id === id)?.price ?? 0), 0);
   return to99(p + d + k + (antidote ? ANTIDOTE.price : 0));
 }
 
@@ -1171,35 +1171,35 @@ export const BUNDLES: SpellBundle[] = [
   {
     id: "charm",
     name: "The Little Charm",
-    desc: "Handwritten note + Vintage Valentine card + wax seal",
+    desc: "Handwritten note + Vintage Valentine card + monogram wax seal",
     save: 2,
     pick: { handwritten: true, card: "vintage", keepsakes: ["seal"] },
   },
   {
     id: "spell",
     name: "The Full Love Spell",
-    desc: "Note + Singing Envelope + potion vial + owl plush + velvet heart",
+    desc: "Handwritten note + Singing Envelope + potion vial + owl plush + velvet heart wrapping",
     save: 10,
     pick: { handwritten: true, card: "singing", keepsakes: ["vial", "plush"], packaging: "velvet" },
   },
   {
     id: "wish",
     name: "The Bottled Confession",
-    desc: "Note + Vintage Valentine + keepsake potion vial + wax seal",
+    desc: "Handwritten note + Vintage Valentine + potion vial + monogram wax seal",
     save: 4,
     pick: { handwritten: true, card: "vintage", keepsakes: ["vial", "seal"] },
   },
   {
     id: "romance",
     name: "The Grand Gesture",
-    desc: "Note + Vintage Valentine + dozen roses + velvet heart",
+    desc: "Handwritten note + Vintage Valentine + dozen roses + velvet heart wrapping",
     save: 7,
     pick: { handwritten: true, card: "vintage", keepsakes: ["bouquet"], packaging: "velvet" },
   },
   {
     id: "serenade",
     name: "The Midnight Serenade",
-    desc: "Note + Singing Envelope + owl plush + music box heart",
+    desc: "Handwritten note + Singing Envelope + owl plush + music box wrapping",
     save: 12,
     pick: { handwritten: true, card: "singing", keepsakes: ["plush"], packaging: "music" },
   },
@@ -1223,9 +1223,14 @@ export function bundlePrice(b: SpellBundle) {
   );
 }
 
+export function bestMatchingBundle(x: Extras): SpellBundle | null {
+  return BUNDLES.reduce<SpellBundle | null>((best, bundle) =>
+    bundleMatches(bundle, x) && (!best || bundle.save > best.save) ? bundle : best,
+  null);
+}
+
 export function bundleSavings(x: Extras) {
-  const hits = BUNDLES.filter((b) => bundleMatches(b, x));
-  return Math.max(0, ...hits.map((b) => b.save));
+  return bestMatchingBundle(x)?.save ?? 0;
 }
 
 // Express delivery fee waived when the rest of the order is over the threshold.

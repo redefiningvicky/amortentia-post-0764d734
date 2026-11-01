@@ -1,3 +1,4 @@
+import { DEMO_COPY } from "@/lib/demo-copy";
 import type { PotionResult } from "@/lib/catalog";
 
 // Optional recipe fields preserve orders saved before live potion results existed.
@@ -55,7 +56,7 @@ export const guest = {
       ...old.filter((g) => g.id !== gift.id),
     ]);
   },
-  profile: () => read<GuestProfile>("ap-profile", { display_name: "Secret Admirer", avatar: null }),
+  profile: () => read<GuestProfile>("ap-profile", { display_name: DEMO_COPY.sender, avatar: null }),
   saveProfile: (p: GuestProfile) => write("ap-profile", p),
   swoons: () => read<string[]>("ap-swoons", []),
   saveSwoons: (s: string[]) => write("ap-swoons", s),

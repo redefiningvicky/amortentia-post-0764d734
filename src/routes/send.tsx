@@ -1,3 +1,4 @@
+import { DEMO_COPY } from "@/lib/demo-copy";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -24,12 +25,10 @@ import {
   ANTIDOTE,
   upgradesTotal,
   BUNDLES,
-  bundleSavings,
-  bundleMatches,
+  bestMatchingBundle,
   bundlePrice,
   expressWaiver,
   FREE_EXPRESS_OVER,
-  to99,
   to99Up,
 } from "@/lib/catalog";
 import { PotionResultCard } from "@/components/potion-result-card";
@@ -88,8 +87,6 @@ export const Route = createFileRoute("/send")({
   component: Send,
 });
 
-const VELVET_HEART = PACKAGING.find((option) => option.id === "velvet")!;
-
 const TITLES = [
   "How Many Bites Will It Take?",
   "Brew a Little Trouble",
@@ -144,14 +141,16 @@ function Send() {
   const [handwritten, setHandwritten] = useState(
     initialBundle?.pick.handwritten ?? false,
   );
-  const [handText, setHandText] = useState("");
-  const [cardMessage, setCardMessage] = useState("");
+  const [handText, setHandText] = useState(DEMO_COPY.handwritten);
+  const [cardMessage, setCardMessage] = useState(DEMO_COPY.cardMessage);
   const [card, setCard] = useState<string | null>(
     initialBundle?.pick.card ?? null,
   );
-  const [to, setTo] = useState("");
-  const [from, setFrom] = useState("");
-  const [note, setNote] = useState("");
+  const [to, setTo] = useState(DEMO_COPY.recipient);
+  const [from, setFrom] = useState(DEMO_COPY.sender);
+  const [note, setNote] = useState(DEMO_COPY.confession);
+  const recipientName = to.trim() || DEMO_COPY.recipient;
+  const senderName = from.trim() || DEMO_COPY.sender;
   const [share, setShare] = useState(false);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -161,7 +160,13 @@ function Send() {
   const durId = DURATIONS.find((d) => d.id === duration)
     ? duration
     : DURATIONS[0]!.id;
-  const saving = bundleSavings({ handwritten, card, keepsakes, packaging });
+  const appliedBundle = bestMatchingBundle({
+    handwritten,
+    card,
+    keepsakes,
+    packaging,
+  });
+  const saving = appliedBundle?.save ?? 0;
   const preDelivery =
     orderTotal(tier, strength, durId) +
     potionsTotal(potions) +
@@ -169,14 +174,6 @@ function Send() {
     upgradesTotal(packaging, "owl", keepsakes, antidote) -
     saving;
   const waived = expressWaiver(delivery, preDelivery);
-  const total = to99(
-    -saving -
-      waived +
-      orderTotal(tier, strength, durId) +
-      potionsTotal(potions) +
-      addonsTotal(handwritten, card) +
-      upgradesTotal(packaging, delivery, keepsakes, antidote),
-  );
   const priceParts =
     orderTotal(tier, strength, durId) +
     potionsTotal(potions) +
@@ -184,11 +181,10 @@ function Send() {
     upgradesTotal(packaging, delivery, keepsakes, antidote) -
     saving -
     waived;
+  const total = Math.round(priceParts * 100) / 100;
   const outcome = blendOutcome(potions);
   const potionResult = livePotionResult(potions);
-  const canNext =
-    (step !== 1 || (potions.length > 0 && brewReady)) &&
-    ((step !== 6 && step !== 7) || (to.trim() && from.trim()));
+  const canNext = step !== 1 || (potions.length > 0 && brewReady);
 
   async function submit() {
     setBusy(true);
@@ -205,8 +201,8 @@ function Send() {
     }
     const details: GiftDetails = {
       id: giftId,
-      to: to.trim(),
-      from: from.trim(),
+      to: recipientName,
+      from: senderName,
       tier,
       blend: outcome?.name ?? "",
       note: note.trim(),
@@ -221,8 +217,8 @@ function Send() {
     };
     const qs = new URLSearchParams({
       id: giftId,
-      to: to.trim(),
-      from: from.trim(),
+      to: recipientName,
+      from: senderName,
       tier,
       blend: outcome?.name ?? "",
       note: note.trim(),
@@ -235,8 +231,8 @@ function Send() {
         strength,
         aroma,
         duration: durId,
-        sender_name: from.trim(),
-        recipient_name: to.trim(),
+        sender_name: senderName,
+        recipient_name: recipientName,
         note: note.trim() || null,
         total,
         share_on_wall: false,
@@ -257,7 +253,7 @@ function Send() {
         guest.addOrder({
           id: giftId,
           tier,
-          recipient_name: to.trim(),
+          recipient_name: recipientName,
           total,
           created_at: details.createdAt!,
           gift_id: giftId,
@@ -273,7 +269,7 @@ function Send() {
         );
         return;
       }
-      if (share)
+      if (share && note.trim())
         addWallConfession({
           tier,
           strength,
@@ -302,8 +298,8 @@ function Send() {
             Owl Dispatched
           </h2>
           <p className="mt-3 text-lg text-muted-foreground">
-            Your box is flying to {to}. All they have to do is take one bite…
-            Fingers crossed, tissues ready.
+            Your box is flying to {recipientName}. All they have to do is take
+            one bite… Fingers crossed, tissues ready.
           </p>
           <div className="mt-8 space-y-3">
             <button
@@ -313,8 +309,8 @@ function Send() {
                   to: "/gift",
                   search: {
                     id: savedGift?.id ?? "",
-                    to,
-                    from,
+                    to: recipientName,
+                    from: senderName,
                     tier,
                     blend: outcome?.name ?? "",
                     note,
@@ -346,11 +342,11 @@ function Send() {
             </div>
             <GoldButton
               onClick={async () => {
-                const text = `I just spent $${total.toFixed(2)} on love-potion chocolates to make ${to} love me. Pray for me.`;
+                const text = `I just spent $${total.toFixed(2)} on love-potion chocolates to make ${recipientName} love me. Pray for me.`;
                 const url = window.location.origin;
                 const file = await makeShareCard({
                   total,
-                  to,
+                  to: recipientName,
                   blend: outcome?.name ?? "A Mystery Blend",
                   level: desperationLevel(total).label,
                 });
@@ -582,14 +578,13 @@ function Send() {
 
         {step === 3 && (
           <>
-            <Label>Spell bundles · one tap, real savings</Label>
+            <Label>Choose a spell bundle</Label>
+            <p className="text-sm text-muted-foreground">
+              One bundle at a time. Its extras are selected automatically; add
+              more below.
+            </p>
             {BUNDLES.map((b) => {
-              const on = bundleMatches(b, {
-                handwritten,
-                card,
-                keepsakes,
-                packaging,
-              });
+              const on = appliedBundle?.id === b.id;
               return (
                 <Option
                   key={b.id}
@@ -616,24 +611,7 @@ function Send() {
             <p className="text-sm text-muted-foreground">
               Every bite counts. Make the box too beautiful to ignore.
             </p>
-            <Option
-              active={packaging === VELVET_HEART.id}
-              onClick={() =>
-                setPackaging(
-                  packaging === VELVET_HEART.id ? "kraft" : VELVET_HEART.id,
-                )
-              }
-            >
-              <OptArt id={VELVET_HEART.id} alt={VELVET_HEART.name} />
-              <div className="flex-1">
-                <div className="text-lg font-semibold">{VELVET_HEART.name}</div>
-                <p className="text-muted-foreground">{VELVET_HEART.desc}</p>
-                <p className="mt-1 text-sm text-gold">
-                  Upgrades your wrapping to a velvet heart-shaped box.
-                </p>
-              </div>
-              <span className="text-gold">+${VELVET_HEART.price}</span>
-            </Option>
+
             {KEEPSAKES.map((k) => (
               <Option
                 key={k.id}
@@ -645,7 +623,11 @@ function Send() {
                   <div className="text-lg font-semibold">{k.name}</div>
                   <p className="text-muted-foreground">{k.desc}</p>
                 </div>
-                <span className="text-gold">+${k.price}</span>
+                <span className="text-gold">
+                  {appliedBundle?.pick.keepsakes.includes(k.id)
+                    ? "Included"
+                    : "+$" + k.price.toFixed(2)}
+                </span>
               </Option>
             ))}
           </>
@@ -683,7 +665,11 @@ function Send() {
                   <div className="text-lg font-semibold">{c.name}</div>
                   <p className="text-muted-foreground">{c.desc}</p>
                 </div>
-                <span className="text-gold">+${c.price}</span>
+                <span className="text-gold">
+                  {appliedBundle?.pick.card === c.id
+                    ? "Included"
+                    : "+$" + c.price.toFixed(2)}
+                </span>
               </Option>
             ))}
             {card && (
@@ -715,7 +701,11 @@ function Send() {
                   like.
                 </p>
               </div>
-              <span className="text-gold">+${HANDWRITTEN.price}</span>
+              <span className="text-gold">
+                {appliedBundle?.pick.handwritten
+                  ? "Included"
+                  : "+$" + HANDWRITTEN.price.toFixed(2)}
+              </span>
             </Option>
             {handwritten && (
               <MessageField
@@ -745,7 +735,11 @@ function Send() {
                   <p className="text-muted-foreground">{k.desc}</p>
                 </div>
                 <span className="text-gold">
-                  {k.price ? `+$${k.price}` : "Included"}
+                  {appliedBundle?.pick.packaging === k.id
+                    ? "Included"
+                    : k.price
+                      ? "+$" + k.price.toFixed(2)
+                      : "Included"}
                 </span>
               </Option>
             ))}
@@ -762,7 +756,7 @@ function Send() {
                   <p className="text-muted-foreground">{k.desc}</p>
                 </div>
                 <span className="text-gold">
-                  {k.price ? `+$${k.price}` : "Included"}
+                  {k.price ? "+$" + k.price.toFixed(2) : "Included"}
                 </span>
               </Option>
             ))}
@@ -819,12 +813,13 @@ function Send() {
                 k="Delivery"
                 v={DELIVERY.find((x) => x.id === delivery)!.name}
               />
+              {appliedBundle && <Row k="Spell bundle" v={appliedBundle.name} />}
               {saving > 0 && (
                 <Row k="Bundle savings" v={`−$${saving.toFixed(2)}`} />
               )}
               {waived > 0 && <Row k="Express Owl" v="Free" />}
-              <Row k="To" v={to} />
-              <Row k="From" v={from} />
+              <Row k="To" v={recipientName} />
+              <Row k="From" v={senderName} />
               {note && <Row k="Confession" v={note} />}
               {handwritten && (
                 <Row
@@ -852,14 +847,7 @@ function Send() {
                   The best matching bundle saving applies automatically. Savings
                   don’t stack.
                 </p>
-                <Row
-                  k="Shop .99 adjustment"
-                  v={`${total - priceParts < 0 ? "−" : "+"}$${Math.abs(total - priceParts).toFixed(2)}`}
-                />
                 <Row k="Total" v={`$${total.toFixed(2)}`} />
-                <p className="text-xs text-muted-foreground">
-                  Shop totals are rounded to the nearest .99.
-                </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {[
@@ -960,10 +948,7 @@ function Send() {
             {STRENGTHS.find((x) => x.id === strength)!.price.toFixed(2)} ·
             Duration ${DURATIONS.find((x) => x.id === durId)!.price.toFixed(2)}
           </p>
-          <p>
-            Selected recipe, extras and any savings are included. Shop totals
-            round to .99.
-          </p>
+          <p>Selected recipe, extras and any savings are included.</p>
         </details>
         {step >= 3 && preDelivery < FREE_EXPRESS_OVER && (
           <p className="mb-2 text-center text-xs text-muted-foreground">

@@ -104,8 +104,47 @@ describe("seasonal boxes & desperation meter", () => {
     expect(desperationLevel(400).label).toBe("Unhinged Romantic"));
 });
 
-import { BUNDLES, bundlePrice, bundleSavings, expressWaiver } from "@/lib/catalog";
+import {
+  BUNDLES,
+  bestMatchingBundle,
+  bundlePrice,
+  bundleSavings,
+  expressWaiver,
+} from "@/lib/catalog";
 describe("bundles & free express", () => {
+  it("has distinct bundles with no repeated or unavailable components", () => {
+    const signatures = BUNDLES.map((bundle) => {
+      expect(new Set(bundle.pick.keepsakes).size).toBe(bundle.pick.keepsakes.length);
+      expect(CARDS.some((card) => card.id === bundle.pick.card)).toBe(true);
+      expect(PACKAGING.some((option) => option.id === (bundle.pick.packaging ?? "kraft"))).toBe(
+        true,
+      );
+      for (const id of bundle.pick.keepsakes)
+        expect(KEEPSAKES.some((item) => item.id === id)).toBe(true);
+      return JSON.stringify([
+        bundle.pick.handwritten,
+        bundle.pick.card,
+        [...bundle.pick.keepsakes].sort(),
+        bundle.pick.packaging ?? "kraft",
+      ]);
+    });
+    expect(new Set(signatures).size).toBe(BUNDLES.length);
+  });
+  it("identifies only the best bundle when a smaller one is also covered", () => {
+    const extras = {
+      handwritten: true,
+      card: "vintage",
+      keepsakes: ["seal", "vial"],
+      packaging: "kraft",
+    };
+    expect(bestMatchingBundle(extras)?.id).toBe("wish");
+    expect(bundleSavings(extras)).toBe(4);
+  });
+  it("never charges twice for the same keepsake ID", () => {
+    expect(upgradesTotal("kraft", "owl", ["vial", "vial", "seal"], false)).toBe(
+      upgradesTotal("kraft", "owl", ["vial", "seal"], false),
+    );
+  });
   it("Full Love Spell saves $10 when all its items are picked", () =>
     expect(
       bundleSavings({
@@ -127,6 +166,8 @@ describe("bundles & free express", () => {
   it("express is free over $99", () => expect(expressWaiver("express", 99)).toBe(14.99));
   it("express is paid under $99", () => expect(expressWaiver("express", 98.99)).toBe(0));
   it.each([
+    ["charm", 2, 12.99],
+    ["spell", 10, 47.99],
     ["wish", 4, 23.99],
     ["romance", 7, 44.99],
     ["serenade", 12, 62.99],

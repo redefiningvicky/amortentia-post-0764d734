@@ -2,8 +2,40 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { useState } from "react";
 import { BrewClass } from "@/components/brew-class";
+import { POTIONS } from "@/lib/catalog";
 
 describe("cauldron class", () => {
+  it("mixes five cabinet potions, requires three stirs, and resets when edited", () => {
+    const onReady = vi.fn();
+    function Mixing() {
+      const [ids, setIds] = useState<string[]>([]);
+      return <BrewClass mode="cabinet" value={ids} onChange={setIds} onReady={onReady} />;
+    }
+    render(<Mixing />);
+    expect(screen.queryByRole("button", { name: /Crushed Dragon Pepper/ })).toBeNull();
+    for (const potion of POTIONS.slice(0, 4)) {
+      fireEvent.click(screen.getByRole("button", { name: (name) => name.includes(potion.name) }));
+      expect(screen.queryByRole("dialog")).toBeNull();
+    }
+    const fifth = POTIONS[4]!;
+    fireEvent.click(screen.getByRole("button", { name: (name) => name.includes(fifth.name) }));
+    const prompt = screen.getByRole("dialog");
+    expect(prompt).toHaveTextContent("Your five potions are chosen.");
+    fireEvent.click(within(prompt).getByRole("button", { name: /Into the Cauldron/ }));
+    const bottle = screen.getByRole("button", { name: "Bottle My Love Potion" });
+    for (let n = 0; n < 3; n++) {
+      expect(bottle).toBeDisabled();
+      fireEvent.click(screen.getByRole("button", { name: "Stir the cauldron" }));
+    }
+    fireEvent.click(bottle);
+    expect(onReady).toHaveBeenLastCalledWith(true);
+    fireEvent.click(screen.getByRole("button", { name: "Change Potions" }));
+    expect(onReady).toHaveBeenLastCalledWith(false);
+    fireEvent.click(screen.getByRole("button", { name: `Remove ${fifth.name}` }));
+    fireEvent.click(screen.getByRole("button", { name: /Into the Cauldron/ }));
+    expect(screen.getByRole("button", { name: "Stir the cauldron" })).toHaveTextContent("0/3");
+    expect(screen.getByRole("button", { name: "Bottle My Love Potion" })).toBeDisabled();
+  });
   it("prompts at the fifth raw ingredient and proceeds with the chosen blend", () => {
     function Brewing() {
       const [ids, setIds] = useState<string[]>([]);

@@ -32,7 +32,6 @@ import {
   to99,
   to99Up,
 } from "@/lib/catalog";
-import { PotionCabinet } from "@/components/potion-cabinet";
 import { PotionResultCard } from "@/components/potion-result-card";
 import { livePotionResult } from "@/lib/catalog";
 import { BrewClass } from "@/components/brew-class";
@@ -161,7 +160,7 @@ function Send() {
   const outcome = blendOutcome(potions);
   const potionResult = livePotionResult(potions);
   const canNext =
-    (step !== 1 || (potions.length > 0 && (potionMode === "cabinet" || brewReady))) &&
+    (step !== 1 || (potions.length > 0 && brewReady)) &&
     (step !== 3 || !handwritten || handText.trim().length > 0) &&
     (step !== 5 || (to.trim() && from.trim()));
 
@@ -436,6 +435,7 @@ function Send() {
                 variant="outline"
                 aria-pressed={potionMode === "cabinet"}
                 onClick={() => {
+                  if (potionMode === "cabinet") return;
                   setPotionMode("cabinet");
                   setBrewReady(false);
                 }}
@@ -451,6 +451,7 @@ function Send() {
                 variant="outline"
                 aria-pressed={potionMode === "class"}
                 onClick={() => {
+                  if (potionMode === "class") return;
                   setPotionMode("class");
                   setBrewReady(false);
                 }}
@@ -466,17 +467,13 @@ function Send() {
                 ? "Create a potion from raw ingredients."
                 : "Mix ready-made potions into your own blend."}
             </p>
-            {potionMode === "class" ? (
-              <BrewClass value={potions} onChange={setPotions} onReady={setBrewReady} />
-            ) : (
-              <PotionCabinet
-                value={potions}
-                onChange={(ids) => {
-                  setPotions(ids);
-                  setBrewReady(false);
-                }}
-              />
-            )}
+            <BrewClass
+              key={potionMode}
+              mode={potionMode}
+              value={potions}
+              onChange={setPotions}
+              onReady={setBrewReady}
+            />
           </>
         )}
 

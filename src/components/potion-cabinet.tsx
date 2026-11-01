@@ -12,7 +12,9 @@ const RARITY_LABEL = { common: "", rare: "Rare", legendary: "Legendary" } as con
 export function PotionCabinet({
   value,
   onChange,
+  showResult = true,
 }: {
+  showResult?: boolean;
   value: string[];
   onChange: (v: string[]) => void;
 }) {
@@ -35,36 +37,38 @@ export function PotionCabinet({
 
   return (
     <div className="space-y-3">
-      <div className="pb-3 pt-1">
-        <BlendAnchor count={value.length}>
-          <PotionResultCard
-            ids={value}
-            emptyText="Pick up to 5 potions. Mixing them changes how they fall for you."
-          >
-            <SelectionChips
-              onRemove={toggle}
-              items={value.flatMap((id) => {
-                const p = POTIONS.find((x) => x.id === id);
-                return p
-                  ? [
-                      {
-                        id,
-                        name: p.name,
-                        art: (
-                          <span
-                            aria-hidden="true"
-                            className="inline-block h-5 w-4 bg-no-repeat"
-                            style={bottleStyle(p.essence)}
-                          />
-                        ),
-                      },
-                    ]
-                  : [];
-              })}
-            />
-          </PotionResultCard>
-        </BlendAnchor>
-      </div>
+      {showResult && (
+        <div className="pb-3 pt-1">
+          <BlendAnchor count={value.length}>
+            <PotionResultCard
+              ids={value}
+              emptyText="Pick up to 5 potions. Mixing them changes how they fall for you."
+            >
+              <SelectionChips
+                onRemove={toggle}
+                items={value.flatMap((id) => {
+                  const p = POTIONS.find((x) => x.id === id);
+                  return p
+                    ? [
+                        {
+                          id,
+                          name: p.name,
+                          art: (
+                            <span
+                              aria-hidden="true"
+                              className="inline-block h-5 w-4 bg-no-repeat"
+                              style={bottleStyle(p.essence)}
+                            />
+                          ),
+                        },
+                      ]
+                    : [];
+                })}
+              />
+            </PotionResultCard>
+          </BlendAnchor>
+        </div>
+      )}
 
       <input
         value={q}

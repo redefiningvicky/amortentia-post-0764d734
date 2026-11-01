@@ -9,7 +9,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Shell } from "@/components/kit";
-import { PotionCabinet } from "@/components/potion-cabinet";
 import { OptArt } from "@/components/opt-art";
 import { potionsTotal } from "@/lib/catalog";
 import { Button } from "@/components/ui/button";
@@ -114,6 +113,7 @@ function Spellbook() {
           variant="outline"
           aria-pressed={mode === "class"}
           onClick={() => {
+            if (mode === "class") return;
             setMode("class");
             setReady(false);
           }}
@@ -124,7 +124,11 @@ function Spellbook() {
         <Button
           variant="outline"
           aria-pressed={mode === "cabinet"}
-          onClick={() => setMode("cabinet")}
+          onClick={() => {
+            if (mode === "cabinet") return;
+            setMode("cabinet");
+            setReady(false);
+          }}
           className={mode === "cabinet" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}
         >
           Potion Cabinet
@@ -136,19 +140,15 @@ function Spellbook() {
           : "Mix ready-made potions into your own blend."}
       </p>
       <div className="pb-28">
-        {mode === "class" ? (
-          <BrewClass value={potions} onChange={setPotions} onReady={setReady} />
-        ) : (
-          <PotionCabinet
-            value={potions}
-            onChange={(ids) => {
-              setPotions(ids);
-              setReady(false);
-            }}
-          />
-        )}
+        <BrewClass
+          key={mode}
+          mode={mode}
+          value={potions}
+          onChange={setPotions}
+          onReady={setReady}
+        />
       </div>
-      {potions.length > 0 && (mode === "cabinet" || ready) && (
+      {potions.length > 0 && ready && (
         <div className="fixed inset-x-0 bottom-16 z-30 mx-auto max-w-md border-t bg-background/95 px-5 py-3 backdrop-blur">
           <Link
             to="/send"

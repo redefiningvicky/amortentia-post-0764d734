@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PotionCabinet } from "@/components/potion-cabinet";
 import { IngredientShelf } from "@/components/ingredient-shelf";
 import { GoldButton } from "@/components/kit";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { OptArt } from "@/components/opt-art";
-import { INGREDIENTS, MAX_BLEND, blendOutcome, potionsTotal } from "@/lib/catalog";
+import { findBrewable, MAX_BLEND, blendOutcome, potionsTotal } from "@/lib/catalog";
 import { BlendAnchor, SelectionChips } from "@/components/blend-browse";
 import { PotionResultCard } from "@/components/potion-result-card";
 
@@ -18,7 +19,9 @@ export function BrewClass({
   value,
   onChange,
   onReady,
+  mode = "class",
 }: {
+  mode?: "class" | "cabinet";
   value: string[];
   onChange: (ids: string[]) => void;
   onReady?: (ready: boolean) => void;
@@ -27,6 +30,7 @@ export function BrewClass({
   const [stirs, setStirs] = useState(0);
   const [cauldronPrompt, setCauldronPrompt] = useState(false);
   const outcome = blendOutcome(value);
+  const cabinet = mode === "cabinet";
   function startBrewing() {
     setCauldronPrompt(false);
     setStage("stir");
@@ -45,19 +49,23 @@ export function BrewClass({
   }
 
   return (
-    <section className="space-y-4" aria-label="Cauldron class">
+    <section className="space-y-4" aria-label={cabinet ? "Potion mixing" : "Cauldron class"}>
       <div className="pb-3 pt-1">
         <BlendAnchor count={value.length}>
           <PotionResultCard
             ids={value}
-            heading="Cauldron Class"
-            emptyText="Start from scratch: pick up to 5 raw ingredients and brew a potion no one has ever tasted."
+            heading={cabinet ? "Potion Cabinet" : "Cauldron Class"}
+            emptyText={
+              cabinet
+                ? "Pick up to 5 potions, then stir them into your own blend."
+                : "Start from scratch: pick up to 5 raw ingredients and brew a potion no one has ever tasted."
+            }
           >
             {stage === "ingredients" && (
               <SelectionChips
                 onRemove={(id) => chooseIngredients(value.filter((x) => x !== id))}
                 items={value.flatMap((id) => {
-                  const p = INGREDIENTS.find((x) => x.id === id);
+                  const p = findBrewable(id);
                   return p ? [{ id, name: p.name }] : [];
                 })}
               />
@@ -67,7 +75,11 @@ export function BrewClass({
       </div>
       {stage === "ingredients" ? (
         <>
-          <IngredientShelf value={value} onChange={chooseIngredients} />
+          {cabinet ? (
+            <PotionCabinet value={value} onChange={chooseIngredients} showResult={false} />
+          ) : (
+            <IngredientShelf value={value} onChange={chooseIngredients} />
+          )}
           <GoldButton disabled={!value.length} onClick={startBrewing}>
             Into the Cauldron · +${potionsTotal(value).toFixed(2)}
           </GoldButton>
@@ -115,7 +127,8 @@ export function BrewClass({
               {outcome?.name}
             </h2>
             <p className="mt-2 text-gold">
-              {value.length} ingredients · +${potionsTotal(value).toFixed(2)}
+              {value.length} {cabinet ? "potions" : "ingredients"} · +$
+              {potionsTotal(value).toFixed(2)}
             </p>
           </div>
           {stage === "stir" && (
@@ -130,7 +143,7 @@ export function BrewClass({
             </GoldButton>
           )}
           <Button variant="outline" className="h-11 w-full" onClick={editIngredients}>
-            Change Ingredients
+            {cabinet ? "Change Potions" : "Change Ingredients"}
           </Button>
           <p className="text-xs italic text-muted-foreground">
             A playful chocolate spell. Real feelings stay delightfully beyond our control.
@@ -141,7 +154,11 @@ export function BrewClass({
         <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-sm overflow-y-auto rounded-lg border-gold bg-card shadow-glow">
           <OptArt
             id="cauldron"
-            alt="An antique cauldron ready for your ingredients"
+            alt={
+              cabinet
+                ? "An antique cauldron ready for your potions"
+                : "An antique cauldron ready for your ingredients"
+            }
             className="aspect-[16/9] w-full rounded-lg object-cover"
           />
           <DialogHeader>
@@ -149,7 +166,8 @@ export function BrewClass({
               Into the Cauldron?
             </DialogTitle>
             <DialogDescription>
-              Your five ingredients are chosen. Time to stir a little longing into chocolate.
+              Your five {cabinet ? "potions" : "ingredients"} are chosen. Time to stir a little
+              longing into chocolate.
             </DialogDescription>
           </DialogHeader>
           <GoldButton onClick={startBrewing}>

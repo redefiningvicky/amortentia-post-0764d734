@@ -186,10 +186,7 @@ function Send() {
   const potionResult = livePotionResult(potions);
   const canNext =
     (step !== 1 || (potions.length > 0 && brewReady)) &&
-    (step !== 4 || !handwritten || handText.trim().length > 0) &&
-    (step !== 6 || (to.trim() && from.trim())) &&
-    (step !== 7 ||
-      (to.trim() && from.trim() && (!handwritten || handText.trim())));
+    ((step !== 6 && step !== 7) || (to.trim() && from.trim()));
 
   async function submit() {
     setBusy(true);
@@ -637,32 +634,32 @@ function Send() {
         {step === 4 && (
           <>
             <p className="text-sm text-muted-foreground">
-              Put all your words here. We’ll tuck them into the unboxing.
+              All messages can be left blank. This is a pretend gift—tap
+              Continue whenever you’re ready.
             </p>
-            <div className="rounded-2xl bg-parchment p-5 text-parchment-foreground">
-              <label
-                htmlFor="gift-confession"
-                className="mt-2 block text-sm font-semibold uppercase tracking-wider"
-              >
-                Your confession
-              </label>
-              <textarea
-                id="gift-confession"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                maxLength={200}
-                rows={4}
-                placeholder="I've liked you since… (please eat the chocolates)"
-                className="mt-1 w-full resize-none rounded-lg border border-parchment-foreground/30 bg-transparent p-3 text-lg italic outline-none"
-              />
-              <p className="text-right text-xs opacity-60">{note.length}/200</p>
-            </div>
-            <Label>Pick a card (optional)</Label>
+            <MessageField
+              id="gift-confession"
+              label="Your confession"
+              value={note}
+              onChange={setNote}
+              maxLength={200}
+              placeholder="I've liked you since… (please eat the chocolates)"
+            />
+            <Label>Choose a card</Label>
+            <Option active={card === null} onClick={() => setCard(null)}>
+              <div className="flex-1">
+                <div className="text-lg font-semibold">No card</div>
+                <p className="text-sm text-muted-foreground">
+                  Let the chocolates do the talking.
+                </p>
+              </div>
+              <span className="text-gold">Included</span>
+            </Option>
             {CARDS.map((c) => (
               <Option
                 key={c.id}
                 active={card === c.id}
-                onClick={() => setCard(card === c.id ? null : c.id)}
+                onClick={() => setCard(c.id)}
               >
                 <OptArt id={c.id} alt={c.name} />
                 <div className="flex-1">
@@ -672,30 +669,17 @@ function Send() {
                 <span className="text-gold">+${c.price}</span>
               </Option>
             ))}
-
             {card && (
-              <div className="rounded-2xl bg-parchment p-5 text-parchment-foreground">
-                <label
-                  htmlFor="card-message"
-                  className="block text-sm font-semibold uppercase tracking-wider"
-                >
-                  Words for your card (optional)
-                </label>
-                <textarea
-                  id="card-message"
-                  value={cardMessage}
-                  onChange={(event) => setCardMessage(event.target.value)}
-                  maxLength={200}
-                  rows={3}
-                  placeholder="A few words they'll keep forever. No pressure."
-                  className="mt-2 w-full resize-none rounded-lg border border-parchment-foreground/30 bg-transparent p-3 text-lg italic outline-none"
-                />
-                <p className="text-right text-xs opacity-60">
-                  {cardMessage.length}/200
-                </p>
-              </div>
+              <MessageField
+                id="card-message"
+                label="Your card message"
+                value={cardMessage}
+                onChange={setCardMessage}
+                maxLength={200}
+                placeholder="A few words they'll keep forever. No pressure."
+              />
             )}
-            <Label>A letter, handwritten by our scribes (optional)</Label>
+            <Label>Add a handwritten note</Label>
             <Option
               active={handwritten}
               onClick={() => setHandwritten(!handwritten)}
@@ -703,31 +687,22 @@ function Send() {
               <OptArt id="quill" alt={HANDWRITTEN.name} />
               <div className="flex-1">
                 <div className="text-lg font-semibold">{HANDWRITTEN.name}</div>
-                <p className="text-muted-foreground">{HANDWRITTEN.desc}</p>
+                <p className="text-muted-foreground">
+                  A pretend letter, penned by our scribes. Leave it blank if you
+                  like.
+                </p>
               </div>
               <span className="text-gold">+${HANDWRITTEN.price}</span>
             </Option>
             {handwritten && (
-              <div>
-                <label
-                  htmlFor="handwritten-message"
-                  className="mb-2 block text-sm text-gold"
-                >
-                  Your handwritten letter
-                </label>
-                <textarea
-                  id="handwritten-message"
-                  value={handText}
-                  onChange={(e) => setHandText(e.target.value)}
-                  maxLength={300}
-                  rows={4}
-                  placeholder="Say it. The thing you rehearse in the shower."
-                  className="w-full resize-none rounded-2xl bg-parchment p-4 font-serif text-lg italic text-parchment-foreground outline-none"
-                />
-                <p className="text-right text-xs text-muted-foreground">
-                  {handText.length}/300
-                </p>
-              </div>
+              <MessageField
+                id="handwritten-message"
+                label="Your handwritten letter"
+                value={handText}
+                onChange={setHandText}
+                maxLength={300}
+                placeholder="Say it. The thing you rehearse in the shower."
+              />
             )}
           </>
         )}
@@ -828,7 +803,12 @@ function Send() {
               <Row k="To" v={to} />
               <Row k="From" v={from} />
               {note && <Row k="Confession" v={note} />}
-              {handwritten && <Row k="Handwritten note" v={handText} />}
+              {handwritten && (
+                <Row
+                  k="Handwritten note"
+                  v={handText.trim() || "No message added"}
+                />
+              )}
               <div className="border-t pt-3">
                 <p className="text-sm text-gold">Price breakdown</p>
                 <Row
@@ -976,6 +956,45 @@ function Send() {
         </GoldButton>
       </div>
     </Shell>
+  );
+}
+
+function MessageField({
+  id,
+  label,
+  value,
+  onChange,
+  maxLength,
+  placeholder,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  maxLength: number;
+  placeholder: string;
+}) {
+  return (
+    <div className="rounded-2xl bg-parchment p-5 text-parchment-foreground">
+      <label
+        htmlFor={id}
+        className="block text-sm font-semibold uppercase tracking-wider"
+      >
+        {label}
+      </label>
+      <textarea
+        id={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        maxLength={maxLength}
+        rows={4}
+        placeholder={placeholder}
+        className="mt-2 w-full resize-none rounded-lg border border-parchment-foreground/30 bg-transparent p-3 font-serif text-lg italic outline-none focus-visible:ring-2 focus-visible:ring-gold"
+      />
+      <p className="mt-1 text-right text-xs opacity-60">
+        {value.length}/{maxLength}
+      </p>
+    </div>
   );
 }
 

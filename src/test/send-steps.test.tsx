@@ -67,6 +67,40 @@ beforeEach(() => {
   sessionStorage.clear();
 });
 describe("Send step arrangement", () => {
+  it("continues and sends a pretend gift with every message blank, including paid note and card", async () => {
+    render(<Send />);
+    const next = () => fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    next();
+    fireEvent.click(screen.getByRole("button", { name: "Finish brewing" }));
+    next();
+    next();
+    next();
+    expect(screen.getByText("Step 5 of 8")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^No card/ })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: /Vintage Valentine/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Handwritten Love Note/ }));
+    for (const label of ["Your confession", "Your card message", "Your handwritten letter"]) {
+      expect(screen.getByLabelText(label)).toHaveValue("");
+      expect(screen.getByLabelText(label)).not.toBeRequired();
+    }
+    expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
+    next();
+    next();
+    fireEvent.change(screen.getByLabelText("To my beloved"), { target: { value: "Beloved" } });
+    fireEvent.change(screen.getByLabelText("From your admirer"), { target: { value: "Admirer" } });
+    next();
+    expect(screen.getByText("No message added")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Seal My Fate" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "Seal My Fate" }));
+    await waitFor(() => expect(guest.orders()).toHaveLength(1));
+    expect(guest.orders()[0]?.gift).toMatchObject({ note: "", handwritten: "", card: "vintage" });
+    expect(guest.orders()[0]?.gift?.cardMessage).toBeUndefined();
+  });
+
   it("keeps all writing together, preserves it through editing, and includes it in the gift", async () => {
     render(<Send />);
     const next = () => fireEvent.click(screen.getByRole("button", { name: "Continue" }));
@@ -83,11 +117,11 @@ describe("Send step arrangement", () => {
       target: { value: "A confession for you" },
     });
     fireEvent.click(screen.getByRole("button", { name: /Vintage Valentine/ }));
-    fireEvent.change(screen.getByLabelText("Words for your card (optional)"), {
+    fireEvent.change(screen.getByLabelText("Your card message"), {
       target: { value: "A card to keep" },
     });
     fireEvent.click(screen.getByRole("button", { name: /Handwritten Love Note/ }));
-    expect(screen.getByRole("button", { name: "Continue" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
     fireEvent.change(screen.getByLabelText("Your handwritten letter"), {
       target: { value: "A letter from me" },
     });
@@ -104,7 +138,7 @@ describe("Send step arrangement", () => {
     expect(screen.getByText("A card to keep")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Edit Note & Card" }));
     expect(screen.getByLabelText("Your handwritten letter")).toHaveValue("A letter from me");
-    expect(screen.getByLabelText("Words for your card (optional)")).toHaveValue("A card to keep");
+    expect(screen.getByLabelText("Your card message")).toHaveValue("A card to keep");
     next();
     next();
     next();

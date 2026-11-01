@@ -9,6 +9,8 @@ import { GoldButton, Shell } from "@/components/kit";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { CONFESSION_LIMIT, validConfession } from "@/lib/confession";
+import { ShowMore, useShowMore } from "@/components/blend-browse";
+
 import sampleUnboxing from "@/assets/album-unboxing.jpg";
 import sampleBite from "@/assets/album-firstbite.jpg";
 import sampleKeepsake from "@/assets/album-keepsake.jpg";

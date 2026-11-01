@@ -1,11 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import hero from "@/assets/hero.jpg";
-import homeAsset from "@/assets/shot-home.jpg.asset.json";
-import boxAsset from "@/assets/shot-box.jpg.asset.json";
-import potionsAsset from "@/assets/shot-potions.jpg.asset.json";
-import extrasAsset from "@/assets/shot-extras.jpg.asset.json";
-import biteAsset from "@/assets/shot-bite.jpg.asset.json";
+import homeScreenshot from "@/assets/shot-home.jpg";
+const homeAsset = { url: homeScreenshot };
+import boxScreenshot from "@/assets/shot-box.jpg";
+const boxAsset = { url: boxScreenshot };
+import potionsScreenshot from "@/assets/shot-potions.jpg";
+const potionsAsset = { url: potionsScreenshot };
+import extrasScreenshot from "@/assets/shot-extras.jpg";
+const extrasAsset = { url: extrasScreenshot };
+import biteScreenshot from "@/assets/shot-bite.jpg";
+const biteAsset = { url: biteScreenshot };
 import grand from "@/assets/box-grand.jpg";
 import { OptArt } from "@/components/opt-art";
 

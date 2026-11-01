@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { demo, giftLink } from "@/lib/demo";
 import { type GiftDetails, guest } from "@/lib/guest";
 import {
   TIERS,
@@ -167,15 +167,7 @@ function Send() {
 
   async function submit() {
     setBusy(true);
-    const u = { user: null as null | { id: string } };
-    let error: unknown = null;
     const giftId = crypto.randomUUID();
-    const { error: giftError } = await supabase.from("gifts").insert({ id: giftId });
-    if (giftError) {
-      setBusy(false);
-      toast.error("The owl could not register your parcel. Please try again.");
-      return;
-    }
     const details: GiftDetails = {
       id: giftId,
       to: to.trim(),
@@ -200,64 +192,35 @@ function Send() {
       note: note.trim(),
     });
     qs.set("details", JSON.stringify(details));
-    const url = `${window.location.origin}/gift?${qs}`;
-    if (u.user) {
-      ({ error } = await supabase.from("orders").insert({
+    const url = giftLink(qs);
+    try {
+      guest.addOrder({
+        id: giftId,
         tier,
-        strength,
-        aroma,
-        duration: durId,
-        sender_name: from.trim(),
         recipient_name: to.trim(),
-        note: note.trim() || null,
         total,
-        share_on_wall: share,
-        addons: [
-          handwritten ? "handwritten" : null,
-          card ? `card:${card}` : null,
-          `pack:${packaging}`,
-          `ship:${delivery}`,
-          antidote ? "antidote" : null,
-          ...keepsakes.map((k) => `keep:${k}`),
-        ].filter(Boolean) as string[],
-        handwritten_text: handwritten ? handText.trim() : null,
+        created_at: details.createdAt!,
+        gift_id: giftId,
+        gift_url: url,
+        gift: details,
         potions: potionResult?.recipeIds ?? potions,
-        outcome: outcome?.name ?? null,
-      }));
-    } else {
-      try {
-        guest.addOrder({
-          id: giftId,
-          tier,
-          recipient_name: to.trim(),
-          total,
-          created_at: details.createdAt!,
-          gift_id: giftId,
-          gift_url: url,
-          gift: details,
-          potions: potionResult?.recipeIds ?? potions,
-          potion_result: potionResult,
-        });
-      } catch {
-        setBusy(false);
-        toast.error(
-          "Your device could not save this gift. Please free some browser storage and try again.",
-        );
-        return;
-      }
-      if (share)
-        ({ error } = await supabase.from("confessions").insert({
+        potion_result: potionResult,
+      });
+      if (share && note.trim())
+        demo.addConfession({
           tier,
           strength,
           aroma,
-          note: note.trim().slice(0, 200) || null,
+          note: note.trim(),
           potions,
           outcome: outcome?.name ?? null,
-        }));
+        });
+    } catch {
+      setBusy(false);
+      toast.error("Your browser could not save this gift. Please free some storage and try again.");
+      return;
     }
     setBusy(false);
-    if (error)
-      toast.error("Your gift is saved, but its confession could not be posted to the Wall.");
     setSavedGift(details);
     setGiftUrl(url);
     setSent(true);
@@ -303,7 +266,8 @@ function Send() {
                 Step 1 · Send them their gift link
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                It opens their unboxing. We'll tell you the moment they take a bite.
+                It opens their unboxing. Opening and bite activity is recorded only on the device
+                used to open it.
               </p>
               <button
                 onClick={async () => {
@@ -318,7 +282,7 @@ function Send() {
             <GoldButton
               onClick={async () => {
                 const text = `I just spent $${total.toFixed(2)} on love-potion chocolates to make ${to} love me. Pray for me.`;
-                const url = window.location.origin;
+                const url = window.location.href.split("#")[0]!;
                 const file = await makeShareCard({
                   total,
                   to,
@@ -750,7 +714,7 @@ function Send() {
               <div className="flex-1">
                 <div className="font-semibold">Share anonymously on the Wall</div>
                 <p className="text-sm text-muted-foreground">
-                  Your confession only. Never your name or theirs.
+                  Your confession only, saved on this browser’s demo Wall.
                 </p>
               </div>
             </Option>

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useMemo, useState } from "react";
+import { demo } from "@/lib/demo";
 import { ALL_BOXES, PACKAGING, KEEPSAKES, CARDS } from "@/lib/catalog";
 import { BOX_ART } from "@/lib/art";
 import { guest, type GiftDetails } from "@/lib/guest";
@@ -82,7 +82,7 @@ function readDetails(s: Search): GiftDetails {
 }
 function Gift() {
   const s = Route.useSearch();
-  const gift = readDetails(s);
+  const gift = useMemo(() => readDetails(s), [s]);
   const [stage, setStage] = useState<"sealed" | "note" | "open" | "bitten">("sealed");
   const [replaying, setReplaying] = useState(false);
   useEffect(() => {
@@ -99,12 +99,8 @@ function Gift() {
     } catch {
       /* The gift remains usable if device storage is full. */
     }
-    if (!replaying)
-      void supabase.rpc("mark_gift", {
-        _id: gift.id,
-        _event: stage === "bitten" ? "bite" : "open",
-      });
-  }, [stage, s.id, s.preview, replaying]);
+    if (!replaying) demo.markGift(gift.id, stage === "bitten" ? "bite" : "open");
+  }, [stage, s.id, s.preview, replaying, gift]);
   function replay() {
     setReplaying(true);
     setStage("sealed");

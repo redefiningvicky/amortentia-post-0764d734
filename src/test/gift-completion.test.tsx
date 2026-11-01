@@ -25,6 +25,7 @@ vi.mock("@/components/kit", () => ({
 }));
 import { Route } from "@/routes/gift";
 import { guest } from "@/lib/guest";
+import { demo } from "@/lib/demo";
 const Gift = Route.options.component as ComponentType;
 afterEach(cleanup);
 beforeEach(() => {
@@ -57,9 +58,9 @@ describe("Recipient unboxing", () => {
     render(<Gift />);
     fireEvent.click(screen.getByRole("button", { name: "Skip Animation" }));
     expect(guest.received()).toHaveLength(1);
-    expect(state.rpc).toHaveBeenCalledWith("mark_gift", { _id: "gift-one", _event: "open" });
+    expect(demo.giftStatus(["gift-one"])[0]?.opened_at).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Take a Bite" }));
-    expect(state.rpc).toHaveBeenCalledWith("mark_gift", { _id: "gift-one", _event: "bite" });
+    expect(demo.giftStatus(["gift-one"])[0]?.bitten_at).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Replay Unboxing" }));
     expect(guest.received()).toHaveLength(1);
   });

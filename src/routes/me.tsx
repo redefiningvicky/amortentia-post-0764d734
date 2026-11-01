@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { demo } from "@/lib/demo";
 import { ALL_BOXES } from "@/lib/catalog";
 import { guest, type GiftDetails } from "@/lib/guest";
 import { Shell } from "@/components/kit";
@@ -47,8 +47,7 @@ function Me() {
   const { data } = useQuery({
     queryKey: ["me"],
     queryFn: async () => {
-      const user = null as null | { id: string; email?: string };
-      if (!user) {
+      {
         const p = guest.profile();
         return {
           user: null,
@@ -71,31 +70,6 @@ function Me() {
           ] as Order[],
         };
       }
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .maybeSingle();
-      let avatar = profile?.avatar_url ?? null;
-      if (avatar && !avatar.startsWith("http"))
-        avatar =
-          (await supabase.storage.from("avatars").createSignedUrl(avatar, 3600)).data?.signedUrl ??
-          null;
-      const { data: orders } = await supabase
-        .from("orders")
-        .select("*")
-        .order("created_at", { ascending: false });
-      return {
-        user,
-        displayName: profile?.display_name ?? "",
-        email: user.email ?? "",
-        avatar,
-        orders: (orders ?? []).map((o) => ({
-          ...o,
-          total: Number(o.total),
-          mine: o.sender_id === user.id,
-        })) as Order[],
-      };
     },
   });
 
@@ -104,7 +78,7 @@ function Me() {
     queryKey: ["gift-status", giftIds],
     enabled: giftIds.length > 0,
     refetchInterval: 15000,
-    queryFn: async () => (await supabase.rpc("gift_status", { _ids: giftIds })).data ?? [],
+    queryFn: async () => demo.giftStatus(giftIds),
   });
 
   if (!data)
@@ -127,20 +101,10 @@ function Me() {
       r.readAsDataURL(f);
       return;
     }
-    const path = `${data!.user.id}/avatar-${Date.now()}`;
-    const { error } = await supabase.storage.from("avatars").upload(path, f, { upsert: true });
-    if (error) {
-      toast.error("Upload failed");
-      return;
-    }
-    await supabase.from("profiles").update({ avatar_url: path }).eq("id", data!.user.id);
-    qc.invalidateQueries({ queryKey: ["me"] });
   }
   async function saveName() {
     if (name === null) return;
-    if (data!.user)
-      await supabase.from("profiles").update({ display_name: name }).eq("id", data!.user.id);
-    else guest.saveProfile({ ...guest.profile(), display_name: name });
+    guest.saveProfile({ ...guest.profile(), display_name: name });
     setName(null);
     qc.invalidateQueries({ queryKey: ["me"] });
     toast.success("Name saved");
@@ -281,10 +245,13 @@ function Tracker({
     ? "They ate it. The potion is in their system."
     : s?.opened_at
       ? "They opened it… but haven't bitten. Come ON."
-      : "Waiting for them to open their gift link…";
+      : "Waiting for this gift to be opened on this device…";
   return (
     <div className="mt-3 border-t pt-3">
       <p className="text-sm text-gold">Did they eat it yet?</p>
+      <p className="text-xs text-muted-foreground">
+        Demo activity on this browser only; other devices do not sync.
+      </p>
       <ol className="mt-2 flex gap-1">
         {steps.map((x) => (
           <li key={x.label} className="flex-1 text-center">

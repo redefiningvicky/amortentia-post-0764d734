@@ -2,10 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { demo, DEMO_CONFESSIONS, type DemoConfession } from "@/lib/demo";
 import { restoreRecipe } from "@/lib/recipe";
 import { guest } from "@/lib/guest";
-import type { Database } from "@/integrations/supabase/types";
 import { findBrewable, STRENGTHS, ALL_BOXES } from "@/lib/catalog";
 import { GoldButton, Shell } from "@/components/kit";
 import { Button } from "@/components/ui/button";
@@ -177,7 +176,7 @@ function Wall() {
   const [confession, setConfession] = useState("");
   const [posting, setPosting] = useState(false);
   // Pretend posting: the confession shows in this session only, never saved to the Wall.
-  const [localConfessions, setLocalConfessions] = useState<
+  const [localConfessions] = useState<
     {
       id: string;
       note: string;
@@ -195,33 +194,26 @@ function Wall() {
     setPosting(true);
     await new Promise((r) => setTimeout(r, 700));
     setPosting(false);
-    setLocalConfessions((prev) => [
-      {
-        id: `local-${Date.now()}`,
-        note: confession.trim(),
-        tier: "confession",
-        strength: "swoon",
-        aroma: "rose",
-        potions: [],
-        swoon_count: 0,
-        created_at: new Date().toISOString(),
-        outcome: null,
-      },
-      ...prev,
-    ]);
+    demo.addConfession({
+      note: confession.trim(),
+      tier: "confession",
+      strength: "swoon",
+      aroma: "rose",
+      potions: [],
+      outcome: "No Potion Needed",
+    });
+    qc.invalidateQueries({ queryKey: ["confessions"] });
     setConfession("");
     setConfessing(false);
     setSort("new");
-    toast.success("Your confession is on the Wall for this visit. Names stay secret.");
+    toast.success("Your confession is on the Wall on this browser. Names stay secret.");
   }
   const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {
     setUserId(null);
   }, []);
 
-  const [cachedConfessions, setCachedConfessions] = useState<
-    Database["public"]["Tables"]["confessions"]["Row"][]
-  >([]);
+  const [cachedConfessions, setCachedConfessions] = useState<DemoConfession[]>([]);
   useEffect(() => {
     try {
       const saved: unknown = JSON.parse(localStorage.getItem("ap-wall-cache-v1") ?? "null");
@@ -241,13 +233,7 @@ function Wall() {
   } = useQuery({
     queryKey: ["confessions", sort],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("confessions")
-        .select("*")
-        .order(sort === "hot" ? "swoon_count" : "created_at", { ascending: false })
-        .limit(100);
-      if (error) throw error;
-      return data;
+      return demo.confessions();
     },
   });
   useEffect(() => {
@@ -259,15 +245,13 @@ function Wall() {
       /* Continue browsing if storage is full. */
     }
   }, [liveRows]);
-  const rows = liveRows ?? cachedConfessions;
+  const rows = liveRows ?? (cachedConfessions.length ? cachedConfessions : DEMO_CONFESSIONS);
   const [guestSwoons, setGuestSwoons] = useState<string[]>([]);
   useEffect(() => setGuestSwoons(guest.swoons()), []);
   const { data: dbSwoons = [] } = useQuery({
     queryKey: ["my-swoons", userId],
     enabled: !!userId,
-    queryFn: async () =>
-      (await supabase.from("swoons").select("confession_id")).data?.map((s) => s.confession_id) ??
-      [],
+    queryFn: async () => [] as string[],
   });
   const mine = userId ? dbSwoons : guestSwoons;
   const count = (r: { id: string; swoon_count: number }) =>
@@ -301,13 +285,7 @@ function Wall() {
       setGuestSwoons(next);
       return;
     }
-    const { error } = has
-      ? await supabase.from("swoons").delete().eq("confession_id", id).eq("user_id", userId)
-      : await supabase.from("swoons").insert({ confession_id: id });
-    if (error) {
-      toast.error("Couldn't swoon, try again");
-      return;
-    }
+
     qc.invalidateQueries({ queryKey: ["confessions"] });
     qc.invalidateQueries({ queryKey: ["my-swoons"] });
   }
@@ -316,21 +294,8 @@ function Wall() {
   const [caption, setCaption] = useState("");
   const { data: photos = [] } = useQuery({
     queryKey: ["wall-photos"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("wall_photos")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(60);
-      if (error) throw error;
-      if (!data.length) return [];
-      const { data: signed } = await supabase.storage.from("wall-photos").createSignedUrls(
-        data.map((p) => p.image_path),
-        3600,
-      );
-      const urls = new Map((signed ?? []).map((s) => [s.path, s.signedUrl]));
-      return data.map((p) => ({ ...p, url: urls.get(p.image_path) ?? "" }));
-    },
+    queryFn: async () =>
+      [] as { id: string; url: string; caption: string | null; swoon_count: number }[],
   });
   const photoMine = guestSwoons.filter((s) => s.startsWith("photo:"));
   function swoonPhoto(id: string) {
@@ -345,12 +310,21 @@ function Wall() {
   const [picking, setPicking] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<(typeof SAMPLE_PHOTOS)[number] | null>(null);
   const [pinned, setPinned] = useState<{ id: string; url: string; caption: string }[]>([]);
+  useEffect(() => {
+    setPinned(
+      demo.photos().flatMap((saved) => {
+        const sample = SAMPLE_PHOTOS.find((p) => p.id === saved.sampleId);
+        return sample ? [{ id: saved.id, url: sample.url, caption: saved.caption }] : [];
+      }),
+    );
+  }, []);
   async function pinSample(photo: (typeof SAMPLE_PHOTOS)[number]) {
     setPicking(false);
     setPhotoPreview(null);
     setUploading(true);
     await new Promise((r) => setTimeout(r, 700));
     setUploading(false);
+    demo.pinPhoto(photo.id, caption.trim() || photo.caption);
     setPinned((prev) => [
       { id: `pin-${Date.now()}`, url: photo.url, caption: caption.trim() || photo.caption },
       ...prev,
@@ -374,6 +348,9 @@ function Wall() {
     <Shell>
       <h1 className="font-display text-3xl text-gold-gradient">Secret Admirer Wall</h1>
       <p className="mt-1 text-muted-foreground">Anonymous confessions, sealed in chocolate.</p>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Demo stories from hopeless romantics. Your additions stay on this browser.
+      </p>
       <Dialog open={confessing} onOpenChange={setConfessing}>
         <DialogContent className="max-w-sm border-gold bg-background">
           <DialogHeader>
@@ -404,7 +381,7 @@ function Wall() {
               {confession.length}/{CONFESSION_LIMIT}
             </p>
             <p className="my-3 text-sm text-muted-foreground">
-              Appears as A Secret Admirer for this visit only. Leave out names and contact details.
+              Appears as A Secret Admirer on this browser only. Leave out names and contact details.
             </p>
             <GoldButton type="submit" disabled={!validConfession(confession) || posting}>
               {posting ? "Sealing your secret…" : "Post My Confession"}
@@ -571,10 +548,10 @@ function Wall() {
             <div role="alert" className="mt-4 rounded-xl border border-gold bg-card p-4">
               <p className="text-gold">The owl can’t reach the confession archive.</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                The Wall’s database is temporarily unavailable.
+                Your saved demo stories could not be loaded.
                 {cachedConfessions.length > 0
                   ? " Showing the last saved confessions on this device."
-                  : " Confessions will return when the connection is restored."}
+                  : " Built-in stories remain available below."}
               </p>
               <Button
                 variant="outline"

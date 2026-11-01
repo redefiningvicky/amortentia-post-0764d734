@@ -11,12 +11,16 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:demo": "vite build --config vite.demo.config.ts",
+    "dev:demo": "vite --config vite.demo.config.ts"
   },
   "overrides": {
     "rolldown": "1.2.1"
   },
   "dependencies": {
+    "@fontsource/cinzel-decorative": "^5.3.0",
+    "@fontsource/cormorant-garamond": "^5.3.0",
     "@hookform/resolvers": "^5.2.2",
     "@lovable.dev/cloud-auth-js": "^1.1.2",
     "@radix-ui/react-accordion": "^1.2.12",

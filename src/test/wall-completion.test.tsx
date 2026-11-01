@@ -35,7 +35,7 @@ describe("Completed Wall", () => {
     localStorage.clear();
     queryState.error = new Error("Database unavailable");
     render(<Wall />);
-    expect(screen.getByRole("alert")).toHaveTextContent("database is temporarily unavailable");
+    expect(screen.getByRole("alert")).toHaveTextContent("saved demo stories could not be loaded");
     fireEvent.click(screen.getByRole("button", { name: "Retry Confessions" }));
     expect(queryState.retry).toHaveBeenCalledOnce();
   });

@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { OptArt } from "@/components/opt-art";
 import { Button } from "@/components/ui/button";
+import lovestruckAdmirer from "@/assets/owl-lovestruck-admirer-natural.jpg";
 
 export function RecipientReaction({
   recipient,
@@ -40,6 +41,15 @@ export function RecipientReaction({
       </div>
       {bitten ? (
         <>
+          <figure className="mt-4 overflow-hidden rounded-lg border bg-card">
+            <img
+              src={lovestruckAdmirer}
+              alt="A dreamy red-haired admirer gazing adoringly after a bite of enchanted chocolate"
+              width={1448}
+              height={1086}
+              className="aspect-[4/3] w-full object-cover"
+            />
+          </figure>
           <p role="status" className="mt-4 text-lg">
             {recipient} has developed a sudden, deeply unreasonable affection for you.
           </p>

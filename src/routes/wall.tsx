@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   WALL_CONFESSIONS,
+  dummySwoonCount,
   readWallConfessions,
   addWallConfession,
   type WallConfession,
@@ -262,8 +263,12 @@ function Wall() {
   }
 
   const albumItems = [
-    ...pinned.map((p) => ({ ...p, label: "Your Pinned Memory", swoon_count: 0 })),
-    ...SAMPLE_PHOTOS.map((p) => ({ ...p, swoon_count: 0 })),
+    ...pinned.map((p) => ({
+      ...p,
+      label: "Your Pinned Memory",
+      swoon_count: dummySwoonCount(p.id),
+    })),
+    ...SAMPLE_PHOTOS.map((p) => ({ ...p, swoon_count: dummySwoonCount(p.id) })),
   ];
   const albumPage = useShowMore(albumItems, "album", 6);
   return (

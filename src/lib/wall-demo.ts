@@ -9,6 +9,11 @@ export type WallConfession = {
   created_at: string;
   outcome: string | null;
 };
+// Stable fictional engagement counts; these never change on refresh.
+export function dummySwoonCount(id: string): number {
+  const hash = [...id].reduce((value, char) => (value * 31 + char.charCodeAt(0)) >>> 0, 0);
+  return 50 + (hash % 51);
+}
 const examples = [
   [
     "Written in the Stars",
@@ -80,7 +85,7 @@ export const WALL_CONFESSIONS: WallConfession[] = examples.map(
     outcome,
     note,
     potions: [...potions],
-    swoon_count,
+    swoon_count: swoon_count === 0 ? dummySwoonCount(`demo-confession-${i}`) : swoon_count,
     tier: potions.length ? "true" : "confession",
     strength: "swoon",
     aroma: "rose",
@@ -103,7 +108,10 @@ export function readWallConfessions(): WallConfession[] {
             Array.isArray(row.potions),
         )
       : [];
-    return [...extra, ...WALL_CONFESSIONS];
+    return [
+      ...extra.map((row) => ({ ...row, swoon_count: row.swoon_count || dummySwoonCount(row.id) })),
+      ...WALL_CONFESSIONS,
+    ];
   } catch {
     return [...WALL_CONFESSIONS];
   }
@@ -115,7 +123,7 @@ export function addWallConfession(
     ...value,
     id: `pretend-${crypto.randomUUID()}`,
     created_at: new Date().toISOString(),
-    swoon_count: 0,
+    swoon_count: dummySwoonCount(value.note),
   };
   try {
     sessionStorage.setItem(

@@ -280,7 +280,7 @@ function Wall() {
           <DialogHeader>
             <DialogTitle className="font-display text-xl text-gold">Confess Your Own</DialogTitle>
             <DialogDescription>
-              No names. No purchase. Just the thing you wish you could say.
+              You’ve rehearsed it in the shower. Let’s hear it.
             </DialogDescription>
           </DialogHeader>
           <form
@@ -305,7 +305,7 @@ function Wall() {
               {confession.length}/{CONFESSION_LIMIT}
             </p>
             <p className="my-3 text-sm text-muted-foreground">
-              Appears as A Secret Admirer for this visit only. Leave out names and contact details.
+              Signed “A Secret Admirer” for this visit. No names or numbers—we’re desperate, not detectives.
             </p>
             <GoldButton type="submit" disabled={!validConfession(confession) || posting}>
               {posting ? "Sealing your secret…" : "Post My Confession"}

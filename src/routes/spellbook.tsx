@@ -32,6 +32,7 @@ function Spellbook() {
       <Button variant="outline" aria-pressed={mode === "class"} onClick={() => setMode("class")} className={mode === "class" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}>Brew My Own</Button>
       <Button variant="outline" aria-pressed={mode === "cabinet"} onClick={() => setMode("cabinet")} className={mode === "cabinet" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}>Potion Cabinet</Button>
     </div>
+    <p className="-mt-2 mb-4 text-sm italic text-muted-foreground">{mode === "class" ? "Create a potion from raw ingredients." : "Mix ready-made potions into your own blend."}</p>
     <div className="pb-28">{mode === "class" ? <BrewClass value={potions} onChange={setPotions} onReady={setReady} /> : <PotionCabinet value={potions} onChange={(ids) => { setPotions(ids); setReady(false); }} />}</div>
     {potions.length > 0 && (mode === "cabinet" || ready) && <div className="fixed inset-x-0 bottom-16 z-30 mx-auto max-w-md border-t bg-background/95 px-5 py-3 backdrop-blur">
       <Link to="/send" search={{ blend: potions.join(",") }} className="flex h-14 items-center justify-center rounded-full bg-gold-gradient font-display text-base text-primary-foreground shadow-glow">Send This Blend · +${potionsTotal(potions).toFixed(2)}</Link>

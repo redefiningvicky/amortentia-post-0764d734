@@ -4,7 +4,8 @@ import { GoldButton } from "@/components/kit";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { OptArt } from "@/components/opt-art";
-import { MAX_BLEND, blendOutcome, potionsTotal } from "@/lib/catalog";
+import { INGREDIENTS, MAX_BLEND, blendOutcome, potionsTotal } from "@/lib/catalog";
+import { BlendAnchor, SelectionChips } from "@/components/blend-browse";
 import { PotionResultCard } from "@/components/potion-result-card";
 
 export function BrewClass({ value, onChange, onReady }: { value: string[]; onChange: (ids: string[]) => void; onReady?: (ready: boolean) => void }) {
@@ -21,7 +22,12 @@ export function BrewClass({ value, onChange, onReady }: { value: string[]; onCha
 
   return <section className="space-y-4" aria-label="Cauldron class">
     <div className="pb-3 pt-1">
-      <PotionResultCard ids={value} heading="Cauldron Class" emptyText="Start from scratch: pick up to 5 raw ingredients and brew a potion no one has ever tasted." />
+      <BlendAnchor count={value.length}>
+        <PotionResultCard ids={value} heading="Cauldron Class" emptyText="Start from scratch: pick up to 5 raw ingredients and brew a potion no one has ever tasted.">
+          {stage === "ingredients" && <SelectionChips onRemove={(id) => chooseIngredients(value.filter((x) => x !== id))}
+            items={value.flatMap((id) => { const p = INGREDIENTS.find((x) => x.id === id); return p ? [{ id, name: p.name }] : []; })} />}
+        </PotionResultCard>
+      </BlendAnchor>
     </div>
     {stage === "ingredients" ? <>
       <IngredientShelf value={value} onChange={chooseIngredients} />

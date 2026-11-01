@@ -3,9 +3,9 @@ import { ESSENCES, MAX_BLEND, POTIONS, type EssenceId } from "@/lib/catalog";
 import { PotionResultCard } from "@/components/potion-result-card";
 import { cn } from "@/lib/utils";
 import { bottleStyle } from "@/lib/art";
-import { Icon } from "@/components/icons";
 import { OptArt } from "@/components/opt-art";
 import { Button } from "@/components/ui/button";
+import { BlendAnchor, SelectionChips, ShowMore, useShowMore } from "@/components/blend-browse";
 
 const RARITY_LABEL = { common: "", rare: "Rare", legendary: "Legendary" } as const;
 
@@ -16,29 +16,21 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
     () => POTIONS.filter((p) => (essence === "all" || p.essence === essence) && p.name.toLowerCase().includes(q.toLowerCase())),
     [essence, q],
   );
+  const page = useShowMore(list, `${essence}|${q}`);
   const toggle = (id: string) =>
     value.includes(id) ? onChange(value.filter((x) => x !== id)) : value.length < MAX_BLEND && onChange([...value, id]);
 
   return (
     <div className="space-y-3">
       <div className="pb-3 pt-1">
-        <PotionResultCard ids={value} emptyText="Pick up to 5 potions. Mixing them changes how they fall for you.">
-          {value.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {value.map((id) => {
-                const p = POTIONS.find((x) => x.id === id);
-                if (!p) return null;
-                const e = ESSENCES.find((x) => x.id === p.essence);
-                if (!e) return null;
-                return (
-                  <button key={id} onClick={() => toggle(id)} className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-sm" aria-label={`Remove ${p.name}`}>
-                    <span role="img" aria-label={`${e.name} potion`} className="inline-block h-5 w-4 bg-no-repeat" style={bottleStyle(e.id)} /> {p.name} <Icon name="x" className="h-3.5 w-3.5 opacity-70" />
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </PotionResultCard>
+        <BlendAnchor count={value.length}>
+          <PotionResultCard ids={value} emptyText="Pick up to 5 potions. Mixing them changes how they fall for you.">
+            <SelectionChips onRemove={toggle} items={value.flatMap((id) => {
+              const p = POTIONS.find((x) => x.id === id);
+              return p ? [{ id, name: p.name, art: <span aria-hidden="true" className="inline-block h-5 w-4 bg-no-repeat" style={bottleStyle(p.essence)} /> }] : [];
+            })} />
+          </PotionResultCard>
+        </BlendAnchor>
       </div>
 
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search 110 potions…" aria-label="Search potions"
@@ -56,7 +48,7 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        {list.map((p) => {
+        {page.visible.map((p) => {
           const on = value.includes(p.id);
           const full = !on && value.length >= MAX_BLEND;
           const e = ESSENCES.find((x) => x.id === p.essence)!;
@@ -77,6 +69,7 @@ export function PotionCabinet({ value, onChange }: { value: string[]; onChange: 
         })}
         {list.length === 0 && <p className="col-span-2 py-6 text-center text-muted-foreground">No potion by that name… yet.</p>}
       </div>
+      <ShowMore shown={page.shown} total={page.total} noun="potions" onMore={page.more} />
     </div>
   );
 }

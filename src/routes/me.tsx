@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_BOXES } from "@/lib/catalog";
-import { guest } from "@/lib/guest";
+import { guest, type GiftDetails } from "@/lib/guest";
 import { Shell } from "@/components/kit";
 import { OptArt } from "@/components/opt-art";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/me")({
   component: Me,
 });
 
-type Order = { gift_id?: string; gift_url?: string; id: string; tier: string; recipient_name: string; total: number; created_at: string; mine: boolean; potions?: string[]; potion_result?: PotionResult | null };
+type Order = { gift?: GiftDetails; gift_id?: string; gift_url?: string; id: string; tier: string; recipient_name: string; total: number; created_at: string; mine: boolean; potions?: string[]; potion_result?: PotionResult | null };
 
 function Me() {
   const qc = useQueryClient();
@@ -38,8 +38,8 @@ function Me() {
       const user = null as null | { id: string; email?: string };
       if (!user) {
         const p = guest.profile();
-        return { user: null, displayName: p.display_name, email: "Ramona", avatar: p.avatar,
-          orders: guest.orders().map((o) => ({ ...o, mine: true })) as Order[] };
+        return { user: null, displayName: p.display_name, email: "", avatar: p.avatar,
+          orders: [...guest.orders().map((o) => ({ ...o, mine: true })), ...guest.received().map((g) => ({ id: `received-${g.id}`, gift_id: g.id, tier: g.tier, recipient_name: g.to, created_at: g.createdAt ?? g.receivedAt, total: 0, mine: false, gift: g, potions: g.potions }))] as Order[] };
       }
       const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
       let avatar = profile?.avatar_url ?? null;
@@ -118,10 +118,13 @@ function Me() {
           <div key={o.id} className="rounded-2xl border bg-card p-4">
             <div className="flex justify-between">
               <span className="font-semibold">{tab === "sent" ? `To ${o.recipient_name}` : "From a Secret Admirer"}</span>
-              <span className="text-gold">${o.total.toFixed(2)}</span>
+              {o.mine && <span className="text-gold">${o.total.toFixed(2)}</span>}
             </div>
             <p className="text-sm text-muted-foreground">{ALL_BOXES.find((t) => t.id === o.tier)?.name} · {new Date(o.created_at).toLocaleDateString()}</p>
             {o.potions && o.potions.length > 0 && <PotionResultCard ids={o.potions} result={o.potion_result} heading="Saved potion result" showRecipe embedded />}
+            {o.mine && <DeliveryJourney createdAt={o.created_at} />}
+            {o.gift && <Link to="/gift" search={{ id: o.gift.id, to: o.gift.to, from: o.gift.from, tier: o.gift.tier, blend: o.gift.blend, note: o.gift.note, details: JSON.stringify(o.gift), preview: o.mine }} className="mt-3 inline-flex min-h-11 items-center rounded-full border border-gold px-4 text-sm text-gold">{o.mine ? "Preview Unboxing" : "Open My Gift"}</Link>}
+            {!o.gift && o.gift_url && <a href={`${o.gift_url}&preview=true`} className="mt-3 inline-flex min-h-11 items-center text-gold underline">Preview Unboxing</a>}
             {tab === "sent" && o.gift_id && <Tracker s={status?.find((x) => x.id === o.gift_id)} url={o.gift_url} />}
           </div>
         ))}
@@ -132,7 +135,6 @@ function Me() {
 
 function Tracker({ s, url }: { s: { opened_at: string | null; bitten_at: string | null } | undefined; url: string | undefined }) {
   const steps = [
-    { label: "Owl departed", done: true },
     { label: "Box opened", done: !!s?.opened_at },
     { label: "First bite taken", done: !!s?.bitten_at },
     { label: "Symptoms detected", done: !!s?.bitten_at },
@@ -150,9 +152,25 @@ function Tracker({ s, url }: { s: { opened_at: string | null; bitten_at: string 
         ))}
       </ol>
       <p className="mt-2 text-sm text-muted-foreground">{now}</p>
-      {url && !s?.opened_at && (
+      {url && (
         <button onClick={async () => { await navigator.clipboard.writeText(url); toast.success("Gift link copied"); }} className="mt-2 min-h-10 text-sm text-gold underline">Copy their gift link again</button>
       )}
     </div>
   );
+}
+
+
+function DeliveryJourney({ createdAt }: { createdAt: string }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 10000); return () => window.clearInterval(timer); }, []);
+  const created = Date.parse(createdAt);
+  if (!Number.isFinite(created)) return <p className="mt-3 text-sm text-muted-foreground">Tracking unavailable for this earlier order.</p>;
+  const steps = [
+    { label: "Brewing", update: "Our scribes are pretending this is a sensible purchase." },
+    { label: "Wax Sealed", update: "Your dignity has been sealed inside. No refunds on that." },
+    { label: "Owl Departed", update: "Your owl has departed. It has been instructed not to eat the parcel." },
+    { label: "Delivered", update: "Your parcel has arrived. Your composure has not." },
+  ];
+  const current = Math.max(0, Math.min(3, Math.floor((now - created) / 60000)));
+  return <section className="mt-3 border-t pt-3" aria-label="Delivery tracking"><p className="text-xs text-muted-foreground">Simulated owl-post journey</p><ol className="mt-2 space-y-2">{steps.map((step, index) => <li key={step.label} aria-current={index === current ? "step" : undefined} className={cn("rounded-lg border p-2 text-sm", index <= current ? "border-gold text-gold" : "text-muted-foreground")}><span>{step.label}</span><span className="float-right text-xs">{index < current ? "Complete" : index === current ? "Current" : "Upcoming"}</span></li>)}</ol><p className="mt-2 text-sm text-muted-foreground">{steps[current]!.update}</p></section>;
 }

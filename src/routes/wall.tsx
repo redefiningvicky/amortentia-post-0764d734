@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { restoreRecipe } from "@/lib/recipe";
 import { guest } from "@/lib/guest";
 import { findBrewable, STRENGTHS, ALL_BOXES } from "@/lib/catalog";
 import { GoldButton, Shell } from "@/components/kit";
@@ -66,6 +67,9 @@ const SAMPLE_PHOTOS = [
 
 function Wall() {
   const qc = useQueryClient();
+  const [rankingsOpen, setRankingsOpen] = useState(true);
+  useEffect(() => { try { setRankingsOpen(localStorage.getItem("ap-rankings-open") !== "false"); } catch {} }, []);
+
   const [tab, setTab] = useState<"confessions" | "album">("confessions");
   const [sort, setSort] = useState<"hot" | "new">("hot");
   const [confessing, setConfessing] = useState(false);
@@ -80,7 +84,7 @@ function Wall() {
     setPosting(false);
     setLocalConfessions((prev) => [{ id: `local-${Date.now()}`, note: confession.trim(), tier: "confession", strength: "swoon", aroma: "rose", potions: [], swoon_count: 0, created_at: new Date().toISOString(), outcome: null }, ...prev]);
     setConfession(""); setConfessing(false); setSort("new");
-    toast.success("Your confession is on the Wall. Names stay secret.");
+    toast.success("Your confession is on the Wall for this visit. Names stay secret.");
   }
   const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {
@@ -111,7 +115,7 @@ function Wall() {
   const trending = [...scores.entries()].map(([name, score]) => ({ id: name, name, score })).sort((a, b) => b.score - a.score).slice(0, 5);
 
   // Confession feed: 10 at a time; changing the sort starts over at 10.
-  const feed = [...localConfessions, ...rows];
+  const feed = [...localConfessions, ...rows].sort((a, b) => sort === "hot" ? count(b) - count(a) : Date.parse(b.created_at) - Date.parse(a.created_at));
   const { visible: feedVisible, shown: feedShown, total: feedTotal, more: showMoreConfessions } = useShowMore(feed, sort);
 
 
@@ -150,9 +154,10 @@ function Wall() {
   }
   // Pretend pinning: pick a sample memory; it shows in this session only, nothing is uploaded.
   const [picking, setPicking] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<(typeof SAMPLE_PHOTOS)[number] | null>(null);
   const [pinned, setPinned] = useState<{ id: string; url: string; caption: string }[]>([]);
   async function pinSample(photo: (typeof SAMPLE_PHOTOS)[number]) {
-    setPicking(false);
+    setPicking(false); setPhotoPreview(null);
     setUploading(true);
     await new Promise((r) => setTimeout(r, 700));
     setUploading(false);
@@ -161,6 +166,12 @@ function Wall() {
     toast.success("Pinned to the album");
   }
 
+  const albumItems = [
+    ...pinned.map((p) => ({ ...p, label: "Your Pinned Memory", swoon_count: 0 })),
+    ...photos.map((p) => ({ ...p, label: "A Secret Admirer’s Memory", caption: p.caption ?? "", swoon_count: p.swoon_count ?? 0 })),
+    ...SAMPLE_PHOTOS.map((p) => ({ ...p, swoon_count: 0 })),
+  ];
+  const albumPage = useShowMore(albumItems, "album", 6);
   return (
     <Shell>
       <h1 className="font-display text-3xl text-gold-gradient">Secret Admirer Wall</h1>
@@ -177,7 +188,7 @@ function Wall() {
               placeholder="I rehearsed saying hello. Then I said ‘you too’ when you said happy birthday."
               className="mt-2 w-full resize-none rounded-lg bg-parchment p-4 text-lg italic text-parchment-foreground" />
             <p className="mt-1 text-right text-xs text-muted-foreground">{confession.length}/{CONFESSION_LIMIT}</p>
-            <p className="my-3 text-sm text-muted-foreground">Posted publicly as A Secret Admirer. Leave out names, contact details, and anything that identifies someone.</p>
+            <p className="my-3 text-sm text-muted-foreground">Appears as A Secret Admirer for this visit only. Leave out names and contact details.</p>
             <GoldButton type="submit" disabled={!validConfession(confession) || posting}>{posting ? "Sealing your secret…" : "Post My Confession"}</GoldButton>
           </form>
         </DialogContent>
@@ -193,7 +204,7 @@ function Wall() {
         <section className="mt-4">
           <div className="rounded-2xl border border-gold bg-card p-4">
             <p className="font-display text-lg text-gold-gradient">Pin a memory</p>
-            <p className="text-sm text-muted-foreground">Your box, their smile, the aftermath. Always anonymous.</p>
+            <p className="text-sm text-muted-foreground">Your box, their smile, the aftermath. Your name is not displayed.</p>
             <input value={caption} onChange={(e) => setCaption(e.target.value)} maxLength={140} placeholder="Caption (optional)"
               aria-label="Photo caption" className="mt-3 h-12 w-full rounded-xl border bg-background px-4 outline-none focus:border-gold" />
             <button onClick={() => setPicking(true)} disabled={uploading}
@@ -205,11 +216,11 @@ function Wall() {
             <DialogContent className="max-h-[80vh] max-w-sm overflow-y-auto border-gold bg-background">
               <DialogHeader>
                 <DialogTitle className="font-display text-xl text-gold">Choose a Photo</DialogTitle>
-                <DialogDescription>Pick a memory from your camera roll.</DialogDescription>
+                <DialogDescription>Choose a memory from the shop’s collection.</DialogDescription>
               </DialogHeader>
               <div className="grid grid-cols-2 gap-2">
                 {SAMPLE_PHOTOS.map((photo) => (
-                  <button key={photo.id} onClick={() => void pinSample(photo)} className="overflow-hidden rounded-xl border text-left transition hover:border-gold">
+                  <button key={photo.id} onClick={() => { setPicking(false); setPhotoPreview(photo); }} className="overflow-hidden rounded-xl border text-left transition hover:border-gold">
                     <img src={photo.url} alt={photo.label} loading="lazy" className="aspect-square w-full object-cover" />
                     <span className="block p-2 text-xs text-muted-foreground">{photo.label}</span>
                   </button>
@@ -217,59 +228,34 @@ function Wall() {
               </div>
             </DialogContent>
           </Dialog>
-          {pinned.length > 0 && (
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              {pinned.map((p) => (
-                <figure key={p.id} className="overflow-hidden rounded-2xl border border-gold bg-card">
-                  <img src={p.url} alt={p.caption} loading="lazy" className="aspect-square w-full object-cover" />
-                  <figcaption className="flex items-center justify-between gap-2 p-2 text-sm">
-                    <span className="line-clamp-1 flex-1 text-muted-foreground">{p.caption}</span>
-                    <button onClick={() => swoonPhoto(p.id)} aria-pressed={photoMine.includes(`photo:${p.id}`)} aria-label="Swoon for this photo"
-                      className={cn("flex min-h-9 items-center gap-1 rounded-full border px-2", photoMine.includes(`photo:${p.id}`) && "bg-accent text-accent-foreground")}>
-                      <OptArt id="heart" alt="" className="h-4 w-4 rounded-full object-cover" /> {photoMine.includes(`photo:${p.id}`) ? 1 : 0}
-                    </button>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          )}
-          {photos.length === 0 ? (
-            <p className="mt-6 text-center text-muted-foreground">Your real memory could be the first.</p>
-          ) : (
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              {photos.map((p) => (
-                <figure key={p.id} className="overflow-hidden rounded-2xl border bg-card">
-                  {p.url && <img src={p.url} alt={p.caption ?? "A secret admirer's photo"} loading="lazy" className="aspect-square w-full object-cover" />}
-                  <figcaption className="flex items-center justify-between gap-2 p-2 text-sm">
-                    <span className="line-clamp-1 flex-1 text-muted-foreground">{p.caption ?? "— A Secret Admirer"}</span>
-                    <button onClick={() => swoonPhoto(p.id)} aria-pressed={photoMine.includes(`photo:${p.id}`)} aria-label="Swoon for this photo"
-                      className={cn("flex min-h-9 items-center gap-1 rounded-full border px-2", photoMine.includes(`photo:${p.id}`) && "bg-accent text-accent-foreground")}>
-                      <OptArt id="heart" alt="" className="h-4 w-4 rounded-full object-cover" /> {p.swoon_count + (photoMine.includes(`photo:${p.id}`) ? 1 : 0)}
-                    </button>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          )}
+          <Dialog open={!!photoPreview} onOpenChange={(open) => { if (!open) setPhotoPreview(null); }}>
+            <DialogContent className="max-h-[85dvh] max-w-sm overflow-y-auto border-gold bg-background"><DialogHeader><DialogTitle>Pin This Memory?</DialogTitle><DialogDescription>Your chosen memory appears in this visit’s album.</DialogDescription></DialogHeader>
+              {photoPreview && <img src={photoPreview.url} alt={photoPreview.label} className="aspect-square w-full rounded-lg object-cover" />}
+              <input aria-label="Preview photo caption" value={caption} onChange={(e) => setCaption(e.target.value)} maxLength={140} placeholder="Caption (optional)" className="h-12 rounded-lg border bg-card px-3" />
+              <GoldButton disabled={uploading} onClick={() => photoPreview && void pinSample(photoPreview)}>Pin My Memory</GoldButton>
+              <Button variant="outline" onClick={() => setPhotoPreview(null)}>Cancel</Button>
+            </DialogContent>
+          </Dialog>
           <h2 className="mt-6 font-display text-lg text-gold">A little album inspiration</h2>
-          <p className="mt-1 text-xs text-muted-foreground">AI-generated sample memories — not real customer submissions.</p>
           <div className="mt-3 grid grid-cols-2 gap-3">
-            {SAMPLE_PHOTOS.map((photo) => (
+            {albumPage.visible.map((photo) => (
               <figure key={photo.id} className="overflow-hidden rounded-lg border bg-card">
-                <img src={photo.url} alt={photo.caption} width={816} height={816} loading="lazy" className="aspect-square w-full object-cover" />
-                <figcaption className="p-3 text-sm text-muted-foreground"><span className="mb-1 block text-xs uppercase text-gold">{photo.label}</span>{photo.caption}</figcaption>
+                {photo.url && <img src={photo.url} alt={photo.caption || photo.label} loading="lazy" className="aspect-square w-full object-cover" />}
+                <figcaption className="p-3 text-sm text-muted-foreground"><span className="mb-1 block text-xs uppercase text-gold">{photo.label}</span>{photo.caption}
+                  <button onClick={() => swoonPhoto(photo.id)} aria-pressed={photoMine.includes(`photo:${photo.id}`)} aria-label={`Swoon for ${photo.label}`} className={cn("mt-2 flex min-h-11 items-center gap-2 rounded-full border px-3", photoMine.includes(`photo:${photo.id}`) && "bg-accent text-accent-foreground")}><OptArt id="heart" alt="" className="h-5 w-5 rounded-full object-cover" />{photo.swoon_count + (photoMine.includes(`photo:${photo.id}`) ? 1 : 0)}</button>
+                </figcaption>
               </figure>
             ))}
           </div>
-          <ShowMore shown={sampleShown} total={sampleTotal} noun="photos" onMore={moreSamples} />
+          <ShowMore shown={albumPage.shown} total={albumPage.total} noun="photos" onMore={albumPage.more} />
         </section>
       )}
 
       {tab === "confessions" && (<>
       <GoldButton className="mt-5" onClick={() => setConfessing(true)}>Confess Your Own</GoldButton>
       <section className="mt-5 rounded-2xl border bg-card p-4">
-        <p className="text-sm uppercase tracking-[0.2em] text-gold">Most craved blends</p>
-        {trending.map((t, i) => (
+        <button className="flex min-h-11 w-full items-center justify-between text-left text-sm uppercase tracking-[0.2em] text-gold" aria-expanded={rankingsOpen} onClick={() => setRankingsOpen((open) => { try { localStorage.setItem("ap-rankings-open", String(!open)); } catch {} return !open; })}>Most craved blends <span aria-hidden="true">{rankingsOpen ? "⌃" : "⌄"}</span></button>
+        {rankingsOpen && trending.map((t, i) => (
           <div key={t.id} className="mt-2 flex items-center gap-3">
             <span className="w-6 font-display text-gold">{i + 1}</span>
             <span className="flex-1 text-lg">{t.name}</span>
@@ -289,11 +275,12 @@ function Wall() {
       <div className="mt-4 space-y-3">
         {feedVisible.map((r) => (
           <article key={r.id} className="rounded-2xl bg-parchment p-4 text-parchment-foreground">
-            <p className="font-display text-lg text-accent">{r.outcome ?? "No Potion Needed"}</p>
+            {r.note && <p className="text-xl italic">“{r.note}”</p>}
+            <p className="mt-3 font-display text-base text-accent">{r.outcome ?? "No Potion Needed"}</p>
             <p className="text-xs uppercase tracking-wider opacity-70">
               {r.tier === "confession" ? "A secret, straight from the heart" : <>{name(ALL_BOXES, r.tier)} · {r.potions.length ? r.potions.map((id) => findBrewable(id)?.name).filter(Boolean).join(" + ") : name(STRENGTHS, r.strength)}</>}
             </p>
-            {r.note && <p className="mt-2 text-lg italic">"{r.note}"</p>}
+            {r.potions.length > 0 && (restoreRecipe(r.potions) ? <Link to="/spellbook" search={{ recipe: r.potions.join(",") }} className="mt-3 inline-flex min-h-11 items-center rounded-full border border-parchment-foreground/30 px-4 text-sm">Brew This Blend</Link> : <p className="mt-2 text-sm opacity-70">This recipe is unavailable.</p>)}
             <div className="mt-3 flex items-center justify-between">
               <span className="text-sm opacity-70">— A Secret Admirer</span>
               <button onClick={() => swoon(r.id)} aria-pressed={mine.includes(r.id)}
@@ -315,3 +302,4 @@ function Wall() {
     </Shell>
   );
 }
+

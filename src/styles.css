@@ -185,3 +185,10 @@
 .slide-body { font-size: 32px; line-height: 1.3; }
 .slide-caption { font-size: 26px; line-height: 1.25; }
 .slide-kicker { font-size: 24px; letter-spacing: 0.2em; text-transform: uppercase; }
+
+
+.gift-unfold { animation: reveal 450ms ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .gift-unfold, .reveal, .sparkle, .float-soft, .candle-flicker { animation: none; opacity: 1; transform: none; }
+  html { scroll-behavior: auto; }
+}

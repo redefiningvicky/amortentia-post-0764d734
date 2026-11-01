@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Wall “Brew This Blend”: exact recipe handoff, correct Spellbook mode, replacement confirmation, unavailable recipe state, preserve edits into Send
+- [x] Wall “Brew This Blend”: exact recipe handoff, correct Spellbook mode, replacement confirmation, unavailable recipe state, preserve edits into Send
 - [x] Live potion result in Cabinet and Brew My Own across Spellbook and Send; carry stable recipe IDs and result into summary and saved orders without changing old data
 - [x] Must-have interactive cauldron class: choose paid ingredients, stir and bottle custom blend, carry into Send
 - [x] Add chosen Discover and Spellbook pages and navigation; carry choices into Send
@@ -43,3 +43,11 @@
 - [x] Spill Your Heart step: remove the recipient email option
 - [x] Give the "A secret, straight from the heart" confession post a title like every other post
 - [x] Verify the "Into the Cauldron" pop-up at the 5th raw ingredient works in the live app
+
+
+- [x] Complete six-photo album paging and deliberate memory preview; retain pretend-post behaviour
+- [x] Persist Spellbook drafts and connect exact Wall recipes
+- [x] Complete gift seal, note, wrapping, keepsakes, recipe reveal, replay and preview mode
+- [x] Remember opened gifts on the receiving device under Me → Received
+- [x] Simulated delivery stages separate from opening and biting
+- [x] Editable order review, price explanation, bundle replacement and duplicate-retry prevention

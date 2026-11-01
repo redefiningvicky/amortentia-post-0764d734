@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { guest } from "@/lib/guest";
+import { type GiftDetails, guest } from "@/lib/guest";
 import { TIERS, SEASONAL, ALL_BOXES, MAX_BLEND, findBrewable, desperationLevel, STRENGTHS, DURATIONS, CARDS, HANDWRITTEN, orderTotal, addonsTotal, potionsTotal, blendOutcome, PACKAGING, DELIVERY, KEEPSAKES, ANTIDOTE, upgradesTotal, BUNDLES, bundleSavings, bundleMatches, bundlePrice, expressWaiver, FREE_EXPRESS_OVER, to99, to99Up } from "@/lib/catalog";
 import { PotionCabinet } from "@/components/potion-cabinet";
 import { PotionResultCard } from "@/components/potion-result-card";
@@ -43,7 +43,7 @@ function Send() {
   const [step, setStep] = useState(0);
   const [potionMode, setPotionMode] = useState<"cabinet" | "class">(search.blend?.split(",").some((id) => id.startsWith("raw-")) ? "class" : "cabinet");
   const [brewReady, setBrewReady] = useState(false);
-  useEffect(() => { window.scrollTo(0, 0); }, [step]);
+  useEffect(() => { window.scrollTo(0, 0); if (step === 1) setBrewReady(false); }, [step]);
   const [cabinetPotions, setCabinetPotions] = useState<string[]>(search.blend?.split(",").filter((id) => !id.startsWith("raw-")) ?? []);
   const [rawIngredients, setRawIngredients] = useState<string[]>(search.blend?.split(",").filter((id) => id.startsWith("raw-")) ?? []);
   const potions = potionMode === "class" ? rawIngredients : cabinetPotions;
@@ -63,16 +63,18 @@ function Send() {
   const [to, setTo] = useState("");
   const [from, setFrom] = useState("");
   const [note, setNote] = useState("");
-  const [share, setShare] = useState(true);
+  const [share, setShare] = useState(false);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [giftUrl, setGiftUrl] = useState("");
+  const [savedGift, setSavedGift] = useState<GiftDetails | null>(null);
 
   const durId = DURATIONS.find((d) => d.id === duration) ? duration : DURATIONS[0]!.id;
   const saving = bundleSavings({ handwritten, card, keepsakes, packaging });
   const preDelivery = orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, "owl", keepsakes, antidote) - saving;
   const waived = expressWaiver(delivery, preDelivery);
   const total = to99(-saving - waived + orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, delivery, keepsakes, antidote));
+  const priceParts = orderTotal(tier, strength, durId) + potionsTotal(potions) + addonsTotal(handwritten, card) + upgradesTotal(packaging, delivery, keepsakes, antidote) - saving - waived;
   const outcome = blendOutcome(potions);
   const potionResult = livePotionResult(potions);
   const canNext =
@@ -85,8 +87,11 @@ function Send() {
     const u = { user: null as null | { id: string } };
     let error: unknown = null;
     const giftId = crypto.randomUUID();
-    await supabase.from("gifts").insert({ id: giftId });
+    const { error: giftError } = await supabase.from("gifts").insert({ id: giftId });
+    if (giftError) { setBusy(false); toast.error("The owl could not register your parcel. Please try again."); return; }
+    const details: GiftDetails = { id: giftId, to: to.trim(), from: from.trim(), tier, blend: outcome?.name ?? "", note: note.trim(), wrapping: packaging, handwritten: handwritten ? handText.trim() : undefined, card: card ?? undefined, keepsakes, potions, potionResult, createdAt: new Date().toISOString() };
     const qs = new URLSearchParams({ id: giftId, to: to.trim(), from: from.trim(), tier, blend: outcome?.name ?? "", note: note.trim() });
+    qs.set("details", JSON.stringify(details));
     const url = `${window.location.origin}/gift?${qs}`;
     if (u.user) {
       ({ error } = await supabase.from("orders").insert({
@@ -98,11 +103,13 @@ function Send() {
         potions: potionResult?.recipeIds ?? potions, outcome: outcome?.name ?? null,
       }));
     } else {
-      guest.addOrder({ id: crypto.randomUUID(), tier, recipient_name: to.trim(), total, created_at: new Date().toISOString(), gift_id: giftId, gift_url: url, potions: potionResult?.recipeIds ?? potions, potion_result: potionResult });
+      try { guest.addOrder({ id: giftId, tier, recipient_name: to.trim(), total, created_at: details.createdAt!, gift_id: giftId, gift_url: url, gift: details, potions: potionResult?.recipeIds ?? potions, potion_result: potionResult }); }
+      catch { setBusy(false); toast.error("Your device could not save this gift. Please free some browser storage and try again."); return; }
       if (share) ({ error } = await supabase.from("confessions").insert({ tier, strength, aroma, note: note.trim().slice(0, 200) || null, potions, outcome: outcome?.name ?? null }));
     }
     setBusy(false);
-    if (error) { toast.error("The owl tripped over its own feelings. Try again."); return; }
+    if (error) toast.error("Your gift is saved, but its confession could not be posted to the Wall.");
+    setSavedGift(details);
     setGiftUrl(url);
     setSent(true);
   }
@@ -115,6 +122,7 @@ function Send() {
           <h2 className="mt-6 font-display text-3xl text-gold-gradient">Owl Dispatched</h2>
           <p className="mt-3 text-lg text-muted-foreground">Your box is flying to {to}. All they have to do is take one bite… Fingers crossed, tissues ready.</p>
           <div className="mt-8 space-y-3">
+            <button className="h-12 w-full rounded-full border text-gold" onClick={() => navigate({ to: "/gift", search: { id: savedGift?.id ?? "", to, from, tier, blend: outcome?.name ?? "", note, details: JSON.stringify(savedGift), preview: true } })}>Preview Unboxing</button>
             <div className="rounded-2xl border border-gold bg-card p-4 text-left">
               <p className="text-sm uppercase tracking-[0.2em] text-gold">Step 1 · Send them their gift link</p>
               <p className="mt-1 text-sm text-muted-foreground">It opens their unboxing. We'll tell you the moment they take a bite.</p>
@@ -177,8 +185,8 @@ function Send() {
 
         {step === 1 && <>
           <div className="mb-4 grid grid-cols-2 gap-2">
-            <Button variant="outline" aria-pressed={potionMode === "cabinet"} onClick={() => setPotionMode("cabinet")} className={potionMode === "cabinet" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}>Potion Cabinet</Button>
-            <Button variant="outline" aria-pressed={potionMode === "class"} onClick={() => setPotionMode("class")} className={potionMode === "class" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}>Brew My Own</Button>
+            <Button variant="outline" aria-pressed={potionMode === "cabinet"} onClick={() => { setPotionMode("cabinet"); setBrewReady(false); }} className={potionMode === "cabinet" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}>Potion Cabinet</Button>
+            <Button variant="outline" aria-pressed={potionMode === "class"} onClick={() => { setPotionMode("class"); setBrewReady(false); }} className={potionMode === "class" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}>Brew My Own</Button>
           </div>
     <p className="-mt-2 mb-4 text-sm italic text-muted-foreground">{potionMode === "class" ? "Create a potion from raw ingredients." : "Mix ready-made potions into your own blend."}</p>
           {potionMode === "class" ? <BrewClass value={potions} onChange={setPotions} onReady={setBrewReady} /> : <PotionCabinet value={potions} onChange={(ids) => { setPotions(ids); setBrewReady(false); }} />}
@@ -215,8 +223,8 @@ function Send() {
               return (
                 <Option key={b.id} active={on} onClick={() => {
                   setHandwritten(b.pick.handwritten); setCard(b.pick.card);
-                  setKeepsakes((k) => Array.from(new Set([...k, ...b.pick.keepsakes])));
-                  if (b.pick.packaging) setPackaging(b.pick.packaging);
+                  setKeepsakes([...b.pick.keepsakes]);
+                  setPackaging(b.pick.packaging ?? "kraft");
                 }}>
                   <OptArt id={b.id} alt={b.name} />
                   <div className="min-w-0 flex-1"><div className="text-lg font-semibold">{b.name}</div><p className="text-sm text-muted-foreground">{b.desc}</p><p className="mt-1 text-sm text-gold">Extras ${bundlePrice(b).toFixed(2)} · save ${b.save}</p></div>
@@ -295,12 +303,26 @@ function Send() {
               <Row k="Lasts" v={DURATIONS.find((d) => d.id === durId)!.name} />
               {handwritten && <Row k="Extra" v="Handwritten note" />}
               {card && <Row k="Card" v={CARDS.find((c) => c.id === card)!.name} />}
-              {keepsakes.length > 0 && <Row k="Keepsakes" v={`${keepsakes.length} added`} />}
+              {keepsakes.length > 0 && <Row k="Keepsakes" v={keepsakes.map((id) => KEEPSAKES.find((k) => k.id === id)?.name).filter(Boolean).join(", ")} />}
               <Row k="Wrapping" v={PACKAGING.find((x) => x.id === packaging)!.name} />
               <Row k="Delivery" v={DELIVERY.find((x) => x.id === delivery)!.name} />
               {saving > 0 && <Row k="Bundle savings" v={`−$${saving.toFixed(2)}`} />}
               {waived > 0 && <Row k="Express Owl" v="Free" />}
               <Row k="To" v={to} />
+              <Row k="From" v={from} />
+              {note && <Row k="Confession" v={note} />}
+              {handwritten && <Row k="Handwritten note" v={handText} />}
+              <div className="border-t pt-3"><p className="text-sm text-gold">Price breakdown</p>
+                <Row k="Box, potency & duration" v={`$${orderTotal(tier, strength, durId).toFixed(2)}`} />
+                <Row k="Recipe" v={`$${potionsTotal(potions).toFixed(2)}`} />
+                <Row k="Note & card" v={`$${addonsTotal(handwritten, card).toFixed(2)}`} />
+                <Row k="Wrapping, delivery & extras" v={`$${upgradesTotal(packaging, delivery, keepsakes, antidote).toFixed(2)}`} />
+                <Row k="Savings" v={`−$${(saving + waived).toFixed(2)}`} />
+                <Row k="Shop .99 adjustment" v={`${total - priceParts < 0 ? "−" : "+"}$${Math.abs(total - priceParts).toFixed(2)}`} />
+                <Row k="Total" v={`$${total.toFixed(2)}`} />
+                <p className="text-xs text-muted-foreground">Shop totals are rounded to the nearest .99.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">{["Box", "Recipe", "Potency & Duration", "Extras", "Wrapping & Delivery", "Message"].map((label, index) => <button key={label} className="min-h-11 rounded-full border px-3 text-sm text-gold" onClick={() => setStep(index)}>Edit {label}</button>)}</div>
             </div>
             <PotionResultCard ids={potions} result={potionResult} heading="Your potion result" showRecipe />
             <Option active={antidote} onClick={() => setAntidote(!antidote)}>
@@ -332,6 +354,7 @@ function Send() {
           </div>
           <span className="text-lg font-bold text-gold">${total.toFixed(2)}</span>
         </div>
+        <details className="mb-2 text-xs text-muted-foreground"><summary className="cursor-pointer py-1 text-gold">What’s included in this total?</summary><p>Box ${ALL_BOXES.find((b) => b.id === tier)!.price.toFixed(2)} · Potency ${STRENGTHS.find((x) => x.id === strength)!.price.toFixed(2)} · Duration ${DURATIONS.find((x) => x.id === durId)!.price.toFixed(2)}</p><p>Selected recipe, extras and any savings are included. Shop totals round to .99.</p></details>
         {step >= 3 && preDelivery < FREE_EXPRESS_OVER && (
           <p className="mb-2 text-center text-xs text-muted-foreground">Add ${to99Up(FREE_EXPRESS_OVER - preDelivery).toFixed(2)} more for <span className="text-gold">free Express Owl</span></p>
         )}
@@ -353,5 +376,6 @@ function Field({ label, value, onChange, placeholder, type = "text" }: { label: 
   );
 }
 function Row({ k, v }: { k: string; v: string }) {
-  return <div className="flex justify-between"><span className="text-muted-foreground">{k}</span><span className="font-semibold">{v}</span></div>;
+  return <div className="flex justify-between"><span className="text-muted-foreground">{k}</span><span className="max-w-[65%] break-words text-right font-semibold">{v}</span></div>;
 }
+

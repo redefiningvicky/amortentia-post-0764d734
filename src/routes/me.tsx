@@ -8,6 +8,14 @@ import { guest, type GiftDetails } from "@/lib/guest";
 import { Shell } from "@/components/kit";
 import { OptArt } from "@/components/opt-art";
 import { cn } from "@/lib/utils";
+import { RecipientReaction } from "@/components/recipient-reaction";
+import {
+  SAMPLE_SENT_ID,
+  SAMPLE_SENT_ORDER,
+  readOwlReactions,
+  saveOwlReactions,
+  type OwlReactionState,
+} from "@/lib/owl-post-demo";
 import { PotionResultCard } from "@/components/potion-result-card";
 import type { PotionResult } from "@/lib/catalog";
 
@@ -16,9 +24,15 @@ export const Route = createFileRoute("/me")({
   head: () => ({
     meta: [
       { title: "My Love Letters — Amortentia Post" },
-      { name: "description", content: "Your profile, boxes sent, and boxes received." },
+      {
+        name: "description",
+        content: "Your profile, boxes sent, and boxes received.",
+      },
       { property: "og:title", content: "My Love Letters" },
-      { property: "og:description", content: "Your enchanted chocolate history." },
+      {
+        property: "og:description",
+        content: "Your enchanted chocolate history.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -27,6 +41,7 @@ export const Route = createFileRoute("/me")({
 });
 
 type Order = {
+  demo?: boolean;
   gift?: GiftDetails;
   gift_id?: string;
   gift_url?: string;
@@ -42,6 +57,17 @@ type Order = {
 
 function Me() {
   const qc = useQueryClient();
+  const [reactions, setReactions] = useState(readOwlReactions);
+  function updateReactions(next: OwlReactionState) {
+    setReactions(next);
+    saveOwlReactions(next);
+  }
+  function showSampleReaction() {
+    updateReactions({
+      sampleBittenAt: reactions.sampleBittenAt ?? new Date().toISOString(),
+      dismissed: reactions.dismissed.filter((id) => id !== SAMPLE_SENT_ID),
+    });
+  }
   const [tab, setTab] = useState<"sent" | "received">("sent");
   const [name, setName] = useState<string | null>(null);
   const { data } = useQuery({
@@ -57,6 +83,7 @@ function Me() {
           avatar: p.avatar,
           orders: [
             ...guest.orders().map((o) => ({ ...o, mine: true })),
+            SAMPLE_SENT_ORDER,
             ...guest.received().map((g) => ({
               id: `received-${g.id}`,
               gift_id: g.id,
@@ -79,8 +106,8 @@ function Me() {
       let avatar = profile?.avatar_url ?? null;
       if (avatar && !avatar.startsWith("http"))
         avatar =
-          (await supabase.storage.from("avatars").createSignedUrl(avatar, 3600)).data?.signedUrl ??
-          null;
+          (await supabase.storage.from("avatars").createSignedUrl(avatar, 3600))
+            .data?.signedUrl ?? null;
       const { data: orders } = await supabase
         .from("orders")
         .select("*")
@@ -99,12 +126,16 @@ function Me() {
     },
   });
 
-  const giftIds = (data?.orders ?? []).map((o) => o.gift_id).filter(Boolean) as string[];
+  const giftIds = (data?.orders ?? [])
+    .filter((order) => !order.demo)
+    .map((o) => o.gift_id)
+    .filter(Boolean) as string[];
   const { data: status } = useQuery({
     queryKey: ["gift-status", giftIds],
     enabled: giftIds.length > 0,
     refetchInterval: 15000,
-    queryFn: async () => (await supabase.rpc("gift_status", { _ids: giftIds })).data ?? [],
+    queryFn: async () =>
+      (await supabase.rpc("gift_status", { _ids: giftIds })).data ?? [],
   });
 
   if (!data)
@@ -128,18 +159,26 @@ function Me() {
       return;
     }
     const path = `${data!.user.id}/avatar-${Date.now()}`;
-    const { error } = await supabase.storage.from("avatars").upload(path, f, { upsert: true });
+    const { error } = await supabase.storage
+      .from("avatars")
+      .upload(path, f, { upsert: true });
     if (error) {
       toast.error("Upload failed");
       return;
     }
-    await supabase.from("profiles").update({ avatar_url: path }).eq("id", data!.user.id);
+    await supabase
+      .from("profiles")
+      .update({ avatar_url: path })
+      .eq("id", data!.user.id);
     qc.invalidateQueries({ queryKey: ["me"] });
   }
   async function saveName() {
     if (name === null) return;
     if (data!.user)
-      await supabase.from("profiles").update({ display_name: name }).eq("id", data!.user.id);
+      await supabase
+        .from("profiles")
+        .update({ display_name: name })
+        .eq("id", data!.user.id);
     else guest.saveProfile({ ...guest.profile(), display_name: name });
     setName(null);
     qc.invalidateQueries({ queryKey: ["me"] });
@@ -151,7 +190,11 @@ function Me() {
       <div className="flex items-center gap-4">
         <label className="relative grid h-20 w-20 cursor-pointer place-items-center overflow-hidden rounded-full border-2 border-gold bg-card">
           {data.avatar ? (
-            <img src={data.avatar} alt="Your photo" className="h-full w-full object-cover" />
+            <img
+              src={data.avatar}
+              alt="Your photo"
+              className="h-full w-full object-cover"
+            />
           ) : (
             <OptArt id="quill" alt="" className="h-full w-full object-cover" />
           )}
@@ -180,10 +223,41 @@ function Me() {
           <div className="text-sm text-muted-foreground">Boxes sent</div>
         </div>
         <div className="rounded-2xl border bg-card p-3">
-          <div className="font-display text-2xl text-gold">{received.length}</div>
+          <div className="font-display text-2xl text-gold">
+            {received.length}
+          </div>
           <div className="text-sm text-muted-foreground">Admirers</div>
         </div>
       </div>
+
+      {sent
+        .filter(
+          (order) => !reactions.dismissed.includes(order.gift_id ?? order.id),
+        )
+        .filter(
+          (order) =>
+            order.demo ||
+            status?.some((item) => item.id === order.gift_id && item.bitten_at),
+        )
+        .map((order) => (
+          <RecipientReaction
+            key={order.id}
+            recipient={order.recipient_name}
+            blend={
+              order.gift?.blend ??
+              order.potion_result?.name ??
+              "Your love-potion blend"
+            }
+            bitten={order.demo ? !!reactions.sampleBittenAt : true}
+            onSimulate={order.demo ? showSampleReaction : undefined}
+            onDismiss={() =>
+              updateReactions({
+                ...reactions,
+                dismissed: [...reactions.dismissed, order.gift_id ?? order.id],
+              })
+            }
+          />
+        ))}
 
       <div className="mt-6 flex gap-2">
         {(["sent", "received"] as const).map((t) => (
@@ -192,7 +266,9 @@ function Me() {
             onClick={() => setTab(t)}
             className={cn(
               "min-h-11 flex-1 rounded-full border",
-              tab === t ? "bg-gold-gradient text-primary-foreground" : "bg-card",
+              tab === t
+                ? "bg-gold-gradient text-primary-foreground"
+                : "bg-card",
             )}
           >
             {t === "sent" ? "Sent" : "Received"}
@@ -211,9 +287,18 @@ function Me() {
           <div key={o.id} className="rounded-2xl border bg-card p-4">
             <div className="flex justify-between">
               <span className="font-semibold">
-                {tab === "sent" ? `To ${o.recipient_name}` : "From a Secret Admirer"}
+                {tab === "sent"
+                  ? `To ${o.recipient_name}`
+                  : "From a Secret Admirer"}
               </span>
-              {o.mine && <span className="text-gold">${o.total.toFixed(2)}</span>}
+              {o.demo && (
+                <span className="rounded-full border border-gold px-2 py-1 text-xs text-gold">
+                  Sample box
+                </span>
+              )}
+              {o.mine && (
+                <span className="text-gold">${o.total.toFixed(2)}</span>
+              )}
             </div>
             <p className="text-sm text-muted-foreground">
               {ALL_BOXES.find((t) => t.id === o.tier)?.name} ·{" "}
@@ -256,7 +341,27 @@ function Me() {
               </a>
             )}
             {tab === "sent" && o.gift_id && (
-              <Tracker s={status?.find((x) => x.id === o.gift_id)} url={o.gift_url} />
+              <Tracker
+                s={
+                  o.demo
+                    ? {
+                        opened_at: reactions.sampleBittenAt,
+                        bitten_at: reactions.sampleBittenAt,
+                      }
+                    : status?.find((x) => x.id === o.gift_id)
+                }
+                url={o.gift_url}
+              />
+            )}
+            {o.demo && (
+              <button
+                onClick={showSampleReaction}
+                className="mt-3 min-h-11 w-full rounded-full border border-gold px-4 text-sm text-gold"
+              >
+                {reactions.sampleBittenAt
+                  ? "View Their Reaction"
+                  : "Try the First-Bite Reaction"}
+              </button>
             )}
           </div>
         ))}
@@ -288,7 +393,12 @@ function Tracker({
       <ol className="mt-2 flex gap-1">
         {steps.map((x) => (
           <li key={x.label} className="flex-1 text-center">
-            <div className={cn("h-1.5 rounded-full", x.done ? "bg-gold-gradient" : "bg-muted")} />
+            <div
+              className={cn(
+                "h-1.5 rounded-full",
+                x.done ? "bg-gold-gradient" : "bg-muted",
+              )}
+            />
             <span
               className={cn(
                 "mt-1 block text-[10px] leading-tight",
@@ -330,18 +440,30 @@ function DeliveryJourney({ createdAt }: { createdAt: string }) {
       </p>
     );
   const steps = [
-    { label: "Brewing", update: "Our scribes are pretending this is a sensible purchase." },
-    { label: "Wax Sealed", update: "Your dignity has been sealed inside. No refunds on that." },
+    {
+      label: "Brewing",
+      update: "Our scribes are pretending this is a sensible purchase.",
+    },
+    {
+      label: "Wax Sealed",
+      update: "Your dignity has been sealed inside. No refunds on that.",
+    },
     {
       label: "Owl Departed",
-      update: "Your owl has departed. It has been instructed not to eat the parcel.",
+      update:
+        "Your owl has departed. It has been instructed not to eat the parcel.",
     },
-    { label: "Delivered", update: "Your parcel has arrived. Your composure has not." },
+    {
+      label: "Delivered",
+      update: "Your parcel has arrived. Your composure has not.",
+    },
   ];
   const current = Math.max(0, Math.min(3, Math.floor((now - created) / 60000)));
   return (
     <section className="mt-3 border-t pt-3" aria-label="Delivery tracking">
-      <p className="text-xs text-muted-foreground">Simulated owl-post journey</p>
+      <p className="text-xs text-muted-foreground">
+        Simulated owl-post journey
+      </p>
       <ol className="mt-2 space-y-2">
         {steps.map((step, index) => (
           <li
@@ -349,17 +471,25 @@ function DeliveryJourney({ createdAt }: { createdAt: string }) {
             aria-current={index === current ? "step" : undefined}
             className={cn(
               "rounded-lg border p-2 text-sm",
-              index <= current ? "border-gold text-gold" : "text-muted-foreground",
+              index <= current
+                ? "border-gold text-gold"
+                : "text-muted-foreground",
             )}
           >
             <span>{step.label}</span>
             <span className="float-right text-xs">
-              {index < current ? "Complete" : index === current ? "Current" : "Upcoming"}
+              {index < current
+                ? "Complete"
+                : index === current
+                  ? "Current"
+                  : "Upcoming"}
             </span>
           </li>
         ))}
       </ol>
-      <p className="mt-2 text-sm text-muted-foreground">{steps[current]!.update}</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        {steps[current]!.update}
+      </p>
     </section>
   );
 }

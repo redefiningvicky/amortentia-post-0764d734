@@ -3,9 +3,13 @@ import { ESSENCES, MAX_BLEND, POTIONS, type EssenceId } from "@/lib/catalog";
 import { PotionResultCard } from "@/components/potion-result-card";
 import { cn } from "@/lib/utils";
 import { bottleStyle } from "@/lib/art";
-import { OptArt } from "@/components/opt-art";
-import { Button } from "@/components/ui/button";
-import { BlendAnchor, SelectionChips, ShowMore, useShowMore } from "@/components/blend-browse";
+import {
+  BlendAnchor,
+  EssenceFilter,
+  SelectionChips,
+  ShowMore,
+  useShowMore,
+} from "@/components/blend-browse";
 
 const RARITY_LABEL = { common: "", rare: "Rare", legendary: "Legendary" } as const;
 
@@ -77,32 +81,7 @@ export function PotionCabinet({
         aria-label="Search potions"
         className="h-12 w-full rounded-xl border bg-card px-4 outline-none focus:border-gold"
       />
-      <div className="grid grid-cols-2 gap-2" aria-label="Potion essences">
-        {[{ id: "all" as const, name: "All" }, ...ESSENCES].map((e) => (
-          <Button
-            key={e.id}
-            variant="outline"
-            aria-pressed={essence === e.id}
-            onClick={() => setEssence(e.id)}
-            className={cn(
-              "h-11 min-w-0 justify-start gap-1.5 rounded-full px-3 text-sm",
-              essence === e.id ? "bg-gold-gradient text-primary-foreground" : "bg-card",
-            )}
-          >
-            {e.id === "all" ? (
-              <OptArt id="wand" alt="" className="h-6 w-6 rounded-full object-cover" />
-            ) : (
-              <span
-                role="img"
-                aria-label={`${e.name} potion`}
-                className="inline-block h-6 w-5 bg-no-repeat"
-                style={bottleStyle(e.id)}
-              />
-            )}
-            {e.name}
-          </Button>
-        ))}
-      </div>
+      <EssenceFilter value={essence} onChange={setEssence} label="Potion essence" />
 
       <div>
         <div className="grid grid-cols-2 gap-2">

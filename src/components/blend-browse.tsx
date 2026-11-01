@@ -1,7 +1,38 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { MAX_BLEND } from "@/lib/catalog";
+import { ESSENCES, MAX_BLEND, type EssenceId } from "@/lib/catalog";
 import { Icon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+
+export function EssenceFilter({
+  value,
+  onChange,
+  label,
+}: {
+  value: EssenceId | "all";
+  onChange: (value: EssenceId | "all") => void;
+  label: string;
+}) {
+  return (
+    <label className="flex items-center gap-3 rounded-xl border bg-card px-3 focus-within:border-gold">
+      <span className="shrink-0 text-sm text-gold">Essence</span>
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(event) => onChange(event.target.value as EssenceId | "all")}
+        className="h-11 min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none"
+      >
+        <option className="bg-card text-foreground" value="all">
+          All essences
+        </option>
+        {ESSENCES.map((essence) => (
+          <option className="bg-card text-foreground" key={essence.id} value={essence.id}>
+            {essence.name}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
 
 export const PAGE_SIZE = 10;
 

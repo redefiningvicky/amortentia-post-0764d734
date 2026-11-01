@@ -2,9 +2,7 @@ import { useMemo, useState } from "react";
 import { ESSENCES, INGREDIENTS, INGREDIENT_KIND, MAX_BLEND, type EssenceId } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 import { ING_ART } from "@/lib/art";
-import { ShowMore, useShowMore } from "@/components/blend-browse";
-import { OptArt } from "@/components/opt-art";
-import { Button } from "@/components/ui/button";
+import { EssenceFilter, ShowMore, useShowMore } from "@/components/blend-browse";
 
 const RARITY_LABEL = { common: "", rare: "Rare", legendary: "Legendary" } as const;
 
@@ -41,32 +39,7 @@ export function IngredientShelf({
         aria-label="Search ingredients"
         className="h-12 w-full rounded-xl border bg-card px-4 outline-none focus:border-gold"
       />
-      <div className="grid grid-cols-2 gap-2" aria-label="Ingredient essences">
-        {[{ id: "all" as const, name: "All" }, ...ESSENCES].map((e) => (
-          <Button
-            key={e.id}
-            variant="outline"
-            aria-pressed={essence === e.id}
-            onClick={() => setEssence(e.id)}
-            className={cn(
-              "h-11 min-w-0 justify-start gap-1.5 rounded-full px-3 text-sm",
-              essence === e.id ? "bg-gold-gradient text-primary-foreground" : "bg-card",
-            )}
-          >
-            {e.id === "all" ? (
-              <OptArt id="wand" alt="" className="h-6 w-6 rounded-full object-cover" />
-            ) : (
-              <img
-                src={ING_ART[`raw-${e.id}-1`]}
-                alt=""
-                loading="lazy"
-                className="h-6 w-6 rounded-full object-cover"
-              />
-            )}
-            {e.name}
-          </Button>
-        ))}
-      </div>
+      <EssenceFilter value={essence} onChange={setEssence} label="Ingredient essence" />
 
       <div>
         <div className="grid grid-cols-2 gap-2">

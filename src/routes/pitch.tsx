@@ -10,11 +10,16 @@ import grand from "@/assets/box-grand.jpg";
 import { OptArt } from "@/components/opt-art";
 
 export const Route = createFileRoute("/pitch")({
-  validateSearch: (s: Record<string, unknown>) => ({ slide: Math.max(1, Math.min(6, Number(s["slide"]) || 1)) }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    slide: Math.max(1, Math.min(6, Number(s["slide"]) || 1)),
+  }),
   head: () => ({
     meta: [
       { title: "Pitch Deck — Amortentia Post" },
-      { name: "description", content: "Love-potion chocolates for the hopelessly unrequited. Our six-slide story." },
+      {
+        name: "description",
+        content: "Love-potion chocolates for the hopelessly unrequited. Our six-slide story.",
+      },
       { property: "og:title", content: "Amortentia Post — The Pitch" },
       { property: "og:description", content: "One bite. Finally seen." },
       { property: "og:type", content: "website" },
@@ -25,115 +30,237 @@ export const Route = createFileRoute("/pitch")({
 });
 
 function Slide({ children }: { children: ReactNode }) {
-  return <div className="slide-content relative overflow-hidden bg-background text-foreground">{children}</div>;
+  return (
+    <div className="slide-content relative overflow-hidden bg-background text-foreground">
+      {children}
+    </div>
+  );
 }
 function Phone({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
   return (
-    <div className={`overflow-hidden rounded-[48px] border-[10px] border-card shadow-glow ${className}`} style={{ width: 300, height: 650 }}>
+    <div
+      className={`overflow-hidden rounded-[48px] border-[10px] border-card shadow-glow ${className}`}
+      style={{ width: 300, height: 650 }}
+    >
       <img src={src} alt={alt} className="h-full w-full object-cover object-top" />
     </div>
   );
 }
-const Kicker = ({ children }: { children: ReactNode }) => <p className="slide-kicker text-gold">{children}</p>;
-const Ph = ({ children }: { children: ReactNode }) => <span className="rounded-lg border-2 border-dashed border-gold px-3 text-gold">{children}</span>;
+const Kicker = ({ children }: { children: ReactNode }) => (
+  <p className="slide-kicker text-gold">{children}</p>
+);
+const Ph = ({ children }: { children: ReactNode }) => (
+  <span className="rounded-lg border-2 border-dashed border-gold px-3 text-gold">{children}</span>
+);
 
 const SLIDES: { title: string; el: ReactNode }[] = [
-  { title: "Problem", el: (
-    <Slide>
-      <div className="absolute inset-0 grid grid-cols-2 items-center gap-20 px-[140px]">
-        <div>
-          <Kicker>01 · The Problem</Kicker>
-          <h1 className="slide-title mt-6 font-display text-gold-gradient">Millions of people love someone who doesn't love them back.</h1>
-          <ul className="slide-body mt-10 space-y-5 text-muted-foreground">
-            <li className="flex gap-4"><OptArt id="wand" alt="" className="mt-1 h-14 w-14 shrink-0 rounded-full border border-gold object-cover" /><span><b className="text-foreground">Who's hurting:</b> the hopeless crushers, the left-on-read, the "we're just friends" crowd.</span></li>
-            <li className="flex gap-4"><OptArt id="broken" alt="" className="mt-1 h-14 w-14 shrink-0 rounded-full border border-gold object-cover" /><span><b className="text-foreground">What's broken:</b> gifting is generic, confessing is terrifying, and nothing makes heartache <i>fun</i>.</span></li>
-          </ul>
+  {
+    title: "Problem",
+    el: (
+      <Slide>
+        <div className="absolute inset-0 grid grid-cols-2 items-center gap-20 px-[140px]">
+          <div>
+            <Kicker>01 · The Problem</Kicker>
+            <h1 className="slide-title mt-6 font-display text-gold-gradient">
+              Millions of people love someone who doesn't love them back.
+            </h1>
+            <ul className="slide-body mt-10 space-y-5 text-muted-foreground">
+              <li className="flex gap-4">
+                <OptArt
+                  id="wand"
+                  alt=""
+                  className="mt-1 h-14 w-14 shrink-0 rounded-full border border-gold object-cover"
+                />
+                <span>
+                  <b className="text-foreground">Who's hurting:</b> the hopeless crushers, the
+                  left-on-read, the "we're just friends" crowd.
+                </span>
+              </li>
+              <li className="flex gap-4">
+                <OptArt
+                  id="broken"
+                  alt=""
+                  className="mt-1 h-14 w-14 shrink-0 rounded-full border border-gold object-cover"
+                />
+                <span>
+                  <b className="text-foreground">What's broken:</b> gifting is generic, confessing
+                  is terrifying, and nothing makes heartache <i>fun</i>.
+                </span>
+              </li>
+            </ul>
+          </div>
+          <div className="text-center">
+            <OptArt
+              id="broken"
+              alt="A broken heart mended with gold"
+              className="mx-auto h-[340px] w-[340px] rounded-[48px] border border-gold object-cover shadow-glow"
+            />
+            <p className="slide-subtitle mt-6 font-serif italic text-gold">
+              "Why won't they notice me?"
+            </p>
+          </div>
         </div>
-        <div className="text-center">
-          <OptArt id="broken" alt="A broken heart mended with gold" className="mx-auto h-[340px] w-[340px] rounded-[48px] border border-gold object-cover shadow-glow" />
-          <p className="slide-subtitle mt-6 font-serif italic text-gold">"Why won't they notice me?"</p>
+      </Slide>
+    ),
+  },
+  {
+    title: "Solution",
+    el: (
+      <Slide>
+        <img
+          src={hero}
+          alt=""
+          className="absolute right-0 top-0 h-full w-[45%] object-cover opacity-80"
+        />
+        <div className="absolute inset-y-0 left-0 flex w-[60%] flex-col justify-center bg-gradient-to-r from-background via-background to-transparent px-[140px]">
+          <Kicker>02 · The Solution</Kicker>
+          <h1 className="slide-title mt-6 font-display text-gold-gradient">
+            What if one chocolate could make them fall for you?
+          </h1>
+          <p className="slide-body-lg mt-8 max-w-[900px] text-muted-foreground">
+            We brew playful "love potions" into vintage heart-box chocolates. Send one, and all they
+            have to do is take a bite.
+          </p>
+          <p className="slide-body mt-6 max-w-[900px] text-foreground">
+            It's a gift, a confession, and a joke your whole family will laugh-cry over.
+          </p>
         </div>
-      </div>
-    </Slide>) },
-  { title: "Solution", el: (
-    <Slide>
-      <img src={hero} alt="" className="absolute right-0 top-0 h-full w-[45%] object-cover opacity-80" />
-      <div className="absolute inset-y-0 left-0 flex w-[60%] flex-col justify-center bg-gradient-to-r from-background via-background to-transparent px-[140px]">
-        <Kicker>02 · The Solution</Kicker>
-        <h1 className="slide-title mt-6 font-display text-gold-gradient">What if one chocolate could make them fall for you?</h1>
-        <p className="slide-body-lg mt-8 max-w-[900px] text-muted-foreground">
-          We brew playful "love potions" into vintage heart-box chocolates. Send one, and all they have to do is take a bite.
-        </p>
-        <p className="slide-body mt-6 max-w-[900px] text-foreground">It's a gift, a confession, and a joke your whole family will laugh-cry over.</p>
-      </div>
-    </Slide>) },
-  { title: "Market", el: (
-    <Slide>
-      <div className="absolute inset-0 flex flex-col justify-center px-[140px]">
-        <Kicker>03 · The Market</Kicker>
-        <h1 className="slide-title mt-6 font-display text-gold-gradient">Everyone with a crush is a customer.</h1>
-        <div className="mt-14 grid grid-cols-3 gap-10">
-          {[
-            ["Who pays", "Senders aged 18–40 buying for a crush, partner, ex… or bestie", "coins"],
-            ["How many", <>Valentine's spend: <Ph>[US $ figure — add source]</Ph></>, "chart"],
-            ["Why now", "Gifting went social: people buy what makes a great share, not just a great present", "clock"],
-          ].map(([h, b, e]) => (
-            <div key={String(h)} className="min-h-[300px] rounded-[32px] border border-gold/40 bg-card p-10">
-              <OptArt id={String(e)} alt="" className="h-28 w-28 rounded-3xl border border-gold object-cover" />
-              <p className="slide-subtitle mt-4 font-display text-gold">{h}</p>
-              <p className="slide-body mt-4 text-muted-foreground">{b}</p>
-            </div>
-          ))}
+      </Slide>
+    ),
+  },
+  {
+    title: "Market",
+    el: (
+      <Slide>
+        <div className="absolute inset-0 flex flex-col justify-center px-[140px]">
+          <Kicker>03 · The Market</Kicker>
+          <h1 className="slide-title mt-6 font-display text-gold-gradient">
+            Everyone with a crush is a customer.
+          </h1>
+          <div className="mt-14 grid grid-cols-3 gap-10">
+            {[
+              [
+                "Who pays",
+                "Senders aged 18–40 buying for a crush, partner, ex… or bestie",
+                "coins",
+              ],
+              [
+                "How many",
+                <>
+                  Valentine's spend: <Ph>[US $ figure — add source]</Ph>
+                </>,
+                "chart",
+              ],
+              [
+                "Why now",
+                "Gifting went social: people buy what makes a great share, not just a great present",
+                "clock",
+              ],
+            ].map(([h, b, e]) => (
+              <div
+                key={String(h)}
+                className="min-h-[300px] rounded-[32px] border border-gold/40 bg-card p-10"
+              >
+                <OptArt
+                  id={String(e)}
+                  alt=""
+                  className="h-28 w-28 rounded-3xl border border-gold object-cover"
+                />
+                <p className="slide-subtitle mt-4 font-display text-gold">{h}</p>
+                <p className="slide-body mt-4 text-muted-foreground">{b}</p>
+              </div>
+            ))}
+          </div>
+          <p className="slide-caption mt-10 text-muted-foreground">
+            Average order today: from $19.99 up to $380.99 with potions, keepsakes and delivery.
+          </p>
         </div>
-        <p className="slide-caption mt-10 text-muted-foreground">Average order today: from $19.99 up to $380.99 with potions, keepsakes and delivery.</p>
-      </div>
-    </Slide>) },
-  { title: "Product", el: (
-    <Slide>
-      <div className="absolute inset-0 flex flex-col px-[100px] pt-[80px]">
-        <Kicker>04 · The Product — live demo</Kicker>
-        <h1 className="slide-subtitle mt-4 font-display text-gold-gradient">Pick a box, brew a potion, they take a bite, you find out.</h1>
-        <div className="mt-12 flex justify-between">
-          {[[homeAsset.url, "Home"], [boxAsset.url, "Choose a box"], [potionsAsset.url, "110 potions"], [extrasAsset.url, "Extras & meter"], [biteAsset.url, "They bit it!"]].map(([s, l]) => (
-            <div key={l} className="text-center">
-              <Phone src={s!} alt={l!} />
-              <p className="slide-caption mt-5 text-gold">{l}</p>
-            </div>
-          ))}
+      </Slide>
+    ),
+  },
+  {
+    title: "Product",
+    el: (
+      <Slide>
+        <div className="absolute inset-0 flex flex-col px-[100px] pt-[80px]">
+          <Kicker>04 · The Product — live demo</Kicker>
+          <h1 className="slide-subtitle mt-4 font-display text-gold-gradient">
+            Pick a box, brew a potion, they take a bite, you find out.
+          </h1>
+          <div className="mt-12 flex justify-between">
+            {[
+              [homeAsset.url, "Home"],
+              [boxAsset.url, "Choose a box"],
+              [potionsAsset.url, "110 potions"],
+              [extrasAsset.url, "Extras & meter"],
+              [biteAsset.url, "They bit it!"],
+            ].map(([s, l]) => (
+              <div key={l} className="text-center">
+                <Phone src={s!} alt={l!} />
+                <p className="slide-caption mt-5 text-gold">{l}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </Slide>) },
-  { title: "Company", el: (
-    <Slide>
-      <img src={grand} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <Kicker>05 · Who We Are</Kicker>
-        <h1 className="slide-title-lg mt-8 font-display text-gold-gradient">Amortentia Post</h1>
-        <p className="slide-subtitle mt-8 font-serif italic">One bite. Finally seen.</p>
-      </div>
-    </Slide>) },
-  { title: "Smile", el: (
-    <Slide>
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-[200px] text-center">
-        <OptArt id="spell" alt="A bubbling cauldron of golden love potion" className="sparkle mx-auto h-[240px] w-[240px] rounded-full border border-gold object-cover shadow-glow" />
-        <h1 className="slide-title mt-10 font-display text-gold-gradient">We can't make them love you…</h1>
-        <p className="slide-subtitle mt-6 font-serif italic">…but we can make them eat the chocolate.</p>
-      </div>
-    </Slide>) },
+      </Slide>
+    ),
+  },
+  {
+    title: "Company",
+    el: (
+      <Slide>
+        <img
+          src={grand}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-30"
+        />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+          <Kicker>05 · Who We Are</Kicker>
+          <h1 className="slide-title-lg mt-8 font-display text-gold-gradient">Amortentia Post</h1>
+          <p className="slide-subtitle mt-8 font-serif italic">One bite. Finally seen.</p>
+        </div>
+      </Slide>
+    ),
+  },
+  {
+    title: "Smile",
+    el: (
+      <Slide>
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-[200px] text-center">
+          <OptArt
+            id="spell"
+            alt="A bubbling cauldron of golden love potion"
+            className="sparkle mx-auto h-[240px] w-[240px] rounded-full border border-gold object-cover shadow-glow"
+          />
+          <h1 className="slide-title mt-10 font-display text-gold-gradient">
+            We can't make them love you…
+          </h1>
+          <p className="slide-subtitle mt-6 font-serif italic">
+            …but we can make them eat the chocolate.
+          </p>
+        </div>
+      </Slide>
+    ),
+  },
 ];
 
 function Pitch() {
   const { slide } = Route.useSearch();
   const navigate = useNavigate({ from: "/pitch" });
   const i = slide - 1;
-  const go = (n: number) => navigate({ search: { slide: Math.max(1, Math.min(SLIDES.length, n)) }, replace: true });
+  const go = (n: number) =>
+    navigate({ search: { slide: Math.max(1, Math.min(SLIDES.length, n)) }, replace: true });
   const wrap = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.3);
   const touch = useRef(0);
 
   useEffect(() => {
-    const fit = () => { const el = wrap.current; if (el) setScale(Math.min(el.clientWidth / 1920, el.clientHeight / 1080)); };
-    fit(); window.addEventListener("resize", fit);
+    const fit = () => {
+      const el = wrap.current;
+      if (el) setScale(Math.min(el.clientWidth / 1920, el.clientHeight / 1080));
+    };
+    fit();
+    window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
   }, []);
   useEffect(() => {
@@ -149,16 +276,43 @@ function Pitch() {
 
   return (
     <div className="fixed inset-0 flex flex-col bg-background">
-      <div ref={wrap} className="relative flex-1 overflow-hidden"
+      <div
+        ref={wrap}
+        className="relative flex-1 overflow-hidden"
         onTouchStart={(e) => (touch.current = e.touches[0]!.clientX)}
-        onTouchEnd={(e) => { const d = e.changedTouches[0]!.clientX - touch.current; if (Math.abs(d) > 40) go(slide + (d < 0 ? 1 : -1)); }}>
-        <div className="slide-wrapper" style={{ ["--scale" as string]: scale }}>{SLIDES[i]!.el}</div>
+        onTouchEnd={(e) => {
+          const d = e.changedTouches[0]!.clientX - touch.current;
+          if (Math.abs(d) > 40) go(slide + (d < 0 ? 1 : -1));
+        }}
+      >
+        <div className="slide-wrapper" style={{ ["--scale" as string]: scale }}>
+          {SLIDES[i]!.el}
+        </div>
       </div>
       <div className="flex items-center justify-center gap-4 p-3">
-        <button onClick={() => go(slide - 1)} aria-label="Previous slide" className="h-11 w-11 rounded-full border text-gold">‹</button>
-        <span className="text-sm text-muted-foreground">{slide} / {SLIDES.length} · {SLIDES[i]!.title}</span>
-        <button onClick={() => go(slide + 1)} aria-label="Next slide" className="h-11 w-11 rounded-full border text-gold">›</button>
-        <button onClick={() => void document.documentElement.requestFullscreen?.()} className="h-11 rounded-full border px-4 text-sm text-gold">Present</button>
+        <button
+          onClick={() => go(slide - 1)}
+          aria-label="Previous slide"
+          className="h-11 w-11 rounded-full border text-gold"
+        >
+          ‹
+        </button>
+        <span className="text-sm text-muted-foreground">
+          {slide} / {SLIDES.length} · {SLIDES[i]!.title}
+        </span>
+        <button
+          onClick={() => go(slide + 1)}
+          aria-label="Next slide"
+          className="h-11 w-11 rounded-full border text-gold"
+        >
+          ›
+        </button>
+        <button
+          onClick={() => void document.documentElement.requestFullscreen?.()}
+          className="h-11 rounded-full border px-4 text-sm text-gold"
+        >
+          Present
+        </button>
       </div>
     </div>
   );

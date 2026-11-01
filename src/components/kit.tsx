@@ -7,7 +7,14 @@ function MagicDust() {
   return (
     <div className="magic-dust" aria-hidden="true">
       {Array.from({ length: 16 }).map((_, i) => (
-        <span key={i} style={{ left: `${(i * 61) % 97}%`, animationDuration: `${9 + ((i * 7) % 9)}s`, animationDelay: `${(i * 1.7) % 12}s` }} />
+        <span
+          key={i}
+          style={{
+            left: `${(i * 61) % 97}%`,
+            animationDuration: `${9 + ((i * 7) % 9)}s`,
+            animationDelay: `${(i * 1.7) % 12}s`,
+          }}
+        />
       ))}
     </div>
   );
@@ -34,19 +41,49 @@ export function GoldButton({ className, ...p }: React.ButtonHTMLAttributes<HTMLB
   );
 }
 
-export function Option({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
+export function Option({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
   return (
-    <button type="button" onClick={onClick} aria-pressed={active}
-      className={cn("flex w-full items-center gap-4 rounded-2xl border bg-card p-4 text-left transition", active && "border-gold shadow-glow")}>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        "flex w-full items-center gap-4 rounded-2xl border bg-card p-4 text-left transition",
+        active && "border-gold shadow-glow",
+      )}
+    >
       {children}
     </button>
   );
 }
 
-export function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
+export function Chip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
   return (
-    <button type="button" onClick={onClick} aria-pressed={active}
-      className={cn("min-h-11 rounded-full border px-4 py-2 transition", active ? "bg-gold-gradient text-primary-foreground" : "bg-card")}>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        "min-h-11 rounded-full border px-4 py-2 transition",
+        active ? "bg-gold-gradient text-primary-foreground" : "bg-card",
+      )}
+    >
       {children}
     </button>
   );
@@ -73,8 +110,22 @@ export function BottomNav() {
       {TABS.map((t) => {
         const active = t.to === "/" ? pathname === "/" : pathname.startsWith(t.to);
         return (
-          <Link key={t.to} to={t.to} className={cn("flex min-w-0 flex-1 flex-col items-center gap-1 py-2 text-[10px]", active ? "text-gold" : "text-muted-foreground")}>
-            <OptArt id={t.icon} alt="" className={cn("h-9 w-9 rounded-full border object-cover", active ? "border-gold shadow-glow" : "border-transparent opacity-70")} />
+          <Link
+            key={t.to}
+            to={t.to}
+            className={cn(
+              "flex min-w-0 flex-1 flex-col items-center gap-1 py-2 text-[10px]",
+              active ? "text-gold" : "text-muted-foreground",
+            )}
+          >
+            <OptArt
+              id={t.icon}
+              alt=""
+              className={cn(
+                "h-9 w-9 rounded-full border object-cover",
+                active ? "border-gold shadow-glow" : "border-transparent opacity-70",
+              )}
+            />
             {t.label}
           </Link>
         );

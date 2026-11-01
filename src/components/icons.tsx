@@ -3,7 +3,9 @@ import { cn } from "@/lib/utils";
 
 // Hand-drawn line artwork in place of emoji: thin engraved strokes, inked with currentColor.
 const ART: Record<string, ReactNode> = {
-  heart: <path d="M12 20.5S4 15.6 4 10.2A4.7 4.7 0 0 1 12 7.3a4.7 4.7 0 0 1 8 2.9c0 5.4-8 10.3-8 10.3Z" />,
+  heart: (
+    <path d="M12 20.5S4 15.6 4 10.2A4.7 4.7 0 0 1 12 7.3a4.7 4.7 0 0 1 8 2.9c0 5.4-8 10.3-8 10.3Z" />
+  ),
   "broken-heart": (
     <>
       <path d="M12 20.5S4 15.6 4 10.2A4.7 4.7 0 0 1 12 7.3a4.7 4.7 0 0 1 8 2.9c0 5.4-8 10.3-8 10.3Z" />
@@ -32,7 +34,9 @@ const ART: Record<string, ReactNode> = {
       <path d="M6.4 17.6 12 12M14.2 7.8c-2.2 1.6-4.2 3.7-5.7 6.2" />
     </>
   ),
-  flame: <path d="M12 3c1.5 3.5 5 5.2 5 9a5 5 0 0 1-10 0c0-2 1-3.6 2-4.6 0 1.6 1 2.6 2 2.6S12 4.5 12 3Z" />,
+  flame: (
+    <path d="M12 3c1.5 3.5 5 5.2 5 9a5 5 0 0 1-10 0c0-2 1-3.6 2-4.6 0 1.6 1 2.6 2 2.6S12 4.5 12 3Z" />
+  ),
   rose: (
     <>
       <circle cx="12" cy="8.5" r="3.5" />

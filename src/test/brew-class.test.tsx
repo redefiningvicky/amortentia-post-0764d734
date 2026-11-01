@@ -10,7 +10,12 @@ describe("cauldron class", () => {
       return <BrewClass value={ids} onChange={setIds} />;
     }
     render(<Brewing />);
-    for (const name of ["Crushed Dragon Pepper", "Phoenix Ash", "Chili-Chocolate Nibs", "Heartfire Ember"]) {
+    for (const name of [
+      "Crushed Dragon Pepper",
+      "Phoenix Ash",
+      "Chili-Chocolate Nibs",
+      "Heartfire Ember",
+    ]) {
       fireEvent.click(screen.getByRole("button", { name: new RegExp(name) }));
       expect(screen.queryByRole("dialog")).toBeNull();
     }
@@ -20,7 +25,11 @@ describe("cauldron class", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Remove Smoked Cinnamon Bark" }));
     fireEvent.click(screen.getByRole("button", { name: /Smoked Cinnamon Bark/ }));
-    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Into the Cauldron · +$9.99" }));
+    fireEvent.click(
+      within(screen.getByRole("dialog")).getByRole("button", {
+        name: "Into the Cauldron · +$9.99",
+      }),
+    );
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(screen.getByRole("button", { name: "Stir the cauldron" })).toBeEnabled();
   }, 30000);
@@ -30,7 +39,8 @@ describe("cauldron class", () => {
     fireEvent.click(screen.getByRole("button", { name: "Into the Cauldron · +$7.99" }));
     const bottle = screen.getByRole("button", { name: "Bottle My Love Potion" });
     expect(bottle).toBeDisabled();
-    for (let n = 0; n < 2; n++) fireEvent.click(screen.getByRole("button", { name: "Stir the cauldron" }));
+    for (let n = 0; n < 2; n++)
+      fireEvent.click(screen.getByRole("button", { name: "Stir the cauldron" }));
     expect(bottle).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "Stir the cauldron" }));
     fireEvent.click(bottle);

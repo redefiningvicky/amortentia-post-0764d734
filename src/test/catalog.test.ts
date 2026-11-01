@@ -1,5 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { TIERS, orderTotal, INGREDIENTS, INGREDIENT_KIND, blendOutcome, findBrewable, potionsTotal, livePotionResult } from "@/lib/catalog";
+import {
+  TIERS,
+  orderTotal,
+  INGREDIENTS,
+  INGREDIENT_KIND,
+  blendOutcome,
+  findBrewable,
+  potionsTotal,
+  livePotionResult,
+} from "@/lib/catalog";
 
 describe("box tiers", () => {
   it("lowest box is $19.99", () => {
@@ -15,10 +24,16 @@ describe("box tiers", () => {
 
 describe("live potion recipes", () => {
   it("the same combination produces the same complete result in any selection order", () => {
-    expect(livePotionResult(["rose-1", "ember-1", "moon-4"])).toEqual(livePotionResult(["moon-4", "rose-1", "ember-1"]));
+    expect(livePotionResult(["rose-1", "ember-1", "moon-4"])).toEqual(
+      livePotionResult(["moon-4", "rose-1", "ember-1"]),
+    );
   });
   it("retains stable raw catalogue IDs for saved recipes", () => {
-    expect(livePotionResult(["raw-rose-1", "raw-bloom-6", "raw-storm-1"])?.recipeIds).toEqual(["raw-bloom-6", "raw-rose-1", "raw-storm-1"]);
+    expect(livePotionResult(["raw-rose-1", "raw-bloom-6", "raw-storm-1"])?.recipeIds).toEqual([
+      "raw-bloom-6",
+      "raw-rose-1",
+      "raw-storm-1",
+    ]);
   });
   it("derives the flavour from the actual rose, cherry and cocoa selections", () => {
     const result = livePotionResult(["raw-rose-1", "raw-bloom-6", "raw-storm-1"]);
@@ -54,45 +69,90 @@ describe("potion cabinet", () => {
   it("a legendary potion upgrades the outcome", () => {
     expect(blendOutcome(["ember-10", "thorn-1"])?.name).toBe("Legendary Wildfire Obsession");
   });
-  it("potion prices add up", () => expect(potionsTotal(["ember-1", "ember-7", "ember-10"])).toBe(22.99));
+  it("potion prices add up", () =>
+    expect(potionsTotal(["ember-1", "ember-7", "ember-10"])).toBe(22.99));
 });
 
 import { upgradesTotal, MAX_BLEND } from "@/lib/catalog";
 describe("upgrades", () => {
   it("blend allows up to 5 potions", () => expect(MAX_BLEND).toBe(5));
-  it("default kraft + standard owl is free", () => expect(upgradesTotal("kraft", "owl", [], false)).toBe(0));
-  it("music box + courier + plush + antidote", () => expect(upgradesTotal("music", "courier", ["plush"], true)).toBe(116.99));
+  it("default kraft + standard owl is free", () =>
+    expect(upgradesTotal("kraft", "owl", [], false)).toBe(0));
+  it("music box + courier + plush + antidote", () =>
+    expect(upgradesTotal("music", "courier", ["plush"], true)).toBe(116.99));
 });
 
 import { SEASONAL, desperationLevel } from "@/lib/catalog";
 describe("seasonal boxes & desperation meter", () => {
-  it("seasonal box prices count in total", () => expect(orderTotal("valentine", "flutter", "hour")).toBe(55.99));
+  it("seasonal box prices count in total", () =>
+    expect(orderTotal("valentine", "flutter", "hour")).toBe(55.99));
   it("offers Christmas", () => expect(SEASONAL.some((box) => box.id === "christmas")).toBe(true));
   it("offers New Year", () => expect(SEASONAL.some((box) => box.id === "newyear")).toBe(true));
-  it("offers Thanksgiving", () => expect(SEASONAL.some((box) => box.id === "thanksgiving")).toBe(true));
-  it("offers birthday gifts", () => expect(SEASONAL.some((box) => box.id === "birthday")).toBe(true));
-  it.each(["christmas", "newyear"])("%s proposed box price counts in totals", (id) => expect(orderTotal(id, "flutter", "hour")).toBe(55.99));
-  it.each(["thanksgiving", "birthday"])("%s proposed box price counts in totals", (id) => expect(orderTotal(id, "flutter", "hour")).toBe(45.99));
-  it("cheap order is Mildly Hopeful", () => expect(desperationLevel(40).label).toBe("Mildly Hopeful"));
-  it("$400 order is Unhinged Romantic", () => expect(desperationLevel(400).label).toBe("Unhinged Romantic"));
+  it("offers Thanksgiving", () =>
+    expect(SEASONAL.some((box) => box.id === "thanksgiving")).toBe(true));
+  it("offers birthday gifts", () =>
+    expect(SEASONAL.some((box) => box.id === "birthday")).toBe(true));
+  it.each(["christmas", "newyear"])("%s proposed box price counts in totals", (id) =>
+    expect(orderTotal(id, "flutter", "hour")).toBe(55.99),
+  );
+  it.each(["thanksgiving", "birthday"])("%s proposed box price counts in totals", (id) =>
+    expect(orderTotal(id, "flutter", "hour")).toBe(45.99),
+  );
+  it("cheap order is Mildly Hopeful", () =>
+    expect(desperationLevel(40).label).toBe("Mildly Hopeful"));
+  it("$400 order is Unhinged Romantic", () =>
+    expect(desperationLevel(400).label).toBe("Unhinged Romantic"));
 });
 
 import { BUNDLES, bundlePrice, bundleSavings, expressWaiver } from "@/lib/catalog";
 describe("bundles & free express", () => {
   it("Full Love Spell saves $10 when all its items are picked", () =>
-    expect(bundleSavings({ handwritten: true, card: "singing", keepsakes: ["vial", "plush"], packaging: "velvet" })).toBe(10));
+    expect(
+      bundleSavings({
+        handwritten: true,
+        card: "singing",
+        keepsakes: ["vial", "plush"],
+        packaging: "velvet",
+      }),
+    ).toBe(10));
   it("no saving if a bundle item is removed", () =>
-    expect(bundleSavings({ handwritten: true, card: "singing", keepsakes: ["vial"], packaging: "velvet" })).toBe(0));
+    expect(
+      bundleSavings({
+        handwritten: true,
+        card: "singing",
+        keepsakes: ["vial"],
+        packaging: "velvet",
+      }),
+    ).toBe(0));
   it("express is free over $99", () => expect(expressWaiver("express", 99)).toBe(14.99));
   it("express is paid under $99", () => expect(expressWaiver("express", 98.99)).toBe(0));
-  it.each([["wish", 4, 23.99], ["romance", 7, 44.99], ["serenade", 12, 62.99]])("%s bundle applies its proposed saving", (id, saving, price) => {
+  it.each([
+    ["wish", 4, 23.99],
+    ["romance", 7, 44.99],
+    ["serenade", 12, 62.99],
+  ])("%s bundle applies its proposed saving", (id, saving, price) => {
     const bundle = BUNDLES.find((b) => b.id === id);
     expect(bundle).toBeDefined();
     if (!bundle) throw new Error("Missing bundle");
-    expect(bundleSavings({ handwritten: bundle.pick.handwritten, card: bundle.pick.card, keepsakes: [...bundle.pick.keepsakes], packaging: bundle.pick.packaging ?? "kraft" })).toBe(saving);
+    expect(
+      bundleSavings({
+        handwritten: bundle.pick.handwritten,
+        card: bundle.pick.card,
+        keepsakes: [...bundle.pick.keepsakes],
+        packaging: bundle.pick.packaging ?? "kraft",
+      }),
+    ).toBe(saving);
     expect(bundlePrice(bundle)).toBe(price);
   });
-  it("overlapping savings do not stack", () => expect(bundleSavings({ handwritten: true, card: "vintage", keepsakes: ["seal", "vial", "bouquet"], packaging: "velvet" })).toBe(7));
+  it("overlapping savings do not stack", () =>
+    expect(
+      bundleSavings({
+        handwritten: true,
+        card: "vintage",
+        keepsakes: ["seal", "vial", "bouquet"],
+        packaging: "velvet",
+      }),
+    ).toBe(7));
 });
 
 import { ICON_NAMES } from "@/components/icons";
@@ -116,7 +176,8 @@ describe("raw brewing ingredients", () => {
   it("has 110 ingredients, 10 per essence across 11 kinds, and none are free", () => {
     expect(INGREDIENTS.length).toBe(110);
     for (const ing of INGREDIENTS) expect(ing.price).toBeGreaterThan(0);
-    for (const e of ESSENCES) expect(INGREDIENTS.filter((i) => i.essence === e.id)).toHaveLength(10);
+    for (const e of ESSENCES)
+      expect(INGREDIENTS.filter((i) => i.essence === e.id)).toHaveLength(10);
     expect(new Set(INGREDIENTS.map((i) => INGREDIENT_KIND[i.essence])).size).toBe(11);
   });
   it("prices raw blends through the same totals as potions", () => {
@@ -135,16 +196,30 @@ import { STRENGTHS, DURATIONS, HANDWRITTEN, ANTIDOTE } from "@/lib/catalog";
 describe("every price ends in .99", () => {
   const ends99 = (n: number) => Math.round((n % 1) * 100) === 99;
   it("every option price ends in .99", () => {
-    for (const p of [...TIERS, ...SEASONAL, ...STRENGTHS, ...DURATIONS, ...CARDS, ...POTIONS, ...INGREDIENTS]) expect(ends99(p.price)).toBe(true);
-    for (const p of [...PACKAGING, ...DELIVERY]) expect(p.price === 0 || ends99(p.price)).toBe(true);
+    for (const p of [
+      ...TIERS,
+      ...SEASONAL,
+      ...STRENGTHS,
+      ...DURATIONS,
+      ...CARDS,
+      ...POTIONS,
+      ...INGREDIENTS,
+    ])
+      expect(ends99(p.price)).toBe(true);
+    for (const p of [...PACKAGING, ...DELIVERY])
+      expect(p.price === 0 || ends99(p.price)).toBe(true);
     expect(ends99(HANDWRITTEN.price)).toBe(true);
     expect(ends99(ANTIDOTE.price)).toBe(true);
   });
   it("every computed total ends in .99", () => {
     expect(ends99(orderTotal("grand", "besotted", "week"))).toBe(true);
     expect(ends99(addonsTotal(true, "singing"))).toBe(true);
-    expect(ends99(potionsTotal(["raw-ember-1", "raw-rose-1", "ember-1", "ember-7", "ember-10"]))).toBe(true);
-    expect(ends99(upgradesTotal("music", "courier", ["seal", "vial", "plush", "bouquet"], true))).toBe(true);
+    expect(
+      ends99(potionsTotal(["raw-ember-1", "raw-rose-1", "ember-1", "ember-7", "ember-10"])),
+    ).toBe(true);
+    expect(
+      ends99(upgradesTotal("music", "courier", ["seal", "vial", "plush", "bouquet"], true)),
+    ).toBe(true);
     for (const b of BUNDLES) expect(ends99(bundlePrice(b))).toBe(true);
   });
 });

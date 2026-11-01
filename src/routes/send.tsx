@@ -180,6 +180,7 @@ function Send() {
             <Button variant="outline" aria-pressed={potionMode === "cabinet"} onClick={() => setPotionMode("cabinet")} className={potionMode === "cabinet" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}>Potion Cabinet</Button>
             <Button variant="outline" aria-pressed={potionMode === "class"} onClick={() => setPotionMode("class")} className={potionMode === "class" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}>Brew My Own</Button>
           </div>
+    <p className="-mt-2 mb-4 text-sm italic text-muted-foreground">{potionMode === "class" ? "Create a potion from raw ingredients." : "Mix ready-made potions into your own blend."}</p>
           {potionMode === "class" ? <BrewClass value={potions} onChange={setPotions} onReady={setBrewReady} /> : <PotionCabinet value={potions} onChange={(ids) => { setPotions(ids); setBrewReady(false); }} />}
         </>}
 

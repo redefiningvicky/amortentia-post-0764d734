@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { ESSENCES, INGREDIENTS, INGREDIENT_KIND, MAX_BLEND, type EssenceId } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 import { ING_ART } from "@/lib/art";
-import { Icon } from "@/components/icons";
+import { ShowMore, useShowMore } from "@/components/blend-browse";
 import { OptArt } from "@/components/opt-art";
 import { Button } from "@/components/ui/button";
 
@@ -15,6 +15,7 @@ export function IngredientShelf({ value, onChange }: { value: string[]; onChange
     () => INGREDIENTS.filter((p) => (essence === "all" || p.essence === essence) && p.name.toLowerCase().includes(q.toLowerCase())),
     [essence, q],
   );
+  const page = useShowMore(list, `${essence}|${q}`);
   const toggle = (id: string) =>
     value.includes(id) ? onChange(value.filter((x) => x !== id)) : value.length < MAX_BLEND && onChange([...value, id]);
 
@@ -34,22 +35,8 @@ export function IngredientShelf({ value, onChange }: { value: string[]; onChange
         ))}
       </div>
 
-      {value.length > 0 && (
-        <div className="flex flex-wrap gap-1.5" aria-label="Chosen ingredients">
-          {value.map((id) => {
-            const p = INGREDIENTS.find((x) => x.id === id);
-            if (!p) return null;
-            return (
-              <button key={id} onClick={() => toggle(id)} className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-sm" aria-label={`Remove ${p.name}`}>
-                {p.name} <Icon name="x" className="h-3.5 w-3.5 opacity-70" />
-              </button>
-            );
-          })}
-        </div>
-      )}
-
       <div className="grid grid-cols-2 gap-2">
-        {list.map((p) => {
+        {page.visible.map((p) => {
           const on = value.includes(p.id);
           const full = !on && value.length >= MAX_BLEND;
           const e = ESSENCES.find((x) => x.id === p.essence)!;
@@ -74,6 +61,7 @@ export function IngredientShelf({ value, onChange }: { value: string[]; onChange
         })}
         {list.length === 0 && <p className="col-span-2 py-6 text-center text-muted-foreground">No ingredient by that name… yet.</p>}
       </div>
+      <ShowMore shown={page.shown} total={page.total} noun="ingredients" onMore={page.more} />
     </div>
   );
 }

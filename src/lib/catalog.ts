@@ -10,14 +10,14 @@ export const TIERS: Tier[] = [
 
 // Limited-edition seasonal boxes (proposed prices, unconfirmed).
 export const SEASONAL: Tier[] = [
-  { id: "spooky", name: "The Spooky Crush", pieces: 16, price: 34.99, blurb: "Halloween only · scary how much you like them" },
   { id: "valentine", name: "The Heartbreaker", pieces: 24, price: 44.99, blurb: "Valentine's only · for when Feb 14 hurts" },
   { id: "galentine", name: "The Galentine's Gossip", pieces: 20, price: 29.99, blurb: "Galentine's only · love your besties loudly" },
   { id: "revenge", name: "The Revenge Ex Edition", pieces: 18, price: 39.99, blurb: "Limited · make them regret everything" },
+  { id: "birthday", name: "The Birthday Wish", pieces: 18, price: 34.99, blurb: "Birthday · you were the wish all along" },
+  { id: "spooky", name: "The Spooky Crush", pieces: 16, price: 34.99, blurb: "Halloween only · scary how much you like them" },
+  { id: "thanksgiving", name: "The Grateful Heart", pieces: 20, price: 34.99, blurb: "Thanksgiving · thankful you exist, frankly" },
   { id: "christmas", name: "The Mistletoe Spell", pieces: 24, price: 44.99, blurb: "Christmas · suddenly, mistletoe everywhere" },
   { id: "newyear", name: "The Midnight Kiss", pieces: 24, price: 44.99, blurb: "New Year · one resolution: kiss you" },
-  { id: "thanksgiving", name: "The Grateful Heart", pieces: 20, price: 34.99, blurb: "Thanksgiving · thankful you exist, frankly" },
-  { id: "birthday", name: "The Birthday Wish", pieces: 18, price: 34.99, blurb: "Birthday · you were the wish all along" },
 ];
 export const ALL_BOXES: Tier[] = [...TIERS, ...SEASONAL];
 

@@ -547,10 +547,6 @@ function Send() {
                 </Option>
               );
             })}
-            <p className="text-xs text-muted-foreground">
-              Box and potions priced separately. Your best matching bundle saving applies; savings
-              don’t stack.
-            </p>
             <Label>Or pick your own · handwritten by our scribes</Label>
             <Option active={handwritten} onClick={() => setHandwritten(!handwritten)}>
               <OptArt id="quill" alt={HANDWRITTEN.name} />
@@ -694,7 +690,10 @@ function Send() {
                   k="Wrapping, delivery & extras"
                   v={`$${upgradesTotal(packaging, delivery, keepsakes, antidote).toFixed(2)}`}
                 />
-                <Row k="Savings" v={`−$${(saving + waived).toFixed(2)}`} />
+                <Row k="Savings" v={`−${(saving + waived).toFixed(2)}`} />
+                <p className="text-xs text-muted-foreground">
+                  The best matching bundle saving applies automatically. Savings don’t stack.
+                </p>
                 <Row
                   k="Shop .99 adjustment"
                   v={`${total - priceParts < 0 ? "−" : "+"}$${Math.abs(total - priceParts).toFixed(2)}`}

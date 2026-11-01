@@ -101,20 +101,20 @@ export function PotionCabinet({
                   p.rarity === "legendary" && "border-primary/60",
                 )}
               >
-                <div className="flex items-start justify-between">
+                <div className="relative flex justify-center pb-1 pt-5">
                   <span
                     role="img"
                     aria-label={`${e.name} potion`}
-                    className="block h-14 w-11 bg-no-repeat"
+                    className="block h-22 w-[69px] shrink-0 bg-no-repeat"
                     style={bottleStyle(e.id)}
                   />
                   {RARITY_LABEL[p.rarity] && (
-                    <span className="rounded-full bg-gold-gradient px-2 text-[10px] font-bold uppercase text-primary-foreground">
+                    <span className="absolute right-0 top-0 rounded-full bg-gold-gradient px-2 text-[10px] font-bold uppercase text-primary-foreground">
                       {RARITY_LABEL[p.rarity]}
                     </span>
                   )}
                 </div>
-                <p className="mt-1 font-semibold leading-tight">{p.name}</p>
+                <p className="mt-3 font-semibold leading-tight">{p.name}</p>
                 <p className="mt-0.5 text-xs italic text-muted-foreground">{p.note}</p>
                 <p className="text-xs text-muted-foreground">{e.name}</p>
                 <p className="mt-1 text-gold">${p.price}</p>

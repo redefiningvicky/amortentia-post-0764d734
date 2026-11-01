@@ -108,6 +108,11 @@ function Wall() {
   rows.forEach((r) => r.outcome && scores.set(r.outcome, (scores.get(r.outcome) ?? 0) + r.swoon_count + 1));
   const trending = [...scores.entries()].map(([name, score]) => ({ id: name, name, score })).sort((a, b) => b.score - a.score).slice(0, 5);
 
+  // Confession feed: 10 at a time; changing the sort starts over at 10.
+  const feed = [...localConfessions, ...rows];
+  const { visible: feedVisible, shown: feedShown, total: feedTotal, more: showMoreConfessions } = useShowMore(feed, sort);
+
+
   async function swoon(id: string) {
     const has = mine.includes(id);
     if (!userId) {

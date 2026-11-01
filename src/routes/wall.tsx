@@ -299,8 +299,12 @@ function Wall() {
                 className={cn("flex min-h-11 items-center gap-2 rounded-full border border-parchment-foreground/30 px-4", mine.includes(r.id) && "bg-accent text-accent-foreground")}>
                 <OptArt id="heart" alt="swoon" className="h-5 w-5 rounded-full object-cover" /> {count(r)}
               </button>
+            </div>
+          </article>
+        ))}
       </div>
       <ShowMore shown={feedShown} total={feedTotal} noun="confessions" onMore={showMoreConfessions} />
+
 
 
       <Button onClick={() => setConfessing(true)} className="mt-6 h-14 rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow">

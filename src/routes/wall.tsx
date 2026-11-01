@@ -554,12 +554,14 @@ function Wall() {
               </figure>
             ))}
           </div>
-          <ShowMore
-            shown={albumPage.shown}
-            total={albumPage.total}
-            noun="photos"
-            onMore={albumPage.more}
-          />
+          <div className="mt-5 pb-2 [&>div]:space-y-3">
+            <ShowMore
+              shown={albumPage.shown}
+              total={albumPage.total}
+              noun="photos"
+              onMore={albumPage.more}
+            />
+          </div>
         </section>
       )}
 

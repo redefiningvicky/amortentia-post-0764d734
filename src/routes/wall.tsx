@@ -575,12 +575,7 @@ function Wall() {
             onMore={showMoreConfessions}
           />
 
-          <Button
-            onClick={() => setConfessing(true)}
-            className="mt-6 h-14 rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow"
-          >
-            Confess Your Own
-          </Button>
+
         </>
       )}
     </Shell>

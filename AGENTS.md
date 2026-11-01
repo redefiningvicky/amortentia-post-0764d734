@@ -20,3 +20,7 @@
 - Pitch deck lives at /pitch as an in-app slide route (1920x1080 scaled, ?slide=N); product slide uses real app screenshots in src/assets/shot-* (bundled images or CDN asset pointers) — retake them when screens change.
 - Gift tracking: public `gifts` table holds only open/bite timestamps (no names); recipient names travel in the private gift link URL; read/write only via mark_gift/gift_status RPCs.
 - All imagery is realistic vintage storybook oil-painting art (burgundy/gold on aged parchment) generated into src/assets/opt-*.jpg and mapped in src/lib/art.ts (OPT_ART), rendered via src/components/opt-art.tsx — never emoji, pictographs, or flat line-art icons, in the app or the deck. src/components/icons.tsx survives only for pure UI glyphs (check, x). Catalog entries still carry icon name strings asserted by src/test/catalog.test.ts.
+
+
+## Static browser demo
+On the static-browser-demo branch, public stories, photos, gift events, and user activity use src/lib/demo.ts and browser storage. No database, auth, email, payment, or Lovable runtime requests belong in the static bundle. This supersedes database-specific instructions above for this branch. Build with npm run build:demo and run node scripts/check-demo.mjs. Preserve the large fictional catalogue and the existing artwork. Publish only dist-demo contents to the public hosting repository.

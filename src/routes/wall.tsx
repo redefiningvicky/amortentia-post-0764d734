@@ -291,7 +291,7 @@ function Wall() {
     shown: feedShown,
     total: feedTotal,
     more: showMoreConfessions,
-  } = useShowMore(feed, sort);
+  } = useShowMore(feed, sort, 5);
 
   async function swoon(id: string) {
     const has = mine.includes(id);

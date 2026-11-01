@@ -68,6 +68,7 @@ function readDetails(s: Search): GiftDetails {
       wrapping: text("wrapping"),
       handwritten: text("handwritten"),
       card: text("card"),
+      cardMessage: text("cardMessage"),
       createdAt: text("createdAt"),
       keepsakes: Array.isArray(d.keepsakes)
         ? d.keepsakes.filter((v: unknown) => typeof v === "string")
@@ -161,7 +162,14 @@ function Gift() {
               )}
             </div>
             {gift.card && (
-              <p className="mt-3 text-gold">{CARDS.find((c) => c.id === gift.card)?.name}</p>
+              <div className="mt-3 rounded-2xl border border-gold bg-card p-4">
+                <p className="text-gold">{CARDS.find((c) => c.id === gift.card)?.name}</p>
+                {gift.cardMessage && (
+                  <blockquote className="mt-2 whitespace-pre-wrap break-words text-xl italic">
+                    {gift.cardMessage}
+                  </blockquote>
+                )}
+              </div>
             )}
             <GoldButton className="mt-6" onClick={() => setStage("open")}>
               Reveal My Chocolates

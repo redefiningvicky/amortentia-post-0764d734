@@ -23,6 +23,7 @@ export type GiftDetails = {
   wrapping?: string | undefined;
   handwritten?: string | undefined;
   card?: string | undefined;
+  cardMessage?: string | undefined;
   keepsakes?: string[];
   potions?: string[];
   potionResult?: PotionResult | null;

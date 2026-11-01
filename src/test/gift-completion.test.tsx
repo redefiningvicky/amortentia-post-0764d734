@@ -35,6 +35,8 @@ beforeEach(() => {
     ...state.search,
     wrapping: "velvet",
     handwritten: "The paid handwritten letter",
+    card: "vintage",
+    cardMessage: "The words written on their card",
     keepsakes: ["plush"],
     potions: ["ember-1"],
   });
@@ -45,6 +47,7 @@ describe("Recipient unboxing", () => {
     expect(screen.getByText("Crimson Velvet Heart")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Break the wax seal" }));
     expect(screen.getByText("The paid handwritten letter")).toBeInTheDocument();
+    expect(screen.getByText("The words written on their card")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Reveal My Chocolates" }));
     expect(screen.getByText("Messenger Owl Plush")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Take a Bite" }));

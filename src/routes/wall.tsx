@@ -9,6 +9,8 @@ import { GoldButton, Shell } from "@/components/kit";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { CONFESSION_LIMIT, validConfession } from "@/lib/confession";
+import { ShowMore, useShowMore } from "@/components/blend-browse";
+
 import sampleUnboxing from "@/assets/album-unboxing.jpg";
 import sampleBite from "@/assets/album-firstbite.jpg";
 import sampleKeepsake from "@/assets/album-keepsake.jpg";
@@ -107,6 +109,11 @@ function Wall() {
   const scores = new Map<string, number>();
   rows.forEach((r) => r.outcome && scores.set(r.outcome, (scores.get(r.outcome) ?? 0) + r.swoon_count + 1));
   const trending = [...scores.entries()].map(([name, score]) => ({ id: name, name, score })).sort((a, b) => b.score - a.score).slice(0, 5);
+
+  // Confession feed: 10 at a time; changing the sort starts over at 10.
+  const feed = [...localConfessions, ...rows];
+  const { visible: feedVisible, shown: feedShown, total: feedTotal, more: showMoreConfessions } = useShowMore(feed, sort);
+
 
   async function swoon(id: string) {
     const has = mine.includes(id);
@@ -279,7 +286,7 @@ function Wall() {
       </div>
 
       <div className="mt-4 space-y-3">
-        {[...localConfessions, ...rows].map((r) => (
+        {feedVisible.map((r) => (
           <article key={r.id} className="rounded-2xl bg-parchment p-4 text-parchment-foreground">
             <p className="font-display text-lg text-accent">{r.outcome ?? "No Potion Needed"}</p>
             <p className="text-xs uppercase tracking-wider opacity-70">
@@ -296,6 +303,9 @@ function Wall() {
           </article>
         ))}
       </div>
+      <ShowMore shown={feedShown} total={feedTotal} noun="confessions" onMore={showMoreConfessions} />
+
+
 
       <Button onClick={() => setConfessing(true)} className="mt-6 h-14 rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow">
         Confess Your Own

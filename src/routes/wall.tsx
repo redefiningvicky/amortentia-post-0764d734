@@ -279,7 +279,7 @@ function Wall() {
       </div>
 
       <div className="mt-4 space-y-3">
-        {[...localConfessions, ...rows].map((r) => (
+        {feedVisible.map((r) => (
           <article key={r.id} className="rounded-2xl bg-parchment p-4 text-parchment-foreground">
             <p className="font-display text-lg text-accent">{r.outcome ?? "No Potion Needed"}</p>
             <p className="text-xs uppercase tracking-wider opacity-70">

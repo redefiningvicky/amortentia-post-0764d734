@@ -172,7 +172,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
             ))}
           </div>
           <p className="slide-caption mt-10 text-muted-foreground">
-            Average order today: from $19.99 up to $380.99 with potions, keepsakes and delivery.
+            Average order today: from $19.99 up to $392.96 with potions, keepsakes and delivery.
           </p>
         </div>
       </Slide>

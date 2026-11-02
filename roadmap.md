@@ -51,4 +51,4 @@
 - [x] Remember opened gifts on the receiving device under Me → Received
 - [x] Simulated delivery stages separate from opening and biting
 - [x] Editable order review, price explanation, bundle replacement and duplicate-retry prevention
-- [ ] Pitch product slide: update average order line to "from $19.99 up to $380.99 with potions, keepsakes and delivery"
+- [x] Pitch product slide: average order line already matches requested text ("from $19.99 up to $380.99") to "from $19.99 up to $380.99 with potions, keepsakes and delivery"

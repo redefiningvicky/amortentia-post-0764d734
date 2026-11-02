@@ -141,13 +141,13 @@ const SLIDES: { title: string; el: ReactNode }[] = [
             {[
               [
                 "Who pays",
-                "Senders aged 18–40 buying for a crush, partner, ex… or bestie",
+                "Anyone buying for a crush, partner, ex… or bestie",
                 "coins",
               ],
               [
                 "How many",
                 <>
-                  Valentine's spend: <Ph>[US $ figure — add source]</Ph>
+                  Valentine's spend: <span className="text-gold">$1 trillion</span>
                 </>,
                 "chart",
               ],

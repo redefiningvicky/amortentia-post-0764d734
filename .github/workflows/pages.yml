@@ -52,7 +52,6 @@ jobs:
         with:
           path: dist-pages
   publish:
-    if: vars.PUBLISH_GITHUB_PAGES == 'true'
     needs: build
     runs-on: ubuntu-latest
     permissions:

@@ -26,10 +26,8 @@ In this repository's **Settings > Pages**, choose **GitHub Actions** as the sour
 Private repositories require a GitHub plan that supports Pages. Keep the repository
 private unless you independently choose to make the source public.
 
-Set the repository Actions variable `PUBLISH_GITHUB_PAGES` to `true` to enable
-the deployment job after configuring Pages. The workflow still builds and saves
-exports when that variable is absent. Each subsequent source update rebuilds the
-app and slides together.
+Each source update rebuilds the app and slides together, saves the export bundle,
+and deploys it once GitHub Pages has been configured.
 
 The app URL will end in `/amortentia-post-0764d734/#/`; slides use
 `/amortentia-post-0764d734/#/pitch?slide=1`. The existing Demo repository can stay

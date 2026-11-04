@@ -9,15 +9,28 @@ This project draws inspiration from the iconic Harry Potter and the Half-Blood s
 
 <sub>Click the image above to watch the video.</sub> <p>
 ## 🛠️ Tools <br>
-Lovable <p>
-## 🪙 Lovable Credit Usage <br>
-
+Lovable, ChatGPT, Github <p>
 ## 📱 App <br>
-This project is a fully functional app available at the following link: [Launch App]() <p>
-## 📢 Pitch Format <br>
-1. Problem
-2. Solution
-3. Market
-4. Product
-5. Company Name
-6. Smile
+This project has a fully functional app available at the following link: [Launch App](https://redefiningvicky.github.io/amortentia-post-0764d734/#/) <p>
+## 📢 Pitch <br>
+This project has a fully functional pitch available at the following link: [Launch Pitch](https://redefiningvicky.github.io/amortentia-post-0764d734/#/pitch?slide=1) <p>
+
+<details>
+<summary><strong>View Pitch Format</strong></summary><p></p>
+
+<p>
+1. Problem <br>
+2. Solution <br>
+3. Market <br>
+4. Product <br>
+5. Company Name <br>
+6. Smile <br>
+<p>
+  
+</details>
+<img src="https://github.com/redefiningvicky/amortentia-post-0764d734/blob/b5498f8b1a02f2f2c3ba08b4ae110b6411d61f2e/exports/pitch/png/01-problem.png" width="900" />
+<img src="https://github.com/redefiningvicky/amortentia-post-0764d734/blob/b5498f8b1a02f2f2c3ba08b4ae110b6411d61f2e/exports/pitch/png/02-solution.png" width="900" />
+<img src="https://github.com/redefiningvicky/amortentia-post-0764d734/blob/b5498f8b1a02f2f2c3ba08b4ae110b6411d61f2e/exports/pitch/png/03-market.png" width="900" />
+<img src="https://github.com/redefiningvicky/amortentia-post-0764d734/blob/b5498f8b1a02f2f2c3ba08b4ae110b6411d61f2e/exports/pitch/png/04-product.png" width="900" />
+<img src="https://github.com/redefiningvicky/amortentia-post-0764d734/blob/b5498f8b1a02f2f2c3ba08b4ae110b6411d61f2e/exports/pitch/png/05-the-payoff.png" width="900" />
+<img src="https://github.com/redefiningvicky/amortentia-post-0764d734/blob/b5498f8b1a02f2f2c3ba08b4ae110b6411d61f2e/exports/pitch/png/06-smile.png" width="900" />

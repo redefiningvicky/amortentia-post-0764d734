@@ -167,7 +167,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
             ))}
           </div>
           <p className="slide-caption mt-10 text-muted-foreground">
-            Average order range: $54.98–$189.96. Dignity sold separately.
+            Typical damage: $54.98–$189.96. Dignity sold separately.
           </p>
         </div>
       </Slide>

@@ -300,7 +300,8 @@ function Pitch() {
 
   if (exportSize === "4k") {
     return (
-      <div className="bg-background" style={{ width: 3840, height: 2160, overflow: "hidden" }}>
+      <div data-pitch-export className="bg-background" style={{ width: 3840, height: 2160, overflow: "hidden" }}>
+        <style>{`html:has([data-pitch-export]) { scrollbar-width: none; } html:has([data-pitch-export])::-webkit-scrollbar { display: none; }`}</style>
         <div style={{ width: 1920, height: 1080, transform: "scale(2)", transformOrigin: "top left" }}>
           {SLIDES[i]!.el}
         </div>

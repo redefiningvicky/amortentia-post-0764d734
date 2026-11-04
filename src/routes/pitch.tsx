@@ -167,7 +167,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
             ))}
           </div>
           <p className="slide-caption mt-10 text-muted-foreground">
-            Example order range: $32.98–$389.96, including a brew, potency, extras and delivery.
+            Average order range: $54.98–$189.96. Dignity sold separately.
           </p>
         </div>
       </Slide>

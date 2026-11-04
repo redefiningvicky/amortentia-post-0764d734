@@ -1,7 +1,7 @@
 import { chromium } from "playwright";
 import { PDFDocument } from "pdf-lib";
 import { createServer } from "node:http";
-import { readFile, mkdir, writeFile, copyFile } from "node:fs/promises";
+import { readFile, mkdir, writeFile, copyFile, cp } from "node:fs/promises";
 import { resolve, extname } from "node:path";
 import { execFileSync } from "node:child_process";
 
@@ -66,6 +66,7 @@ try {
   execFileSync("python3", ["-c", "from pathlib import Path; from zipfile import ZipFile, ZIP_DEFLATED; root=Path('exports/pitch'); z=ZipFile('exports/amortentia-post-png-pdf.zip','w',ZIP_DEFLATED); [z.write(p,p.relative_to(root)) for p in sorted(root.rglob('*')) if p.is_file()]; z.close()"]);
   await mkdir(root + "/downloads", { recursive: true });
   await copyFile("exports/amortentia-post-png-pdf.zip", root + "/downloads/amortentia-post-png-pdf.zip");
+  await cp(out, root + "/downloads/pitch", { recursive: true });
   await writeFile(root + "/.nojekyll", "");
 } finally {
   await browser.close();

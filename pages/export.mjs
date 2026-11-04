@@ -26,7 +26,17 @@ try {
   const base = "http://127.0.0.1:4173" + prefix;
   for (const route of ["/", "/discover", "/send", "/spellbook", "/wall", "/me", "/gift"]) {
     await page.goto(base + "#" + route, { waitUntil: "networkidle" });
-    await page.locator("h1").first().waitFor();
+    // Readiness follows the actual UI: Send uses an h2; Me has a profile input.
+    const ready = route === "/send"
+      ? page.getByRole("heading", { name: "How Many Bites Will It Take?", exact: true })
+      : route === "/me"
+        ? page.getByRole("textbox", { name: "Display name", exact: true })
+        : page.locator("h1").first();
+    try {
+      await ready.waitFor();
+    } catch (error) {
+      throw new Error("Route readiness failed: " + route + "\\n" + errors.join("\\n") + "\\n" + (await page.locator("body").innerText()), { cause: error });
+    }
     if (/Page not found|This page didn't load/.test(await page.locator("body").innerText())) throw new Error("Route failed: " + route);
     console.log("Verified route " + route);
   }

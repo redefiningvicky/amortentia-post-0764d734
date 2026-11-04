@@ -60,10 +60,38 @@ describe("Recipient unboxing", () => {
     render(<Gift />);
     fireEvent.click(screen.getByRole("button", { name: "Skip Animation" }));
     expect(guest.received()).toHaveLength(1);
-    expect(state.rpc).toHaveBeenCalledWith("mark_gift", { _id: "gift-one", _event: "open" });
+    expect(guest.giftStatus(["gift-one"])[0]?.opened_at).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Take a Bite" }));
-    expect(state.rpc).toHaveBeenCalledWith("mark_gift", { _id: "gift-one", _event: "bite" });
+    expect(guest.giftStatus(["gift-one"])[0]?.bitten_at).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Replay Unboxing" }));
     expect(guest.received()).toHaveLength(1);
+  });
+  it("lets the sender try the bite without receiving their own gift or changing its first timestamps", () => {
+    state.search.preview = false;
+    guest.addOrder({
+      id: "gift-one",
+      gift_id: "gift-one",
+      tier: "sweet",
+      recipient_name: "Henry",
+      total: 32.98,
+      created_at: new Date().toISOString(),
+    });
+    render(<Gift />);
+    fireEvent.click(screen.getByRole("button", { name: "Skip Animation" }));
+    const opened = guest.giftStatus(["gift-one"])[0]?.opened_at;
+    expect(opened).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Take a Bite" }));
+    const bitten = guest.giftStatus(["gift-one"])[0]?.bitten_at;
+    expect(bitten).toBeTruthy();
+    expect(guest.received()).toHaveLength(0);
+    fireEvent.click(screen.getByRole("button", { name: "Replay Unboxing" }));
+    fireEvent.click(screen.getByRole("button", { name: "Skip Animation" }));
+    fireEvent.click(screen.getByRole("button", { name: "Take a Bite" }));
+    expect(guest.giftStatus(["gift-one"])[0]).toEqual({
+      id: "gift-one",
+      opened_at: opened,
+      bitten_at: bitten,
+    });
+    expect(state.rpc).not.toHaveBeenCalled();
   });
 });

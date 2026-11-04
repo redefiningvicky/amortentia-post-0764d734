@@ -1,11 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import hero from "@/assets/hero.jpg";
-import homeAsset from "@/assets/shot-home.jpg.asset.json";
-import boxAsset from "@/assets/shot-box.jpg.asset.json";
-import potionsAsset from "@/assets/shot-potions.jpg.asset.json";
-import extrasAsset from "@/assets/shot-extras.jpg.asset.json";
-import biteAsset from "@/assets/shot-bite.jpg.asset.json";
+import boxScreenshot from "@/assets/shot-current-box.jpg";
+import potionsScreenshot from "@/assets/shot-current-potions.jpg";
+import writingScreenshot from "@/assets/shot-current-writing.jpg";
+import biteScreenshot from "@/assets/shot-current-reaction.jpg";
 import grand from "@/assets/box-grand.jpg";
 import { OptArt } from "@/components/opt-art";
 
@@ -40,9 +39,9 @@ function Phone({ src, alt, className = "" }: { src: string; alt: string; classNa
   return (
     <div
       className={`overflow-hidden rounded-[48px] border-[10px] border-card shadow-glow ${className}`}
-      style={{ width: 300, height: 650 }}
+      style={{ width: 360, height: 772 }}
     >
-      <img src={src} alt={alt} className="h-full w-full object-cover object-top" />
+      <img src={src} alt={alt} className="h-full w-full bg-background object-contain object-top" />
     </div>
   );
 }
@@ -139,11 +138,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
           </h1>
           <div className="mt-14 grid grid-cols-3 gap-10">
             {[
-              [
-                "Who pays",
-                "Anyone buying for a crush, partner, ex… or bestie",
-                "coins",
-              ],
+              ["Who pays", "Anyone buying for a crush, partner, ex… or bestie", "coins"],
               [
                 "How many",
                 <>
@@ -172,7 +167,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
             ))}
           </div>
           <p className="slide-caption mt-10 text-muted-foreground">
-            Average order today: from $19.99 up to $392.96 with potions, keepsakes and delivery.
+            Example order range: $32.98–$389.96, including a brew, potency, extras and delivery.
           </p>
         </div>
       </Slide>
@@ -182,18 +177,17 @@ const SLIDES: { title: string; el: ReactNode }[] = [
     title: "Product",
     el: (
       <Slide>
-        <div className="absolute inset-0 flex flex-col px-[100px] pt-[80px]">
-          <Kicker>04 · The Product — live demo</Kicker>
+        <div className="absolute inset-0 flex flex-col px-[110px] pt-[55px]">
+          <Kicker>04 · The Product</Kicker>
           <h1 className="slide-subtitle mt-4 font-display text-gold-gradient">
             Pick a box, brew a potion, they take a bite, you find out.
           </h1>
-          <div className="mt-12 flex justify-between">
+          <div className="mt-7 flex justify-between gap-10">
             {[
-              [homeAsset.url, "Home"],
-              [boxAsset.url, "Choose a box"],
-              [potionsAsset.url, "110 potions"],
-              [extrasAsset.url, "Extras & meter"],
-              [biteAsset.url, "They bit it!"],
+              [boxScreenshot, "Choose your box"],
+              [potionsScreenshot, "Brew their downfall"],
+              [writingScreenshot, "Confess dramatically"],
+              [biteScreenshot, "They ate it!"],
             ].map(([s, l]) => (
               <div key={l} className="text-center">
                 <Phone src={s!} alt={l!} />
@@ -206,7 +200,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
     ),
   },
   {
-    title: "Company",
+    title: "The Payoff",
     el: (
       <Slide>
         <img
@@ -214,10 +208,39 @@ const SLIDES: { title: string; el: ReactNode }[] = [
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-30"
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <Kicker>05 · Who We Are</Kicker>
-          <h1 className="slide-title-lg mt-8 font-display text-gold-gradient">Amortentia Post</h1>
-          <p className="slide-subtitle mt-8 font-serif italic">One bite. Finally seen.</p>
+        <div className="absolute inset-0 grid grid-cols-[1.15fr_1fr] items-center gap-20 px-[140px]">
+          <div>
+            <Kicker>05 · One Bite Later</Kicker>
+            <h1 className="slide-title mt-6 font-display text-gold-gradient">
+              Ramona sent chocolates. Henry lost the plot.
+            </h1>
+            <p className="slide-body-lg mt-8 text-muted-foreground">
+              She chose the blend, tucked in her confession, and trusted an owl with her entire love
+              life.
+            </p>
+            <p className="slide-body mt-6 text-foreground">
+              He broke the seal. He took a bite. Now he’s composing wedding vows between mouthfuls.
+            </p>
+            <p className="slide-subtitle mt-8 font-serif italic text-gold">
+              Owl Post update: THEY ATE IT.
+            </p>
+          </div>
+          <div className="rounded-[40px] border border-gold/40 bg-card/95 p-10 shadow-glow">
+            <p className="slide-caption uppercase tracking-widest text-gold">Henry’s condition</p>
+            <h2 className="slide-subtitle mt-5 font-display text-gold">
+              Utterly, inconveniently besotted.
+            </h2>
+            <p className="slide-body mt-6 text-muted-foreground">
+              Chocolate: eaten.
+              <br />
+              Composure: missing.
+              <br />
+              Ramona: finally noticed.
+            </p>
+            <p className="slide-body mt-8 font-serif italic text-foreground">
+              “Does she think of me? Should I write? Is it too soon to name our owl?”
+            </p>
+          </div>
         </div>
       </Slide>
     ),

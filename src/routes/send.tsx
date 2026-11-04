@@ -52,8 +52,7 @@ export const Route = createFileRoute("/send")({
         ? s["box"]
         : undefined,
     bundle:
-      typeof s["bundle"] === "string" &&
-      BUNDLES.some((b) => b.id === s["bundle"])
+      typeof s["bundle"] === "string" && BUNDLES.some((b) => b.id === s["bundle"])
         ? s["bundle"]
         : undefined,
     blend:
@@ -69,8 +68,7 @@ export const Route = createFileRoute("/send")({
       { title: "Send Enchanted Chocolates — Amortentia Post" },
       {
         name: "description",
-        content:
-          "Choose a box, brew your potion, add a handwritten note, and send it by owl.",
+        content: "Choose a box, brew your potion, add a handwritten note, and send it by owl.",
       },
       { property: "og:title", content: "Send Enchanted Chocolates" },
       {
@@ -101,9 +99,7 @@ function Send() {
   const initialBundle = BUNDLES.find((b) => b.id === search.bundle);
   const [step, setStep] = useState(0);
   const [potionMode, setPotionMode] = useState<"cabinet" | "class">(
-    search.blend?.split(",").some((id) => id.startsWith("raw-"))
-      ? "class"
-      : "cabinet",
+    search.blend?.split(",").some((id) => id.startsWith("raw-")) ? "class" : "cabinet",
   );
   const [brewReady, setBrewReady] = useState(false);
   useEffect(() => {
@@ -117,32 +113,23 @@ function Send() {
     search.blend?.split(",").filter((id) => id.startsWith("raw-")) ?? [],
   );
   const potions = potionMode === "class" ? rawIngredients : cabinetPotions;
-  const setPotions =
-    potionMode === "class" ? setRawIngredients : setCabinetPotions;
+  const setPotions = potionMode === "class" ? setRawIngredients : setCabinetPotions;
   const [keepsakes, setKeepsakes] = useState<string[]>(
     initialBundle ? [...initialBundle.pick.keepsakes] : [],
   );
-  const [packaging, setPackaging] = useState(
-    initialBundle?.pick.packaging ?? "kraft",
-  );
+  const [packaging, setPackaging] = useState(initialBundle?.pick.packaging ?? "kraft");
   const [delivery, setDelivery] = useState("owl");
   const [antidote, setAntidote] = useState(false);
   const toggleKeepsake = (id: string) =>
-    setKeepsakes((k) =>
-      k.includes(id) ? k.filter((x) => x !== id) : [...k, id],
-    );
+    setKeepsakes((k) => (k.includes(id) ? k.filter((x) => x !== id) : [...k, id]));
   const [tier, setTier] = useState(search.box ?? "true");
   const [strength, setStrength] = useState("swoon");
   const aroma = "rose"; // scent choice removed for fewer decisions; DB still stores a value
   const [duration, setDuration] = useState("hour");
-  const [handwritten, setHandwritten] = useState(
-    initialBundle?.pick.handwritten ?? false,
-  );
+  const [handwritten, setHandwritten] = useState(initialBundle?.pick.handwritten ?? false);
   const [handText, setHandText] = useState(DEMO_COPY.handwritten);
   const [cardMessage, setCardMessage] = useState(DEMO_COPY.cardMessage);
-  const [card, setCard] = useState<string | null>(
-    initialBundle?.pick.card ?? null,
-  );
+  const [card, setCard] = useState<string | null>(initialBundle?.pick.card ?? null);
   const [to, setTo] = useState(DEMO_COPY.recipient);
   const [from, setFrom] = useState(DEMO_COPY.sender);
   const [note, setNote] = useState(DEMO_COPY.confession);
@@ -159,8 +146,7 @@ function Send() {
   useEffect(() => {
     const footer = footerRef.current;
     if (!footer) return;
-    const measure = () =>
-      setFooterHeight(Math.ceil(footer.getBoundingClientRect().height));
+    const measure = () => setFooterHeight(Math.ceil(footer.getBoundingClientRect().height));
     measure();
     if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(measure);
@@ -168,9 +154,7 @@ function Send() {
     return () => observer.disconnect();
   }, [sent]);
 
-  const durId = DURATIONS.find((d) => d.id === duration)
-    ? duration
-    : DURATIONS[0]!.id;
+  const durId = DURATIONS.find((d) => d.id === duration) ? duration : DURATIONS[0]!.id;
   const appliedBundle = bestMatchingBundle({
     handwritten,
     card,
@@ -250,9 +234,7 @@ function Send() {
         });
     } catch {
       setBusy(false);
-      toast.error(
-        "Your browser could not save this gift. Please free some storage and try again.",
-      );
+      toast.error("Your browser could not save this gift. Please free some storage and try again.");
       return;
     }
     setBusy(false);
@@ -270,12 +252,10 @@ function Send() {
             alt="An owl carrying your parcel"
             className="sparkle mx-auto h-32 w-32 rounded-full border border-gold object-cover shadow-glow"
           />
-          <h2 className="mt-6 font-display text-3xl text-gold-gradient">
-            Owl Dispatched
-          </h2>
+          <h2 className="mt-6 font-display text-3xl text-gold-gradient">Owl Dispatched</h2>
           <p className="mt-3 text-lg text-muted-foreground">
-            Your box is flying to {recipientName}. All they have to do is take
-            one bite… Fingers crossed, tissues ready.
+            Your box is flying to {recipientName}. All they have to do is take one bite… Fingers
+            crossed, tissues ready.
           </p>
           <div className="mt-8 space-y-3">
             <GoldButton
@@ -322,8 +302,7 @@ function Send() {
                 Step 1 · Send them their gift link
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                It opens their unboxing. We'll tell you the moment they take a
-                bite.
+                It opens their unboxing. We'll tell you the moment they take a bite.
               </p>
               <button
                 onClick={async () => {
@@ -359,9 +338,7 @@ function Send() {
                     a.href = URL.createObjectURL(file);
                     a.download = file.name;
                     a.click();
-                    toast.success(
-                      "Share card saved! Go make your friends laugh-cry.",
-                    );
+                    toast.success("Share card saved! Go make your friends laugh-cry.");
                   }
                 } catch {
                   /* cancelled */
@@ -410,18 +387,12 @@ function Send() {
         {TITLES.map((s, i) => (
           <div
             key={s}
-            className={cn(
-              "h-1 flex-1 rounded-full",
-              i <= step ? "bg-gold-gradient" : "bg-muted",
-            )}
+            className={cn("h-1 flex-1 rounded-full", i <= step ? "bg-gold-gradient" : "bg-muted")}
           />
         ))}
       </div>
 
-      <main
-        className="mt-6 min-w-0 flex-1 space-y-3"
-        style={{ paddingBottom: footerHeight + 24 }}
-      >
+      <main className="mt-6 min-w-0 flex-1 space-y-3" style={{ paddingBottom: footerHeight + 24 }}>
         {step === 0 && (
           <>
             {[
@@ -437,11 +408,7 @@ function Send() {
               <div key={g.title} className="space-y-3">
                 {g.title && <Label>{g.title}</Label>}
                 {g.list.map((t) => (
-                  <Option
-                    key={t.id}
-                    active={tier === t.id}
-                    onClick={() => setTier(t.id)}
-                  >
+                  <Option key={t.id} active={tier === t.id} onClick={() => setTier(t.id)}>
                     <img
                       src={BOX_ART[t.id]}
                       alt={t.name}
@@ -452,9 +419,7 @@ function Send() {
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-lg font-semibold leading-tight">
-                          {t.name}
-                        </span>
+                        <span className="text-lg font-semibold leading-tight">{t.name}</span>
                         {t.id === "true" && (
                           <span className="rounded-full bg-gold-gradient px-2 py-0.5 text-xs font-bold text-primary-foreground">
                             Popular
@@ -465,9 +430,7 @@ function Send() {
                         {t.pieces} chocolates · {t.blurb}
                       </p>
                     </div>
-                    <span className="shrink-0 text-base font-bold text-gold">
-                      ${t.price}
-                    </span>
+                    <span className="shrink-0 text-base font-bold text-gold">${t.price}</span>
                   </Option>
                 ))}
               </div>
@@ -503,9 +466,7 @@ function Send() {
                   setBrewReady(false);
                 }}
                 className={
-                  potionMode === "class"
-                    ? "h-12 bg-gold-gradient text-primary-foreground"
-                    : "h-12"
+                  potionMode === "class" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"
                 }
               >
                 Brew My Own
@@ -535,11 +496,7 @@ function Send() {
             />
             <Label>How badly do you want them? (Be honest. We can tell.)</Label>
             {STRENGTHS.map((s) => (
-              <Option
-                key={s.id}
-                active={strength === s.id}
-                onClick={() => setStrength(s.id)}
-              >
+              <Option key={s.id} active={strength === s.id} onClick={() => setStrength(s.id)}>
                 <OptArt
                   id={s.id}
                   alt={s.name}
@@ -555,11 +512,7 @@ function Send() {
             <Label>How long they'll be yours</Label>
             <div className="grid grid-cols-3 gap-2">
               {DURATIONS.map((d) => (
-                <Chip
-                  key={d.id}
-                  active={durId === d.id}
-                  onClick={() => setDuration(d.id)}
-                >
+                <Chip key={d.id} active={durId === d.id} onClick={() => setDuration(d.id)}>
                   <OptArt
                     id={d.id}
                     alt=""
@@ -578,8 +531,7 @@ function Send() {
           <>
             <Label>Choose a spell bundle</Label>
             <p className="text-sm text-muted-foreground">
-              One bundle at a time. Its extras are selected automatically; add
-              more below.
+              One bundle at a time. Its extras are selected automatically; add more below.
             </p>
             {BUNDLES.map((b) => {
               const on = appliedBundle?.id === b.id;
@@ -646,27 +598,19 @@ function Send() {
             <Option active={card === null} onClick={() => setCard(null)}>
               <div className="flex-1">
                 <div className="text-lg font-semibold">No card</div>
-                <p className="text-sm text-muted-foreground">
-                  Let the chocolates do the talking.
-                </p>
+                <p className="text-sm text-muted-foreground">Let the chocolates do the talking.</p>
               </div>
               <span className="text-gold">Included</span>
             </Option>
             {CARDS.map((c) => (
-              <Option
-                key={c.id}
-                active={card === c.id}
-                onClick={() => setCard(c.id)}
-              >
+              <Option key={c.id} active={card === c.id} onClick={() => setCard(c.id)}>
                 <OptArt id={c.id} alt={c.name} />
                 <div className="flex-1">
                   <div className="text-lg font-semibold">{c.name}</div>
                   <p className="text-muted-foreground">{c.desc}</p>
                 </div>
                 <span className="text-gold">
-                  {appliedBundle?.pick.card === c.id
-                    ? "Included"
-                    : "+$" + c.price.toFixed(2)}
+                  {appliedBundle?.pick.card === c.id ? "Included" : "+$" + c.price.toFixed(2)}
                 </span>
               </Option>
             ))}
@@ -684,9 +628,7 @@ function Send() {
             <Option active={!handwritten} onClick={() => setHandwritten(false)}>
               <div className="flex-1">
                 <div className="text-lg font-semibold">No handwritten note</div>
-                <p className="text-sm text-muted-foreground">
-                  The message slip or card is plenty.
-                </p>
+                <p className="text-sm text-muted-foreground">The message slip or card is plenty.</p>
               </div>
               <span className="text-gold">Included</span>
             </Option>
@@ -695,14 +637,11 @@ function Send() {
               <div className="flex-1">
                 <div className="text-lg font-semibold">{HANDWRITTEN.name}</div>
                 <p className="text-muted-foreground">
-                  A pretend letter, penned by our scribes. Leave it blank if you
-                  like.
+                  A pretend letter, penned by our scribes. Leave it blank if you like.
                 </p>
               </div>
               <span className="text-gold">
-                {appliedBundle?.pick.handwritten
-                  ? "Included"
-                  : "+$" + HANDWRITTEN.price.toFixed(2)}
+                {appliedBundle?.pick.handwritten ? "Included" : "+$" + HANDWRITTEN.price.toFixed(2)}
               </span>
             </Option>
             {handwritten && (
@@ -722,11 +661,7 @@ function Send() {
           <>
             <Label>The moment they first see it (and hopefully eat it)</Label>
             {PACKAGING.map((k) => (
-              <Option
-                key={k.id}
-                active={packaging === k.id}
-                onClick={() => setPackaging(k.id)}
-              >
+              <Option key={k.id} active={packaging === k.id} onClick={() => setPackaging(k.id)}>
                 <OptArt id={k.id} alt={k.name} />
                 <div className="flex-1">
                   <div className="text-lg font-semibold">{k.name}</div>
@@ -743,11 +678,7 @@ function Send() {
             ))}
             <Label>How long can you possibly wait?</Label>
             {DELIVERY.map((k) => (
-              <Option
-                key={k.id}
-                active={delivery === k.id}
-                onClick={() => setDelivery(k.id)}
-              >
+              <Option key={k.id} active={delivery === k.id} onClick={() => setDelivery(k.id)}>
                 <OptArt id={k.id} alt={k.name} />
                 <div className="flex-1">
                   <div className="text-lg font-semibold">{k.name}</div>
@@ -763,12 +694,7 @@ function Send() {
 
         {step === 6 && (
           <div className="rounded-2xl bg-parchment p-5 text-parchment-foreground shadow-glow">
-            <Field
-              label="To my beloved"
-              value={to}
-              onChange={setTo}
-              placeholder="Their name"
-            />
+            <Field label="To my beloved" value={to} onChange={setTo} placeholder="Their name" />
             <Field
               label="From your admirer"
               value={from}
@@ -782,18 +708,11 @@ function Send() {
           <>
             <div className="space-y-2 rounded-2xl border bg-card p-5">
               <Row k="Box" v={ALL_BOXES.find((t) => t.id === tier)!.name} />
-              <Row
-                k="Potency"
-                v={STRENGTHS.find((s) => s.id === strength)!.name}
-              />
+              <Row k="Potency" v={STRENGTHS.find((s) => s.id === strength)!.name} />
               <Row k="Lasts" v={DURATIONS.find((d) => d.id === durId)!.name} />
               {handwritten && <Row k="Extra" v="Handwritten note" />}
-              {card && (
-                <Row k="Card" v={CARDS.find((c) => c.id === card)!.name} />
-              )}
-              {card && cardMessage.trim() && (
-                <Row k="Card message" v={cardMessage} />
-              )}
+              {card && <Row k="Card" v={CARDS.find((c) => c.id === card)!.name} />}
+              {card && cardMessage.trim() && <Row k="Card message" v={cardMessage} />}
               {keepsakes.length > 0 && (
                 <Row
                   k="Keepsakes"
@@ -803,27 +722,16 @@ function Send() {
                     .join(", ")}
                 />
               )}
-              <Row
-                k="Wrapping"
-                v={PACKAGING.find((x) => x.id === packaging)!.name}
-              />
-              <Row
-                k="Delivery"
-                v={DELIVERY.find((x) => x.id === delivery)!.name}
-              />
+              <Row k="Wrapping" v={PACKAGING.find((x) => x.id === packaging)!.name} />
+              <Row k="Delivery" v={DELIVERY.find((x) => x.id === delivery)!.name} />
               {appliedBundle && <Row k="Spell bundle" v={appliedBundle.name} />}
-              {saving > 0 && (
-                <Row k="Bundle savings" v={`−$${saving.toFixed(2)}`} />
-              )}
+              {saving > 0 && <Row k="Bundle savings" v={`−$${saving.toFixed(2)}`} />}
               {waived > 0 && <Row k="Express Owl" v="Free" />}
               <Row k="To" v={recipientName} />
               <Row k="From" v={senderName} />
               {note && <Row k="Confession" v={note} />}
               {handwritten && (
-                <Row
-                  k="Handwritten note"
-                  v={handText.trim() || "No message added"}
-                />
+                <Row k="Handwritten note" v={handText.trim() || "No message added"} />
               )}
               <div className="border-t pt-3">
                 <p className="text-sm text-gold">Price breakdown</p>
@@ -832,10 +740,7 @@ function Send() {
                   v={`$${orderTotal(tier, strength, durId).toFixed(2)}`}
                 />
                 <Row k="Recipe" v={`$${potionsTotal(potions).toFixed(2)}`} />
-                <Row
-                  k="Note & card"
-                  v={`$${addonsTotal(handwritten, card).toFixed(2)}`}
-                />
+                <Row k="Note & card" v={`$${addonsTotal(handwritten, card).toFixed(2)}`} />
                 <Row
                   k="Wrapping, delivery & extras"
                   v={`$${upgradesTotal(packaging, delivery, keepsakes, antidote).toFixed(2)}`}
@@ -888,9 +793,7 @@ function Send() {
                 className="h-14 w-14 shrink-0 rounded-full border border-gold object-cover"
               />
               <div className="flex-1">
-                <div className="font-semibold">
-                  Share anonymously on the Wall
-                </div>
+                <div className="font-semibold">Share anonymously on the Wall</div>
                 <p className="text-sm text-muted-foreground">
                   Try it on the pretend Wall for this visit only.
                 </p>
@@ -932,9 +835,7 @@ function Send() {
               />
             </div>
           </div>
-          <span className="text-lg font-bold text-gold">
-            ${total.toFixed(2)}
-          </span>
+          <span className="text-lg font-bold text-gold">${total.toFixed(2)}</span>
         </div>
         <GoldButton
           disabled={!canNext || busy}
@@ -966,10 +867,7 @@ function MessageField({
 }) {
   return (
     <div className="rounded-2xl bg-parchment p-5 text-parchment-foreground">
-      <label
-        htmlFor={id}
-        className="block text-sm font-semibold uppercase tracking-wider"
-      >
+      <label htmlFor={id} className="block text-sm font-semibold uppercase tracking-wider">
         {label}
       </label>
       {description && <p className="mt-1 text-sm opacity-70">{description}</p>}
@@ -1004,9 +902,7 @@ function Field({
 }) {
   return (
     <label className="mb-3 block">
-      <span className="text-sm font-semibold uppercase tracking-wider">
-        {label}
-      </span>
+      <span className="text-sm font-semibold uppercase tracking-wider">{label}</span>
       <input
         type={type}
         value={value}
@@ -1021,9 +917,7 @@ function Row({ k, v }: { k: string; v: string }) {
   return (
     <div className="flex items-start justify-between gap-3">
       <span className="min-w-0 break-words text-muted-foreground">{k}</span>
-      <span className="min-w-0 max-w-[65%] break-words text-right font-semibold">
-        {v}
-      </span>
+      <span className="min-w-0 max-w-[65%] break-words text-right font-semibold">{v}</span>
     </div>
   );
 }

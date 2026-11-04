@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@fontsource/cinzel-decorative": "^5.2.0",
+    "@fontsource/cormorant-garamond": "^5.2.0",
+    "playwright": "^1.56.0",
+    "pdf-lib": "^1.17.1"
+  }
+}

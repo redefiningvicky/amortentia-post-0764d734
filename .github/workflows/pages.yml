@@ -1,0 +1,66 @@
+name: App, slides and exports
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "exports/**"
+      - "**/*.md"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: app-and-slides
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install
+      - run: npm --prefix pages install
+      - run: npm test
+      - name: Build the static app from Lovable source
+        run: npx vite build --config pages/vite.config.ts
+      - name: Install export browser
+        run: cd pages && npx playwright install --with-deps chromium
+      - name: Verify app routes and export all six slides
+        run: node pages/export.mjs
+      - name: Keep the export bundle in this repository
+        run: |
+          git fetch origin main
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+            echo "Source changed during export; the next run will save the newer bundle."
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add exports/amortentia-post-png-pdf.zip
+          if ! git diff --cached --quiet; then
+            git commit -m "Update PNG and PDF slide exports [skip ci]"
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-slides-and-exports
+          path: dist-pages
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist-pages
+  publish:
+    if: vars.PUBLISH_GITHUB_PAGES == 'true'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

@@ -1,3 +1,4 @@
+import { appUrl } from "@/lib/app-url";
 import { DEMO_COPY } from "@/lib/demo-copy";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
@@ -209,7 +210,7 @@ function Send() {
       note: note.trim(),
     });
     qs.set("details", JSON.stringify(details));
-    const url = `${window.location.origin}/gift?${qs}`;
+    const url = appUrl(`/gift?${qs}`);
     try {
       guest.addOrder({
         id: giftId,
@@ -317,7 +318,7 @@ function Send() {
             <GoldButton
               onClick={async () => {
                 const text = `I just spent $${total.toFixed(2)} on love-potion chocolates to make ${recipientName} love me. Pray for me.`;
-                const url = window.location.origin;
+                const url = appUrl();
                 const file = await makeShareCard({
                   total,
                   to: recipientName,

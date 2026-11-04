@@ -24,3 +24,7 @@
 
 ## Fictional Wall
 The Wall is a gag experience using only the 13 fictional confessions in src/lib/wall-demo.ts and 16 bundled sample photos. This supersedes earlier database-backed Wall instructions. Never read customer confessions, photo uploads, or old database caches into this UI. Posting and order sharing are pretend interactions kept only in sessionStorage; pinning uses built-in photos for the current visit, with no uploads. Send must set share_on_wall to false and must not insert confessions in the database. Preserve five-confession/six-photo paging and the shared ShowMore spacing.
+
+
+## Browser demo gift journey
+Send creates browser-local orders and self-contained gift links. It must not require a database registration to finish this gag demo. Gift opening and biting use guest.markGift / guest.giftStatus; Me uses that same activity store. Previews do not mark activity. Rehearsing your own sent gift must not add it to Received. The fixed navigation height is --app-nav-height, and Send measures its fixed panel so the last controls stay scrollable above it.

@@ -1,8 +1,7 @@
 import { DEMO_COPY } from "@/lib/demo-copy";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { type GiftDetails, guest } from "@/lib/guest";
 import {
   TIERS,
@@ -28,8 +27,6 @@ import {
   bestMatchingBundle,
   bundlePrice,
   expressWaiver,
-  FREE_EXPRESS_OVER,
-  to99Up,
 } from "@/lib/catalog";
 import { PotionResultCard } from "@/components/potion-result-card";
 import { livePotionResult } from "@/lib/catalog";
@@ -157,6 +154,20 @@ function Send() {
   const [giftUrl, setGiftUrl] = useState("");
   const [savedGift, setSavedGift] = useState<GiftDetails | null>(null);
 
+  const footerRef = useRef<HTMLDivElement>(null);
+  const [footerHeight, setFooterHeight] = useState(160);
+  useEffect(() => {
+    const footer = footerRef.current;
+    if (!footer) return;
+    const measure = () =>
+      setFooterHeight(Math.ceil(footer.getBoundingClientRect().height));
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(footer);
+    return () => observer.disconnect();
+  }, [sent]);
+
   const durId = DURATIONS.find((d) => d.id === duration)
     ? duration
     : DURATIONS[0]!.id;
@@ -188,17 +199,7 @@ function Send() {
 
   async function submit() {
     setBusy(true);
-    const u = { user: null as null | { id: string } };
-    let error: unknown = null;
     const giftId = crypto.randomUUID();
-    const { error: giftError } = await supabase
-      .from("gifts")
-      .insert({ id: giftId });
-    if (giftError) {
-      setBusy(false);
-      toast.error("The owl could not register your parcel. Please try again.");
-      return;
-    }
     const details: GiftDetails = {
       id: giftId,
       to: recipientName,
@@ -225,59 +226,34 @@ function Send() {
     });
     qs.set("details", JSON.stringify(details));
     const url = `${window.location.origin}/gift?${qs}`;
-    if (u.user) {
-      ({ error } = await supabase.from("orders").insert({
+    try {
+      guest.addOrder({
+        id: giftId,
         tier,
-        strength,
-        aroma,
-        duration: durId,
-        sender_name: senderName,
         recipient_name: recipientName,
-        note: note.trim() || null,
         total,
-        share_on_wall: false,
-        addons: [
-          handwritten ? "handwritten" : null,
-          card ? `card:${card}` : null,
-          `pack:${packaging}`,
-          `ship:${delivery}`,
-          antidote ? "antidote" : null,
-          ...keepsakes.map((k) => `keep:${k}`),
-        ].filter(Boolean) as string[],
-        handwritten_text: handwritten ? handText.trim() : null,
+        created_at: details.createdAt!,
+        gift_id: giftId,
+        gift_url: url,
+        gift: details,
         potions: potionResult?.recipeIds ?? potions,
-        outcome: outcome?.name ?? null,
-      }));
-    } else {
-      try {
-        guest.addOrder({
-          id: giftId,
-          tier,
-          recipient_name: recipientName,
-          total,
-          created_at: details.createdAt!,
-          gift_id: giftId,
-          gift_url: url,
-          gift: details,
-          potions: potionResult?.recipeIds ?? potions,
-          potion_result: potionResult,
-        });
-      } catch {
-        setBusy(false);
-        toast.error(
-          "Your device could not save this gift. Please free some browser storage and try again.",
-        );
-        return;
-      }
+        potion_result: potionResult,
+      });
       if (share && note.trim())
         addWallConfession({
           tier,
           strength,
           aroma,
-          note: note.trim().slice(0, 200),
+          note: note.trim(),
           potions,
           outcome: outcome?.name ?? null,
         });
+    } catch {
+      setBusy(false);
+      toast.error(
+        "Your browser could not save this gift. Please free some storage and try again.",
+      );
+      return;
     }
     setBusy(false);
     setSavedGift(details);
@@ -302,6 +278,25 @@ function Send() {
             one bite… Fingers crossed, tissues ready.
           </p>
           <div className="mt-8 space-y-3">
+            <GoldButton
+              onClick={() =>
+                navigate({
+                  to: "/gift",
+                  search: {
+                    id: savedGift?.id ?? "",
+                    to: recipientName,
+                    from: senderName,
+                    tier,
+                    blend: outcome?.name ?? "",
+                    note,
+                    details: JSON.stringify(savedGift),
+                    preview: false,
+                  },
+                })
+              }
+            >
+              Try {recipientName}’s Unboxing
+            </GoldButton>
             <button
               className="h-12 w-full rounded-full border text-gold"
               onClick={() =>
@@ -423,7 +418,10 @@ function Send() {
         ))}
       </div>
 
-      <main className="mt-6 flex-1 space-y-3 pb-36">
+      <main
+        className="mt-6 min-w-0 flex-1 space-y-3"
+        style={{ paddingBottom: footerHeight + 24 }}
+      >
         {step === 0 && (
           <>
             {[
@@ -843,10 +841,6 @@ function Send() {
                   v={`$${upgradesTotal(packaging, delivery, keepsakes, antidote).toFixed(2)}`}
                 />
                 <Row k="Savings" v={`−${(saving + waived).toFixed(2)}`} />
-                <p className="text-xs text-muted-foreground">
-                  The best matching bundle saving applies automatically. Savings
-                  don’t stack.
-                </p>
                 <Row k="Total" v={`$${total.toFixed(2)}`} />
               </div>
               <div className="flex flex-wrap gap-2">
@@ -906,7 +900,11 @@ function Send() {
         )}
       </main>
 
-      <div className="fixed inset-x-0 bottom-16 z-30 mx-auto max-w-md border-t bg-background/95 px-5 pb-3 pt-3 backdrop-blur">
+      <div
+        ref={footerRef}
+        data-send-footer
+        className="fixed inset-x-0 bottom-[var(--app-nav-height)] z-30 mx-auto max-w-md border-t bg-background/95 px-5 py-3 backdrop-blur"
+      >
         <div className="mb-2 flex items-center justify-between gap-3 text-muted-foreground">
           <div className="flex-1">
             <p className="text-xs">
@@ -938,24 +936,6 @@ function Send() {
             ${total.toFixed(2)}
           </span>
         </div>
-        <details className="mb-2 text-xs text-muted-foreground">
-          <summary className="cursor-pointer py-1 text-gold">
-            What’s included in this total?
-          </summary>
-          <p>
-            Box ${ALL_BOXES.find((b) => b.id === tier)!.price.toFixed(2)} ·
-            Potency $
-            {STRENGTHS.find((x) => x.id === strength)!.price.toFixed(2)} ·
-            Duration ${DURATIONS.find((x) => x.id === durId)!.price.toFixed(2)}
-          </p>
-          <p>Selected recipe, extras and any savings are included.</p>
-        </details>
-        {step >= 3 && preDelivery < FREE_EXPRESS_OVER && (
-          <p className="mb-2 text-center text-xs text-muted-foreground">
-            Add ${to99Up(FREE_EXPRESS_OVER - preDelivery).toFixed(2)} more for{" "}
-            <span className="text-gold">free Express Owl</span>
-          </p>
-        )}
         <GoldButton
           disabled={!canNext || busy}
           onClick={() => (step === 7 ? submit() : setStep(step + 1))}
@@ -1039,9 +1019,9 @@ function Field({
 }
 function Row({ k, v }: { k: string; v: string }) {
   return (
-    <div className="flex justify-between">
-      <span className="text-muted-foreground">{k}</span>
-      <span className="max-w-[65%] break-words text-right font-semibold">
+    <div className="flex items-start justify-between gap-3">
+      <span className="min-w-0 break-words text-muted-foreground">{k}</span>
+      <span className="min-w-0 max-w-[65%] break-words text-right font-semibold">
         {v}
       </span>
     </div>

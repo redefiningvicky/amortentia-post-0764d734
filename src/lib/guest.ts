@@ -40,9 +40,35 @@ const read = <T>(k: string, d: T): T => {
     return d;
   }
 };
-const write = (k: string, v: unknown) => localStorage.setItem(k, JSON.stringify(v));
+const write = (k: string, v: unknown) =>
+  localStorage.setItem(k, JSON.stringify(v));
 
 export const guest = {
+  markGift: (id: string, event: "open" | "bite") => {
+    const all =
+      read<
+        Record<string, { opened_at: string | null; bitten_at: string | null }>
+      >("ap-demo-gift-status", {}) ?? {};
+    const previous = all[id] ?? { opened_at: null, bitten_at: null };
+    const now = new Date().toISOString();
+    all[id] = {
+      opened_at: previous.opened_at ?? now,
+      bitten_at:
+        event === "bite" ? (previous.bitten_at ?? now) : previous.bitten_at,
+    };
+    write("ap-demo-gift-status", all);
+  },
+  giftStatus: (ids: string[]) => {
+    const all =
+      read<
+        Record<string, { opened_at: string | null; bitten_at: string | null }>
+      >("ap-demo-gift-status", {}) ?? {};
+    return ids.map((id) => ({
+      id,
+      opened_at: all[id]?.opened_at ?? null,
+      bitten_at: all[id]?.bitten_at ?? null,
+    }));
+  },
   orders: () => read<GuestOrder[]>("ap-orders-v2", []),
   addOrder: (o: GuestOrder) => write("ap-orders-v2", [o, ...guest.orders()]),
   received: () => read<ReceivedGift[]>("ap-received-v1", []),
@@ -51,12 +77,18 @@ export const guest = {
     write("ap-received-v1", [
       {
         ...gift,
-        receivedAt: old.find((g) => g.id === gift.id)?.receivedAt ?? new Date().toISOString(),
+        receivedAt:
+          old.find((g) => g.id === gift.id)?.receivedAt ??
+          new Date().toISOString(),
       },
       ...old.filter((g) => g.id !== gift.id),
     ]);
   },
-  profile: () => read<GuestProfile>("ap-profile", { display_name: DEMO_COPY.sender, avatar: null }),
+  profile: () =>
+    read<GuestProfile>("ap-profile", {
+      display_name: DEMO_COPY.sender,
+      avatar: null,
+    }),
   saveProfile: (p: GuestProfile) => write("ap-profile", p),
   swoons: () => read<string[]>("ap-swoons", []),
   saveSwoons: (s: string[]) => write("ap-swoons", s),

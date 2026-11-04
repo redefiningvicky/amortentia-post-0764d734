@@ -1,6 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { readSpellbookDraft, saveSpellbookDraft, restoreRecipe, sameRecipe } from "@/lib/recipe";
+import {
+  readSpellbookDraft,
+  saveSpellbookDraft,
+  restoreRecipe,
+  sameRecipe,
+} from "@/lib/recipe";
 import {
   Dialog,
   DialogContent,
@@ -23,10 +28,14 @@ export const Route = createFileRoute("/spellbook")({
       { title: "The Spellbook — Amortentia Post" },
       {
         name: "description",
-        content: "Explore 110 love potions and discover the playful outcomes of your blend.",
+        content:
+          "Explore 110 love potions and discover the playful outcomes of your blend.",
       },
       { property: "og:title", content: "The Spellbook — Amortentia Post" },
-      { property: "og:description", content: "Find the potion blend for your secret longing." },
+      {
+        property: "og:description",
+        content: "Find the potion blend for your secret longing.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -43,7 +52,8 @@ function Spellbook() {
   const [ready, setReady] = useState(false);
   const search = Route.useSearch();
   const [loaded, setLoaded] = useState(false);
-  const [pending, setPending] = useState<ReturnType<typeof restoreRecipe>>(null);
+  const [pending, setPending] =
+    useState<ReturnType<typeof restoreRecipe>>(null);
   const [unavailable, setUnavailable] = useState(false);
   function applyRecipe(recipe: NonNullable<ReturnType<typeof restoreRecipe>>) {
     setMode(recipe.mode);
@@ -63,9 +73,13 @@ function Spellbook() {
       if (!recipe) setUnavailable(true);
       else if (
         (draft.cabinet.length &&
-          !(recipe.mode === "cabinet" && sameRecipe(draft.cabinet, recipe.ids))) ||
+          !(
+            recipe.mode === "cabinet" && sameRecipe(draft.cabinet, recipe.ids)
+          )) ||
         (draft.ingredients.length &&
-          !(recipe.mode === "class" && sameRecipe(draft.ingredients, recipe.ids)))
+          !(
+            recipe.mode === "class" && sameRecipe(draft.ingredients, recipe.ids)
+          ))
       )
         setPending(recipe);
       else applyRecipe(recipe);
@@ -73,7 +87,12 @@ function Spellbook() {
     setLoaded(true);
   }, [search.recipe]);
   useEffect(() => {
-    if (loaded) saveSpellbookDraft({ cabinet: cabinetPotions, ingredients: rawIngredients, mode });
+    if (loaded)
+      saveSpellbookDraft({
+        cabinet: cabinetPotions,
+        ingredients: rawIngredients,
+        mode,
+      });
   }, [loaded, cabinetPotions, rawIngredients, mode]);
   return (
     <Shell>
@@ -95,7 +114,9 @@ function Spellbook() {
               This Wall recipe will replace the selections in its matching mode.
             </DialogDescription>
           </DialogHeader>
-          <Button onClick={() => pending && applyRecipe(pending)}>Brew This Blend</Button>
+          <Button onClick={() => pending && applyRecipe(pending)}>
+            Brew This Blend
+          </Button>
           <Button variant="outline" onClick={() => setPending(null)}>
             Keep My Recipe
           </Button>
@@ -104,8 +125,12 @@ function Spellbook() {
       <div className="mb-5 flex items-center gap-3">
         <OptArt id="spell" alt="An antique book of love spells" />
         <div>
-          <h1 className="font-display text-3xl text-gold-gradient">Spellbook</h1>
-          <p className="mt-1 text-muted-foreground">What does your heart have in mind?</p>
+          <h1 className="font-display text-3xl text-gold-gradient">
+            Spellbook
+          </h1>
+          <p className="mt-1 text-muted-foreground">
+            What does your heart have in mind?
+          </p>
         </div>
       </div>
       <div className="mb-4 grid grid-cols-2 gap-2">
@@ -117,7 +142,11 @@ function Spellbook() {
             setMode("class");
             setReady(false);
           }}
-          className={mode === "class" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}
+          className={
+            mode === "class"
+              ? "h-12 bg-gold-gradient text-primary-foreground"
+              : "h-12"
+          }
         >
           Brew My Own
         </Button>
@@ -129,7 +158,11 @@ function Spellbook() {
             setMode("cabinet");
             setReady(false);
           }}
-          className={mode === "cabinet" ? "h-12 bg-gold-gradient text-primary-foreground" : "h-12"}
+          className={
+            mode === "cabinet"
+              ? "h-12 bg-gold-gradient text-primary-foreground"
+              : "h-12"
+          }
         >
           Potion Cabinet
         </Button>
@@ -149,7 +182,7 @@ function Spellbook() {
         />
       </div>
       {potions.length > 0 && ready && (
-        <div className="fixed inset-x-0 bottom-16 z-30 mx-auto max-w-md border-t bg-background/95 px-5 py-3 backdrop-blur">
+        <div className="fixed inset-x-0 bottom-[var(--app-nav-height)] z-30 mx-auto max-w-md border-t bg-background/95 px-5 py-3 backdrop-blur">
           <Link
             to="/send"
             search={{ blend: potions.join(",") }}

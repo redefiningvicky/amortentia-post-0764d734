@@ -133,9 +133,8 @@ function Me() {
   const { data: status } = useQuery({
     queryKey: ["gift-status", giftIds],
     enabled: giftIds.length > 0,
-    refetchInterval: 15000,
-    queryFn: async () =>
-      (await supabase.rpc("gift_status", { _ids: giftIds })).data ?? [],
+    refetchInterval: 2500,
+    queryFn: async () => guest.giftStatus(giftIds),
   });
 
   if (!data)
@@ -265,7 +264,7 @@ function Me() {
             key={t}
             onClick={() => setTab(t)}
             className={cn(
-              "min-h-11 flex-1 rounded-full border",
+              "min-h-11 min-w-0 flex-1 rounded-full border px-3",
               tab === t
                 ? "bg-gold-gradient text-primary-foreground"
                 : "bg-card",

@@ -22,19 +22,24 @@ function MagicDust() {
 
 export function Shell({ children }: { children: ReactNode }) {
   return (
-    <div className="relative mx-auto flex min-h-screen max-w-md flex-col border-2 border-gold/50 px-5 pb-24 pt-6 shadow-frame">
+    <div className="relative mx-auto flex min-h-screen max-w-md flex-col border-2 border-gold/50 px-5 pb-[calc(var(--app-nav-height)+1.5rem)] pt-6 shadow-frame">
       <MagicDust />
-      <div className="relative z-10 flex flex-1 flex-col">{children}</div>
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+        {children}
+      </div>
     </div>
   );
 }
 
-export function GoldButton({ className, ...p }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+export function GoldButton({
+  className,
+  ...p
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...p}
       className={cn(
-        "h-14 w-full rounded-full bg-gold-gradient font-display text-lg text-primary-foreground shadow-glow transition active:scale-95 disabled:opacity-40",
+        "min-h-14 h-auto w-full whitespace-normal rounded-full bg-gold-gradient px-4 py-3 font-display text-lg leading-snug text-primary-foreground shadow-glow transition active:scale-95 disabled:opacity-40",
         className,
       )}
     />
@@ -56,7 +61,7 @@ export function Option({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "flex w-full items-center gap-4 rounded-2xl border bg-card p-4 text-left transition",
+        "flex min-h-14 min-w-0 w-full items-center gap-3 rounded-2xl border bg-card p-3 text-left transition [&>.flex-1]:min-w-0 [&>span:last-child]:shrink-0 [&>span:last-child]:whitespace-nowrap",
         active && "border-gold shadow-glow",
       )}
     >
@@ -80,7 +85,7 @@ export function Chip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "min-h-11 rounded-full border px-4 py-2 transition",
+        "min-h-11 min-w-0 rounded-full border px-2 py-2 text-sm leading-snug transition",
         active ? "bg-gold-gradient text-primary-foreground" : "bg-card",
       )}
     >
@@ -90,7 +95,11 @@ export function Chip({
 }
 
 export function Label({ children }: { children: ReactNode }) {
-  return <p className="pt-3 text-sm uppercase tracking-[0.2em] text-gold">{children}</p>;
+  return (
+    <p className="pt-3 text-sm uppercase tracking-[0.2em] text-gold">
+      {children}
+    </p>
+  );
 }
 
 const TABS = [
@@ -106,9 +115,10 @@ export function BottomNav() {
   const { pathname } = useLocation();
   if (pathname.startsWith("/pitch")) return null;
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-md border-x-2 border-t border-gold/50 bg-background/95 backdrop-blur">
+    <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex h-[var(--app-nav-height)] max-w-md pb-[env(safe-area-inset-bottom)] border-x-2 border-t border-gold/50 bg-background/95 backdrop-blur">
       {TABS.map((t) => {
-        const active = t.to === "/" ? pathname === "/" : pathname.startsWith(t.to);
+        const active =
+          t.to === "/" ? pathname === "/" : pathname.startsWith(t.to);
         return (
           <Link
             key={t.to}
@@ -123,7 +133,9 @@ export function BottomNav() {
               alt=""
               className={cn(
                 "h-9 w-9 rounded-full border object-cover",
-                active ? "border-gold shadow-glow" : "border-transparent opacity-70",
+                active
+                  ? "border-gold shadow-glow"
+                  : "border-transparent opacity-70",
               )}
             />
             {t.label}

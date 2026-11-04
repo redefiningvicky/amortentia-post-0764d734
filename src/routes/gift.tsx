@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useMemo, useState } from "react";
 import { ALL_BOXES, PACKAGING, KEEPSAKES, CARDS } from "@/lib/catalog";
 import { BOX_ART } from "@/lib/art";
 import { guest, type GiftDetails } from "@/lib/guest";
@@ -20,7 +19,8 @@ type Search = {
 };
 export const Route = createFileRoute("/gift")({
   validateSearch: (s: Record<string, unknown>): Search => {
-    const str = (k: string) => (typeof s[k] === "string" ? (s[k] as string) : "");
+    const str = (k: string) =>
+      typeof s[k] === "string" ? (s[k] as string) : "";
     return {
       id: str("id"),
       to: str("to"),
@@ -37,7 +37,8 @@ export const Route = createFileRoute("/gift")({
       { title: "You've Got Enchanted Chocolates — Amortentia Post" },
       {
         name: "description",
-        content: "Break the seal, unfold a confession, and take one very questionable bite.",
+        content:
+          "Break the seal, unfold a confession, and take one very questionable bite.",
       },
     ],
   }),
@@ -62,7 +63,8 @@ function readDetails(s: Search): GiftDetails {
   try {
     const d = JSON.parse(s.details ?? "null");
     if (!d || typeof d !== "object" || d.id !== s.id) return fallback;
-    const text = (key: string) => (typeof d[key] === "string" ? d[key] : undefined);
+    const text = (key: string) =>
+      typeof d[key] === "string" ? d[key] : undefined;
     return {
       ...fallback,
       wrapping: text("wrapping"),
@@ -83,29 +85,39 @@ function readDetails(s: Search): GiftDetails {
 }
 function Gift() {
   const s = Route.useSearch();
-  const gift = readDetails(s);
-  const [stage, setStage] = useState<"sealed" | "note" | "open" | "bitten">("sealed");
+  const gift = useMemo(() => readDetails(s), [s]);
+  const [stage, setStage] = useState<"sealed" | "note" | "open" | "bitten">(
+    "sealed",
+  );
   const [replaying, setReplaying] = useState(false);
   useEffect(() => {
     setStage("sealed");
     setReplaying(false);
   }, [s.id]);
   const box = ALL_BOXES.find((b) => b.id === gift.tier) ?? ALL_BOXES[1]!;
-  const wrapping = PACKAGING.find((p) => p.id === gift.wrapping) ?? PACKAGING[0]!;
+  const wrapping =
+    PACKAGING.find((p) => p.id === gift.wrapping) ?? PACKAGING[0]!;
   const from = gift.from || "A Secret Admirer";
   useEffect(() => {
     if (stage === "sealed" || s.preview || !gift.id) return;
     try {
-      guest.receive(gift);
+      if (
+        !guest
+          .orders()
+          .some((order) => order.gift_id === gift.id || order.id === gift.id)
+      )
+        guest.receive(gift);
     } catch {
       /* The gift remains usable if device storage is full. */
     }
-    if (!replaying)
-      void supabase.rpc("mark_gift", {
-        _id: gift.id,
-        _event: stage === "bitten" ? "bite" : "open",
-      });
-  }, [stage, s.id, s.preview, replaying]);
+    if (!replaying) {
+      try {
+        guest.markGift(gift.id, stage === "bitten" ? "bite" : "open");
+      } catch {
+        /* Keep the unboxing usable if storage is full. */
+      }
+    }
+  }, [stage, s.id, s.preview, replaying, gift]);
   function replay() {
     setReplaying(true);
     setStage("sealed");
@@ -114,18 +126,22 @@ function Gift() {
     <Shell>
       {s.preview && (
         <p className="mb-4 rounded-lg border p-2 text-center text-sm text-gold">
-          Unboxing preview · does not mark the gift opened
+          Unboxing preview
         </p>
       )}
       <div className="my-auto text-center">
         {stage === "sealed" && (
           <>
-            <p className="text-sm uppercase tracking-[0.3em] text-gold">Special Owl Delivery</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-gold">
+              Special Owl Delivery
+            </p>
             <h1 className="mt-2 font-display text-3xl text-gold-gradient">
-              {gift.to ? `${gift.to}, someone has a crush on you` : "Someone has a crush on you"}
+              {gift.to
+                ? `${gift.to}, someone has a crush on you`
+                : "Someone has a crush on you"}
             </h1>
             <p className="mt-4 text-muted-foreground">{wrapping.name}</p>
-            <div className="relative mx-auto mt-6 w-64">
+            <div className="relative mx-auto mt-6 w-full max-w-64">
               <OptArt
                 id={wrapping.id}
                 alt={wrapping.name}
@@ -136,7 +152,11 @@ function Gift() {
                 aria-label="Break the wax seal"
                 className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border-2 border-gold bg-card p-2 shadow-glow"
               >
-                <OptArt id="seal" alt="" className="h-16 w-16 rounded-full object-cover" />
+                <OptArt
+                  id="seal"
+                  alt=""
+                  className="h-16 w-16 rounded-full object-cover"
+                />
               </button>
             </div>
             <p className="mt-4 text-muted-foreground">
@@ -146,15 +166,22 @@ function Gift() {
         )}
         {stage === "note" && (
           <div className="gift-unfold">
-            <p className="text-sm uppercase tracking-[0.2em] text-gold">From {from}</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-gold">
+              From {from}
+            </p>
             <div className="mt-5 rounded-2xl bg-parchment p-5 text-parchment-foreground">
-              <p className="font-display text-lg">To {gift.to || "my beloved"}</p>
+              <p className="font-display text-lg">
+                To {gift.to || "my beloved"}
+              </p>
               <blockquote className="mt-3 whitespace-pre-wrap break-words text-xl italic">
-                {gift.note || "Some feelings are better expressed in chocolate."}
+                {gift.note ||
+                  "Some feelings are better expressed in chocolate."}
               </blockquote>
               {gift.handwritten && (
                 <>
-                  <p className="mt-5 text-xs uppercase">A note, penned by our scribes</p>
+                  <p className="mt-5 text-xs uppercase">
+                    A note, penned by our scribes
+                  </p>
                   <blockquote className="mt-2 whitespace-pre-wrap break-words text-xl italic">
                     {gift.handwritten}
                   </blockquote>
@@ -163,7 +190,9 @@ function Gift() {
             </div>
             {gift.card && (
               <div className="mt-3 rounded-2xl border border-gold bg-card p-4">
-                <p className="text-gold">{CARDS.find((c) => c.id === gift.card)?.name}</p>
+                <p className="text-gold">
+                  {CARDS.find((c) => c.id === gift.card)?.name}
+                </p>
                 {gift.cardMessage && (
                   <blockquote className="mt-2 whitespace-pre-wrap break-words text-xl italic">
                     {gift.cardMessage}
@@ -178,14 +207,24 @@ function Gift() {
         )}
         {stage === "open" && (
           <div className="gift-unfold">
-            <h1 className="font-display text-3xl text-gold-gradient">{box.name}</h1>
-            <img src={BOX_ART[box.id]} alt={box.name} className="mx-auto mt-5 w-64 rounded-3xl" />
+            <h1 className="font-display text-3xl text-gold-gradient">
+              {box.name}
+            </h1>
+            <img
+              src={BOX_ART[box.id]}
+              alt={box.name}
+              className="mx-auto mt-5 w-full max-w-64 rounded-3xl"
+            />
             <p className="mt-3 text-gold">
               {box.pieces} tiny opportunities to lose your composure.
             </p>
             {gift.potions?.length ? (
               <div className="mt-4 text-left">
-                <PotionResultCard ids={gift.potions} heading="Brewed just for you" showRecipe />
+                <PotionResultCard
+                  ids={gift.potions}
+                  heading="Brewed just for you"
+                  showRecipe
+                />
               </div>
             ) : (
               gift.blend && <p className="mt-3">Brewed with {gift.blend}</p>
@@ -219,15 +258,22 @@ function Gift() {
         )}
         {stage === "bitten" && (
           <>
-            <OptArt id="heart" alt="" className="mx-auto h-24 w-24 rounded-full object-cover" />
+            <OptArt
+              id="heart"
+              alt=""
+              className="mx-auto h-24 w-24 rounded-full object-cover"
+            />
             <h1 className="mt-5 font-display text-4xl text-gold-gradient">
               The potion is working…
             </h1>
             <p className="mt-3 text-lg">
-              You suddenly can't stop thinking about <span className="text-gold">{from}</span>.
+              You suddenly can't stop thinking about{" "}
+              <span className="text-gold">{from}</span>.
             </p>
             <div className="mt-6 space-y-2 text-left">
-              <p className="text-sm uppercase tracking-[0.2em] text-gold">Symptoms detected</p>
+              <p className="text-sm uppercase tracking-[0.2em] text-gold">
+                Symptoms detected
+              </p>
               {SYMPTOMS.map((x, i) => (
                 <div
                   key={x}

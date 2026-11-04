@@ -273,7 +273,7 @@ function Pitch() {
   const navigate = useNavigate({ from: "/pitch" });
   const i = slide - 1;
   const go = (n: number) =>
-    navigate({ search: { slide: Math.max(1, Math.min(SLIDES.length, n)) }, replace: true });
+    navigate({ search: { slide: Math.max(1, Math.min(SLIDES.length, n)), export: undefined }, replace: true });
   const wrap = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.3);
   const touch = useRef(0);

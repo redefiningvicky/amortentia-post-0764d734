@@ -11,6 +11,7 @@ import { OptArt } from "@/components/opt-art";
 export const Route = createFileRoute("/pitch")({
   validateSearch: (s: Record<string, unknown>) => ({
     slide: Math.max(1, Math.min(6, Number(s["slide"]) || 1)),
+    export: s["export"] === "4k" ? "4k" : undefined,
   }),
   head: () => ({
     meta: [
@@ -268,7 +269,7 @@ const SLIDES: { title: string; el: ReactNode }[] = [
 ];
 
 function Pitch() {
-  const { slide } = Route.useSearch();
+  const { slide, export: exportSize } = Route.useSearch();
   const navigate = useNavigate({ from: "/pitch" });
   const i = slide - 1;
   const go = (n: number) =>
@@ -296,6 +297,16 @@ function Pitch() {
     document.title = `${slide}/${SLIDES.length} — ${SLIDES[i]!.title}`;
     return () => window.removeEventListener("keydown", k);
   });
+
+  if (exportSize === "4k") {
+    return (
+      <div className="bg-background" style={{ width: 3840, height: 2160, overflow: "hidden" }}>
+        <div style={{ width: 1920, height: 1080, transform: "scale(2)", transformOrigin: "top left" }}>
+          {SLIDES[i]!.el}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 flex flex-col bg-background">

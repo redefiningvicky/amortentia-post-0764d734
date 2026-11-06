@@ -11,7 +11,7 @@ This project draws inspiration from the iconic Harry Potter and the Half-Blood s
 ## 🛠️ Tools <br>
 Lovable, ChatGPT, Github <p>
 ## ⚙️ Model <br>
-ChatGPT 6.1 Sol <p>
+ChatGPT 6.1 Sol, 2026 <p>
 ## 📱 App <br>
 This project has a fully functional app available at the following link: [Launch App](https://redefiningvicky.github.io/amortentia-post-0764d734/#/) <p>
 <img src="https://github.com/redefiningvicky/amortentia-post-0764d734/blob/3df668dd2681be30bb34f32cea60c119020d7b0c/app-store/01-app-store.png" width="900" />

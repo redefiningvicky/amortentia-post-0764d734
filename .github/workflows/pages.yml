@@ -39,9 +39,9 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f exports/amortentia-post-png-pdf.zip exports/pitch/png/*.png exports/pitch/amortentia-post-pitch.pdf
+          git add -f exports/amortentia-post-png-pdf.zip exports/pitch/png/*.png exports/pitch/jpg/*.jpg exports/pitch/amortentia-post-pitch.pdf
           if ! git diff --cached --quiet; then
-            git commit -m "Update PNG and PDF slide exports [skip ci]"
+            git commit -m "Update PNG, JPG and PDF slide exports [skip ci]"
             git push origin HEAD:main
           fi
       - uses: actions/upload-artifact@v4

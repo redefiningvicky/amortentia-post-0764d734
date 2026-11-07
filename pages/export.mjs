@@ -47,6 +47,7 @@ try {
   await page.getByRole("heading", { level: 1 }).first().waitFor();
   const out = resolve("exports/pitch");
   await mkdir(out + "/png", { recursive: true });
+  await mkdir(out + "/jpg", { recursive: true });
   const combined = await PDFDocument.create();
   const names = ["problem", "solution", "market", "product", "the-payoff", "smile"];
   for (let i = 1; i <= 6; i++) {
@@ -64,6 +65,7 @@ try {
     const box = await page.locator("[data-pitch-export]").boundingBox();
     if (box.width !== 3840 || box.height !== 2160) throw new Error("Incorrect export dimensions");
     await page.locator("[data-pitch-export]").screenshot({ path: out + "/png/" + String(i).padStart(2, "0") + "-" + names[i - 1] + ".png", animations: "disabled" });
+    await page.locator("[data-pitch-export]").screenshot({ path: out + "/jpg/" + String(i).padStart(2, "0") + "-" + names[i - 1] + ".jpg", type: "jpeg", quality: 95, animations: "disabled" });
     const bytes = await page.pdf({ width: "3840px", height: "2160px", printBackground: true, margin: { top: 0, bottom: 0, left: 0, right: 0 }, pageRanges: "1" });
     const pdf = await PDFDocument.load(bytes);
     const [slide] = await combined.copyPages(pdf, [0]);

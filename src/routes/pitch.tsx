@@ -100,6 +100,9 @@ const SLIDES: { title: string; el: ReactNode }[] = [
             </p>
           </div>
         </div>
+        <p className="slide-caption absolute bottom-[56px] left-[140px] font-serif text-gold">
+          Vicky Wong
+        </p>
       </Slide>
     ),
   },

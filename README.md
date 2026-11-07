@@ -119,6 +119,8 @@
 
 <h3>Amortentia Post App</h3>
 
+[Download PNG](app-store/01-app-store.png) · [Download JPG](app-store/01-app-store.jpg) · [Download PDF](app-store/01-app-store.pdf)
+
 <table>
   <tr>
     <td>
